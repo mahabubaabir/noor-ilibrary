@@ -126,8 +126,8 @@ export default function SurahPage({ params }: { params: Promise<{ surah: string 
               </div>
             </div>
             <p className="mb-3 text-right font-arabic text-2xl leading-loose text-stone-900 dark:text-stone-100">{ayah.text}</p>
-            {showTranslation && english[i] && <p className="mb-1.5 text-sm leading-relaxed text-stone-600 dark:text-stone-400">{english[i].translation}</p>}
-            {showBangla && bangla[i] && <p className="text-sm leading-relaxed text-stone-500 dark:text-stone-500 bengali">{bangla[i].translation}</p>}
+            {showTranslation && english[i] && <p className="mb-1.5 text-sm leading-relaxed text-stone-600 dark:text-stone-400">{english[i].text}</p>}
+            {showBangla && bangla[i] && <p className="text-sm leading-relaxed text-stone-500 dark:text-stone-500 bengali">{bangla[i].text}</p>}
           </div>
         ))}
       </div>
