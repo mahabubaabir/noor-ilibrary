@@ -1,5 +1,5 @@
 {
   "version": 2,
-  "installCommand": "npm install --include=optional && npm install --no-save lightningcss-linux-x64-gnu@1.33.0",
+  "installCommand": "npm install && npm install --no-save @tailwindcss/oxide-linux-x64-gnu lightningcss-linux-x64-gnu",
   "buildCommand": "npx prisma generate --schema=apps/web/prisma/schema.prisma && npm run build"
 }

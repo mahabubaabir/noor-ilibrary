@@ -16,9 +16,6 @@
     "db:generate": "npm run db:generate -w apps/web",
     "db:push": "npm run db:push -w apps/web"
   },
-  "dependencies": {
-    "lightningcss-linux-x64-gnu": "1.33.0"
-  },
   "engines": {
     "node": ">=20"
   },
