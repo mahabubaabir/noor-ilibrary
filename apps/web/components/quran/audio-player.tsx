@@ -24,17 +24,24 @@ export function AudioPlayer({ surahNumber, totalAyahs, reciter: initialReciter =
 
   useEffect(() => {
     if (!playing || currentAyah === 0) return
-    const src = `https://cdn.islamic.network/quran/audio/128/${reciter}/${String(currentAyah).padStart(6, "0")}.mp3`
+    const s = String(surahNumber).padStart(3, "0")
+    const a = String(currentAyah).padStart(3, "0")
+    const src = `https://everyayah.com/data/Alafasy_128kbps/${s}${a}.mp3`
     const audio = new Audio(src)
     audioRef.current = audio
     audio.volume = muted ? 0 : 1
-    audio.play().catch(() => {})
+    audio.play().catch(() => {
+      setPlaying(false)
+    })
     audio.onended = () => {
       if (currentAyah < totalAyahs) setCurrentAyah(currentAyah + 1)
       else setPlaying(false)
     }
-    return () => { audio.pause(); audioRef.current = null }
-  }, [currentAyah, reciter, totalAyahs, playing, muted])
+    return () => {
+      audio.pause()
+      audioRef.current = null
+    }
+  }, [currentAyah, surahNumber, totalAyahs, playing, muted])
 
   const togglePlay = useCallback(() => {
     if (playing) { audioRef.current?.pause(); setPlaying(false) }

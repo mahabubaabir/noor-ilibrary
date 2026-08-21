@@ -125,10 +125,28 @@ export default function SurahDetailPage({
       setCurrentAyahIndex(index)
       setIsPlaying(true)
 
-      const formattedNumber = String(ayah.globalNumber).padStart(6, "0")
-      const src = `https://cdn.islamic.network/quran/audio/128/${reciter}/${formattedNumber}.mp3`
-      const audio = new Audio(src)
+      // Auto-scroll playing ayah into view
+      const el = document.getElementById(`ayah-${ayah.numberInSurah}`)
+      el?.scrollIntoView({ behavior: "smooth", block: "center" })
+
+      // Islamic Network CDN uses unpadded global ayah numbers (1 to 6236)
+      const primarySrc = `https://cdn.islamic.network/quran/audio/128/${reciter}/${ayah.globalNumber}.mp3`
+      const fallbackSrc = `https://everyayah.com/data/Alafasy_128kbps/${String(num).padStart(3, "0")}${String(ayah.numberInSurah).padStart(3, "0")}.mp3`
+
+      const audio = new Audio(primarySrc)
       audioRef.current = audio
+
+      audio.onerror = () => {
+        // Attempt fallback source if primary fails
+        if (audio.src !== fallbackSrc) {
+          audio.src = fallbackSrc
+          audio.play().catch(() => {
+            setIsPlaying(false)
+          })
+        } else {
+          setIsPlaying(false)
+        }
+      }
 
       audio.play().catch(() => {
         setIsPlaying(false)
@@ -143,7 +161,7 @@ export default function SurahDetailPage({
         }
       }
     },
-    [surahData, reciter],
+    [surahData, reciter, num],
   )
 
   const toggleFullSurahPlay = () => {
