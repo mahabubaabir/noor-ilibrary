@@ -1,0 +1,94 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model ContentCache {
+  key       String   @id
+  payload   String
+  updatedAt DateTime @updatedAt
+}
+
+model User {
+  id              String            @id @default(cuid())
+  email           String            @unique
+  name            String?
+  passwordHash    String
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  sessions        Session[]
+  bookmarks       Bookmark[]
+  hadithBookmarks HadithBookmark[]
+  progress        ReadingProgress[]
+  preference      UserPreference?
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model Bookmark {
+  id            String   @id @default(cuid())
+  userId        String
+  surahNumber   Int
+  ayahNumber    Int
+  surahName     String
+  textArabic    String
+  translationEn String
+  translationBn String
+  createdAt     DateTime @default(now())
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, surahNumber, ayahNumber])
+  @@index([userId, createdAt])
+}
+
+model ReadingProgress {
+  id          String   @id @default(cuid())
+  userId      String
+  scope       String   @default("quran")
+  surahNumber Int
+  ayahNumber  Int
+  updatedAt   DateTime @updatedAt
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, scope])
+}
+
+model UserPreference {
+  id                 String   @id @default(cuid())
+  userId             String   @unique
+  defaultTranslation String   @default("en")
+  defaultReciter     String   @default("ar.alafasy")
+  theme              String   @default("system")
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model HadithBookmark {
+  id           String   @id @default(cuid())
+  userId       String
+  collection   String
+  hadithNumber Int
+  arabic       String
+  english      String
+  grade        String
+  createdAt    DateTime @default(now())
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, collection, hadithNumber])
+  @@index([userId, createdAt])
+}

@@ -1,0 +1,22 @@
+{
+  "name": "noor-islamic-library",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w apps/web",
+    "build": "npm run build -w apps/web",
+    "start": "npm run start -w apps/web",
+    "lint": "npm run lint -w apps/web",
+    "typecheck": "npm run typecheck -w apps/web",
+    "db:generate": "npm run db:generate -w apps/web",
+    "db:push": "npm run db:push -w apps/web"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "allowScripts": {}
+}
