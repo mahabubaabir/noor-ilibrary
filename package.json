@@ -19,5 +19,12 @@
   "engines": {
     "node": ">=20"
   },
-  "allowScripts": {}
+  "allowScripts": {
+    "@prisma/client": true,
+    "@prisma/engines": true,
+    "prisma": true,
+    "@tailwindcss/postcss": true,
+    "tailwindcss": true,
+    "@swc/helpers": true
+  }
 }
