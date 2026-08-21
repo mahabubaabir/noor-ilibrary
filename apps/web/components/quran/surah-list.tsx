@@ -1,87 +1,44 @@
-'use client'
+"use client"
 
-import { useState } from 'react'
-import Link from 'next/link'
-import type { SurahMeta } from '@noor/types'
-import { Badge } from '@/components/ui/badge'
-import { Card, CardBody } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Select } from '@/components/ui/select'
+import { useEffect, useState } from "react"
+import Link from "next/link"
 
-type Filter = 'all' | 'Meccan' | 'Medinan'
+interface Surah { number: number; name: string; englishName: string; englishNameTranslation: string; numberOfAyahs: number; revelationType: string }
 
-export function SurahList({ surahs }: { surahs: SurahMeta[] }) {
-  const [query, setQuery] = useState('')
-  const [filter, setFilter] = useState<Filter>('all')
+export function SurahList() {
+  const [surahs, setSurahs] = useState<Surah[]>([])
+  const [loading, setLoading] = useState(true)
 
-  const filtered = surahs.filter((s) => {
-    if (filter !== 'all' && s.revelationType !== filter) return false
-    const q = query.trim().toLowerCase()
-    if (!q) return true
-    return (
-      s.nameEnglish.toLowerCase().includes(q) ||
-      s.nameTranslation.toLowerCase().includes(q) ||
-      s.nameArabic.includes(query.trim())
-    )
-  })
+  useEffect(() => {
+    fetch("/api/quran/surahs")
+      .then(r => r.json())
+      .then(d => { setSurahs(d.data || d.surahs || []); setLoading(false) })
+      .catch(() => setLoading(false))
+  }, [])
+
+  if (loading) return (
+    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      {Array.from({ length: 6 }).map((_, i) => (
+        <div key={i} className="h-20 animate-pulse rounded-2xl bg-stone-200 dark:bg-stone-800" />
+      ))}
+    </div>
+  )
 
   return (
-    <div>
-      <div className="mb-6 flex flex-col gap-3 sm:flex-row">
-        <Input
-          type="search"
-          placeholder="Search surah…"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          className="sm:max-w-xs"
-        />
-        <Select
-          value={filter}
-          onChange={(e) => setFilter(e.target.value as Filter)}
-          className="sm:w-44"
-        >
-          <option value="all">All surahs</option>
-          <option value="Meccan">Meccan</option>
-          <option value="Medinan">Medinan</option>
-        </Select>
-        <p className="text-sm text-stone-500 sm:ml-auto dark:text-stone-400">
-          {filtered.length} / {surahs.length} surahs
-        </p>
-      </div>
-
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {filtered.map((surah) => (
-          <Link key={surah.number} href={`/quran/${surah.number}`} className="group">
-            <Card className="h-full transition-colors group-hover:border-emerald-600/40">
-              <CardBody className="flex items-start gap-4">
-                <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-emerald-700/10 text-sm font-semibold text-emerald-800 dark:bg-emerald-400/10 dark:text-emerald-300">
-                  {surah.number}
-                </span>
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2">
-                    <p className="text-arabic text-2xl text-stone-800 dark:text-stone-100">
-                      {surah.nameArabic}
-                    </p>
-                    <span className="text-xs text-stone-400">· {surah.ayahCount} ayahs</span>
-                  </div>
-                  <p className="truncate font-medium text-stone-800 dark:text-stone-100">
-                    {surah.nameEnglish}
-                    <span className="text-stone-400"> — {surah.nameTranslation}</span>
-                  </p>
-                  <div className="mt-1.5">
-                    <Badge className="bg-emerald-700/10 text-emerald-800 dark:bg-emerald-400/10 dark:text-emerald-300">
-                      {surah.revelationType}
-                    </Badge>
-                    <span className="ml-2 text-xs text-stone-400">
-                      Pages {surah.pageStart}–{surah.pageEnd}
-                    </span>
-                  </div>
-                </div>
-              </CardBody>
-            </Card>
-          </Link>
-        ))}
-      </div>
+    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      {surahs.map(surah => (
+        <Link key={surah.number} href={`/quran/${surah.number}`}>
+          <div className="group flex items-center gap-3 rounded-2xl border border-stone-200 bg-white p-3 transition-all hover:border-emerald-200 hover:shadow-sm dark:border-stone-800 dark:bg-stone-900 dark:hover:border-emerald-800">
+            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-stone-100 text-xs font-bold text-stone-600 group-hover:bg-emerald-100 group-hover:text-emerald-700 dark:bg-stone-800 dark:text-stone-400 dark:group-hover:bg-emerald-900/30">
+              {surah.number}
+            </div>
+            <div className="min-w-0 flex-1">
+              <h3 className="truncate text-sm font-medium text-stone-900 dark:text-stone-100">{surah.englishName}</h3>
+              <p className="text-xs text-stone-400">{surah.englishNameTranslation} · {surah.numberOfAyahs} ayahs</p>
+            </div>
+          </div>
+        </Link>
+      ))}
     </div>
   )
 }

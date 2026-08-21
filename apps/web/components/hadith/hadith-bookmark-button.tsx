@@ -1,78 +1,44 @@
-'use client'
+"use client"
 
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { Button } from '@/components/ui/button'
-import { HeartIcon } from '@/components/icons'
-import { cn } from '@/lib/utils'
+import { useState } from "react"
+import { Heart } from "lucide-react"
 
 interface HadithBookmarkButtonProps {
   collection: string
   hadithNumber: number
-  arabic: string
-  english: string
-  grade: string
+  text?: string
 }
 
-export function HadithBookmarkButton({
-  collection,
-  hadithNumber,
-  arabic,
-  english,
-  grade,
-}: HadithBookmarkButtonProps) {
-  const router = useRouter()
+export function HadithBookmarkButton({ collection, hadithNumber, text }: HadithBookmarkButtonProps) {
   const [bookmarked, setBookmarked] = useState(false)
   const [loading, setLoading] = useState(false)
 
-  useEffect(() => {
-    fetch('/api/library/hadith-bookmarks')
-      .then((res) => res.json())
-      .then((data) => {
-        const exists = data.hadithBookmarks?.some(
-          (b: { collection: string; hadithNumber: number }) =>
-            b.collection === collection && b.hadithNumber === hadithNumber,
-        )
-        setBookmarked(exists)
-      })
-      .catch(() => {})
-  }, [collection, hadithNumber])
-
-  async function toggle() {
+  const toggle = async () => {
     setLoading(true)
-    if (bookmarked) {
-      const res = await fetch(
-        `/api/library/hadith-bookmarks?collection=${collection}&hadith=${hadithNumber}`,
-        { method: 'DELETE' },
-      )
-      if (res.status === 401) {
-        router.push('/login')
-        setLoading(false)
-        return
+    try {
+      if (bookmarked) {
+        await fetch("/api/library/hadith-bookmarks", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ collection, hadithNumber }),
+        })
+        setBookmarked(false)
+      } else {
+        await fetch("/api/library/hadith-bookmarks", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ collection, hadithNumber, text }),
+        })
+        setBookmarked(true)
       }
-      if (res.ok) setBookmarked(false)
-    } else {
-      const res = await fetch('/api/library/hadith-bookmarks', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ collection, hadithNumber, arabic, english, grade }),
-      })
-      if (res.status === 401) {
-        router.push('/login')
-        setLoading(false)
-        return
-      }
-      if (res.ok) setBookmarked(true)
-    }
+    } catch {}
     setLoading(false)
   }
 
   return (
-    <Button variant="outline" size="sm" onClick={toggle} disabled={loading}>
-      <HeartIcon
-        className={cn('mr-1.5 size-4', bookmarked ? 'fill-rose-500 text-rose-500' : 'text-stone-400')}
-      />
-      {bookmarked ? 'Saved' : 'Save'}
-    </Button>
+    <button onClick={toggle} disabled={loading} title={bookmarked ? "Remove bookmark" : "Add bookmark"}
+      className={`rounded-xl p-2 transition-all ${bookmarked ? "bg-red-50 text-red-500 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400" : "text-stone-400 hover:bg-stone-100 hover:text-stone-600 dark:hover:bg-stone-800"}`}>
+      <Heart className={`h-4 w-4 ${bookmarked ? "fill-current" : ""}`} />
+    </button>
   )
 }

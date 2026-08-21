@@ -1,148 +1,87 @@
-import Link from 'next/link'
-import type { Metadata } from 'next'
-import { getHadithCollections, searchHadith } from '@/lib/hadith'
-import { augmentAllWithBangla } from '@/lib/hadith-bn'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Card, CardBody } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Select } from '@/components/ui/select'
-import { HadithBookmarkButton } from '@/components/hadith/hadith-bookmark-button'
+"use client"
 
-export const metadata: Metadata = {
-  title: 'Hadith Library',
-  description: 'Browse and search verified hadith collections.',
-}
+import Link from "next/link"
+import { useEffect, useState } from "react"
+import { BookOpen, Search, ArrowRight, Loader2 } from "lucide-react"
 
-export const dynamic = 'force-dynamic'
+const collections = [
+  { id: "bukhari", name: "Sahih Bukhari", full: "Sahih al-Bukhari", hadithCount: 7563 },
+  { id: "muslim", name: "Sahih Muslim", full: "Sahih Muslim", hadithCount: 7500 },
+]
 
-export default async function HadithPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ q?: string; collection?: string }>
-}) {
-  const { q = '', collection = '' } = await searchParams
-  const collections = await getHadithCollections().catch(() => [])
-  const query = q.trim()
-  const selectedCollection = collection || ''
-  const result =
-    query.length >= 2
-      ? await searchHadith(query, selectedCollection || undefined, 8).catch(() => null)
-      : null
+export default function HadithPage() {
+  const [search, setSearch] = useState("")
+  const [searchResults, setSearchResults] = useState<any[]>([])
+  const [searching, setSearching] = useState(false)
 
-  const resultHadiths =
-    result && result.hadiths.length > 0 ? await augmentAllWithBangla(result.hadiths) : []
+  const handleSearch = async () => {
+    if (!search.trim()) return
+    setSearching(true)
+    try {
+      const r = await fetch(`/api/hadith/search?q=${encodeURIComponent(search)}&collection=bukhari,muslim`)
+      const d = await r.json()
+      setSearchResults(d.hadiths || [])
+    } catch { setSearchResults([]) }
+    setSearching(false)
+  }
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
-      <h1 className="text-2xl font-semibold">Hadith Library</h1>
-      <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
-        Verified collections with Arabic text, English translation and grading. Bangla text is a
-        machine translation for easy reading.
-      </p>
-
-      <form method="get" action="/hadith" className="mt-6 grid gap-3 md:grid-cols-[1fr_220px_auto]">
-        <Input
-          name="q"
-          defaultValue={query}
-          placeholder="Search by keyword, e.g. patience, prayer, charity"
-          minLength={2}
-        />
-        <Select name="collection" defaultValue={selectedCollection} aria-label="Filter collection">
-          <option value="">All collections</option>
-          {collections.map((item) => (
-            <option key={item.key} value={item.key}>
-              {item.name}
-            </option>
-          ))}
-        </Select>
-        <Button type="submit">Search</Button>
-      </form>
-
-      {query.length >= 2 && (
-        <div className="mt-6">
-          <div className="flex items-center justify-between gap-3">
-            <h2 className="text-lg font-semibold">Search results</h2>
-            <span className="text-sm text-stone-500 dark:text-stone-400">
-              {result ? `${result.totalFound} found` : 'Loading failed'}
-            </span>
+      <div className="mb-8">
+        <div className="mb-4 flex items-center gap-3">
+          <div className="rounded-xl bg-amber-100 p-2.5 dark:bg-amber-900/30">
+            <BookOpen className="h-6 w-6 text-amber-600 dark:text-amber-400" />
           </div>
+          <div>
+            <h1 className="text-2xl font-bold text-stone-900 dark:text-stone-100">Hadith Collections</h1>
+            <p className="text-sm text-stone-500 dark:text-stone-400">Authenticated narrations from the Prophet Muhammad (PBUH)</p>
+          </div>
+        </div>
+      </div>
 
-          <div className="mt-3 space-y-3">
-            {resultHadiths.map((hadith) => (
-              <Card key={hadith.id} className="transition-colors hover:border-emerald-600/40">
-                <CardBody>
-                  <div className="flex flex-wrap items-center justify-between gap-3">
-                    <div className="flex flex-wrap items-center gap-2 text-sm">
-                      <Badge className="bg-emerald-700/10 text-emerald-800 dark:bg-emerald-400/10 dark:text-emerald-300">
-                        {hadith.collectionName}
-                      </Badge>
-                      <span className="text-stone-400">Hadith {hadith.hadithNumber}</span>
-                      <span className="text-stone-400">Grade: {hadith.grade}</span>
-                    </div>
-                    <HadithBookmarkButton
-                      collection={hadith.collection}
-                      hadithNumber={hadith.hadithNumber}
-                      arabic={hadith.arabic}
-                      english={hadith.english}
-                      grade={hadith.grade}
-                    />
-                  </div>
-                  <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-stone-700 dark:text-stone-200">
-                    {hadith.english}
-                  </p>
-                  {hadith.translationBn && (
-                    <p className="bengali mt-2 line-clamp-2 text-sm leading-relaxed text-stone-600 dark:text-stone-300">
-                      {hadith.translationBn}
-                    </p>
-                  )}
-                  <Link
-                    href={`/hadith/${hadith.collection}?number=${hadith.hadithNumber}`}
-                    className="mt-3 inline-block text-sm font-medium text-emerald-700 hover:underline dark:text-emerald-400"
-                  >
-                    Read full hadith →
-                  </Link>
-                </CardBody>
-              </Card>
+      <div className="mb-8">
+        <div className="relative max-w-lg">
+          <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400" />
+          <input
+            type="text"
+            placeholder="Search hadith by keyword..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+            className="w-full rounded-xl border border-stone-200 bg-white py-2.5 pl-10 pr-4 text-sm text-stone-900 placeholder:text-stone-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 dark:border-stone-700 dark:bg-stone-800 dark:text-stone-100"
+          />
+        </div>
+      </div>
+
+      {searchResults.length > 0 && (
+        <div className="mb-8">
+          <h2 className="mb-3 text-sm font-semibold text-stone-500 dark:text-stone-400">Search Results</h2>
+          <div className="space-y-3">
+            {searchResults.map((h: any, i: number) => (
+              <Link key={i} href={`/hadith/${h.collection}?n=${h.hadithNumber}`}>
+                <div className="rounded-2xl border border-stone-200 bg-white p-4 transition-all hover:border-emerald-200 hover:shadow-sm dark:border-stone-800 dark:bg-stone-900">
+                  <p className="text-sm text-stone-700 dark:text-stone-300 line-clamp-3">{h.text}</p>
+                  <p className="mt-2 text-xs text-stone-400">#{h.hadithNumber} · {h.collection}</p>
+                </div>
+              </Link>
             ))}
-            {result && result.hadiths.length === 0 && (
-              <p className="text-sm text-stone-500 dark:text-stone-400">No hadith found.</p>
-            )}
           </div>
         </div>
       )}
 
-      <div className="mt-8 flex items-center justify-between gap-3">
-        <h2 className="text-lg font-semibold">Collections</h2>
-        <p className="text-sm text-stone-500 dark:text-stone-400">
-          {collections.length} collections available
-        </p>
-      </div>
-
-      <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {collections.map((collection) => (
-          <Link key={collection.key} href={`/hadith/${collection.key}?number=1`}>
-            <Card className="h-full transition-colors hover:border-emerald-600/40">
-              <CardBody>
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <h3 className="font-semibold">{collection.name}</h3>
-                    <p className="bengali mt-1 text-sm text-stone-500 dark:text-stone-400">
-                      {collection.arabicName}
-                    </p>
-                  </div>
-                  <Badge className="bg-stone-100 text-stone-600 dark:bg-stone-800 dark:text-stone-300">
-                    {collection.reliability}
-                  </Badge>
+      <div className="grid gap-4 sm:grid-cols-2">
+        {collections.map((col) => (
+          <Link key={col.id} href={`/hadith/${col.id}`}>
+            <div className="group rounded-2xl border border-stone-200 bg-white p-6 transition-all duration-200 hover:border-amber-300 hover:shadow-md dark:border-stone-800 dark:bg-stone-900 dark:hover:border-amber-700">
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold text-stone-900 dark:text-stone-100">{col.name}</h3>
+                  <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">{col.full}</p>
+                  <p className="mt-2 text-xs text-stone-400 dark:text-stone-500">{col.hadithCount.toLocaleString()} hadith</p>
                 </div>
-                <p className="mt-3 text-sm text-stone-600 dark:text-stone-300">
-                  Author: {collection.author}
-                </p>
-                <p className="mt-1 text-sm text-stone-600 dark:text-stone-300">
-                  {collection.totalHadiths.toLocaleString()} hadiths
-                </p>
-              </CardBody>
-            </Card>
+                <ArrowRight className="h-5 w-5 text-stone-400 transition-transform group-hover:translate-x-1 group-hover:text-amber-500 dark:text-stone-500" />
+              </div>
+            </div>
           </Link>
         ))}
       </div>

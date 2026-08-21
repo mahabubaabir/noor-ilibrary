@@ -1,69 +1,51 @@
-import type { Metadata, Viewport } from 'next'
-import { Amiri, Inter, Noto_Sans_Bengali } from 'next/font/google'
-import { Header } from '@/components/header'
-import './globals.css'
+import type { Metadata } from "next"
+import { Inter, Noto_Naskh_Arabic, Noto_Sans_Bengali } from "next/font/google"
+import "./globals.css"
+
+import { Providers } from "./providers"
+import { Header } from "../components/header"
 
 const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-latin',
-  display: 'swap',
+  subsets: ["latin"],
+  variable: "--font-latin",
 })
 
-const amiri = Amiri({
-  subsets: ['arabic'],
-  weight: ['400', '700'],
-  variable: '--font-arabic-family',
-  display: 'swap',
+const notoArabic = Noto_Naskh_Arabic({
+  subsets: ["arabic"],
+  variable: "--font-arabic-family",
+  weight: ["400", "700"],
 })
 
-const notoSansBengali = Noto_Sans_Bengali({
-  subsets: ['bengali'],
-  variable: '--font-bengali-family',
-  display: 'swap',
+const notoBengali = Noto_Sans_Bengali({
+  subsets: ["bengali"],
+  variable: "--font-bengali-family",
+  weight: ["400", "500", "600", "700"],
 })
 
 export const metadata: Metadata = {
-  title: {
-    default: 'Noor — Islamic Knowledge Library',
-    template: '%s · Noor',
-  },
+  title: "Noor - Islamic Knowledge Library",
   description:
-    'Read, listen and study the Quran with Arabic, English and Bangla translations, tafsir and hadith.',
-  applicationName: 'Noor',
-}
-
-export const viewport: Viewport = {
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#fafaf9' },
-    { media: '(prefers-color-scheme: dark)', color: '#0c0a09' },
-  ],
-  width: 'device-width',
-  initialScale: 1,
+    "Read and listen to the Quran with Arabic text, English and Bangla translations, explore Tafsir, Hadith collections, and study themed lessons.",
+  icons: {
+    icon: "/icon.svg",
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${amiri.variable} ${notoSansBengali.variable}`}
+      dir="ltr"
       suppressHydrationWarning
+      className={`${inter.variable} ${notoArabic.variable} ${notoBengali.variable}`}
     >
-      <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `try{var t=localStorage.getItem('theme');if(t==='dark'||(!t&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.classList.add('dark')}catch(e){}`,
-          }}
-        />
-      </head>
-      <body className="flex min-h-screen flex-col">
-        <Header />
-        <main className="flex-1">{children}</main>
-        <footer className="border-t border-stone-200 py-6 text-center text-xs text-stone-500 dark:border-stone-800 dark:text-stone-400">
-          <p className="mx-auto max-w-3xl px-4">
-            Content sources: Tanzil / AlQuran Cloud, Quran.com, UmmahAPI — free open Islamic data.
-            Read, learn and understand. {new Date().getFullYear()}
-          </p>
-        </footer>
+      <body className="min-h-screen bg-stone-50 font-sans text-stone-800 antialiased dark:bg-stone-950 dark:text-stone-200">
+        <Providers>
+          <div className="flex min-h-screen flex-col">
+            <Header />
+            <main className="flex-1">{children}</main>
+          </div>
+        </Providers>
       </body>
     </html>
   )

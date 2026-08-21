@@ -1,44 +1,32 @@
-import Link from 'next/link'
-import type { StudyTheme } from '@noor/types'
-import { Badge } from '@/components/ui/badge'
-import { Card, CardBody } from '@/components/ui/card'
-import { countAyahRefs } from '@/lib/study/themes'
-import { themeAccents } from '@/lib/study/accents'
-import { ThemeIcon } from './theme-icon'
+"use client"
 
-export function ThemeCard({ theme }: { theme: StudyTheme }) {
-  const accent = themeAccents[theme.icon]
-  const lessons = theme.lessons.length
-  const passages = countAyahRefs(theme)
+import Link from "next/link"
+import { ArrowRight } from "lucide-react"
+import type { StudyTheme } from "@noor/types"
+import { getAccentClasses, type ThemeAccent } from "@/lib/study/accents"
 
+interface ThemeCardProps {
+  theme: StudyTheme
+  accent?: ThemeAccent
+}
+
+export function ThemeCard({ theme, accent = "emerald" }: ThemeCardProps) {
+  const colors = getAccentClasses(accent)
   return (
-    <Link href={`/study/${theme.id}`} className="group">
-      <Card className={`h-full transition-colors ${accent.hoverBorder}`}>
-        <CardBody>
-          <div className="flex items-start gap-4">
-            <span
-              className={`inline-flex size-12 shrink-0 items-center justify-center rounded-xl ${accent.chip}`}
-            >
-              <ThemeIcon icon={theme.icon} className="size-6" />
-            </span>
-            <div>
-              <p className="font-arabic text-sm text-stone-400 dark:text-stone-500">
-                {theme.arabicTitle}
-              </p>
-              <h3 className="mt-0.5 font-semibold">{theme.title}</h3>
-            </div>
-          </div>
-          <p className="mt-3 text-sm text-stone-600 dark:text-stone-300">{theme.tagline}</p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            <Badge className={accent.badge}>{theme.difficulty}</Badge>
-            <Badge>{theme.duration}</Badge>
-            <Badge>
-              {lessons} lesson{lessons === 1 ? '' : 's'}
-            </Badge>
-            <Badge>{passages} passages</Badge>
-          </div>
-        </CardBody>
-      </Card>
+    <Link href={`/study/${theme.id}`}>
+      <div className="group h-full rounded-2xl border border-stone-200 bg-white p-5 transition-all duration-200 hover:border-emerald-300 hover:shadow-md dark:border-stone-800 dark:bg-stone-900 dark:hover:border-emerald-700">
+        <div className="mb-3 flex items-center gap-2">
+          <span className={`inline-flex items-center rounded-lg px-2 py-0.5 text-xs font-medium ${colors.bg} ${colors.text}`}>
+            {theme.difficulty}
+          </span>
+          <span className="text-xs text-stone-400">{theme.lessons.length} lessons</span>
+        </div>
+        <h3 className="mb-2 text-lg font-semibold text-stone-900 dark:text-stone-100">{theme.title}</h3>
+        <p className="mb-4 text-sm leading-relaxed text-stone-600 dark:text-stone-400 line-clamp-2">{theme.description}</p>
+        <div className="flex items-center gap-1 text-xs font-medium text-emerald-600 dark:text-emerald-400">
+          Start studying <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
+        </div>
+      </div>
     </Link>
   )
 }

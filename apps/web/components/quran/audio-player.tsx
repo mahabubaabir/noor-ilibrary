@@ -1,183 +1,76 @@
-'use client'
+"use client"
 
-import { useEffect, useRef, useState } from 'react'
-import type { Ayah, Reciter } from '@noor/types'
-import { audioUrl, DEFAULT_RECITER } from '@/lib/constants'
-import { Button } from '@/components/ui/button'
-import { Select } from '@/components/ui/select'
-import { NextIcon, PauseIcon, PlayIcon, PrevIcon, RepeatIcon } from '@/components/icons'
-import { cn } from '@/lib/utils'
-import type { PlayRequest } from './surah-viewer'
-
-export type RepeatMode = 'none' | 'verse' | 'surah'
+import { useCallback, useEffect, useRef, useState } from "react"
+import { Pause, Play, SkipBack, SkipForward, Volume2, VolumeX } from "lucide-react"
 
 interface AudioPlayerProps {
-  ayahs: Ayah[]
-  reciters: Reciter[]
-  initialAyah?: number
-  playRequest?: PlayRequest | null
-  onCurrentChange?: (globalNumber: number | null) => void
+  surahNumber: number
+  totalAyahs: number
+  reciter?: string
 }
 
-export function AudioPlayer({
-  ayahs,
-  reciters,
-  initialAyah,
-  playRequest,
-  onCurrentChange,
-}: AudioPlayerProps) {
-  const [index, setIndex] = useState<number | null>(() => {
-    if (initialAyah == null) return null
-    const found = ayahs.findIndex((a) => a.numberInSurah === initialAyah)
-    return found >= 0 ? found : null
-  })
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [repeat, setRepeat] = useState<RepeatMode>('none')
-  const [reciterId, setReciterId] = useState(DEFAULT_RECITER)
+const reciters = [
+  { name: "Mishary Alafasy", id: "ar.alafasy" },
+  { name: "Abdul Rahman As-Sudais", id: "ar.abdurrahmaanassudais" },
+  { name: "Abu Bakr Al Shatri", id: "ar.abubakrasshatri" },
+]
+
+export function AudioPlayer({ surahNumber, totalAyahs, reciter: initialReciter = "ar.alafasy" }: AudioPlayerProps) {
+  const [playing, setPlaying] = useState(false)
+  const [currentAyah, setCurrentAyah] = useState(0)
+  const [reciter, setReciter] = useState(initialReciter)
+  const [muted, setMuted] = useState(false)
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
-  const current = index != null ? ayahs[index] : undefined
-
   useEffect(() => {
-    if (!playRequest) return
-    const nextIndex = ayahs.findIndex((a) => a.globalNumber === playRequest.globalNumber)
-    if (nextIndex >= 0) playAt(nextIndex)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [playRequest?.nonce])
+    if (!playing || currentAyah === 0) return
+    const src = `https://cdn.islamic.network/quran/audio/128/${reciter}/${String(currentAyah).padStart(6, "0")}.mp3`
+    const audio = new Audio(src)
+    audioRef.current = audio
+    audio.volume = muted ? 0 : 1
+    audio.play().catch(() => {})
+    audio.onended = () => {
+      if (currentAyah < totalAyahs) setCurrentAyah(currentAyah + 1)
+      else setPlaying(false)
+    }
+    return () => { audio.pause(); audioRef.current = null }
+  }, [currentAyah, reciter, totalAyahs, playing, muted])
 
-  function notify(nextIndex: number | null) {
-    const global = nextIndex != null ? ayahs[nextIndex]?.globalNumber ?? null : null
-    onCurrentChange?.(global)
-  }
+  const togglePlay = useCallback(() => {
+    if (playing) { audioRef.current?.pause(); setPlaying(false) }
+    else { setCurrentAyah(1); setPlaying(true) }
+  }, [playing])
 
-  function playAt(nextIndex: number | null) {
-    setIndex(nextIndex)
-    notify(nextIndex)
-    const audio = audioRef.current
-    if (nextIndex == null || !audio) {
-      setIsPlaying(false)
-      return
-    }
-    const next = ayahs[nextIndex]
-    if (!next) return
-    audio.src = audioUrl(reciterId, next.globalNumber)
-    void audio.play().catch(() => setIsPlaying(false))
-    setIsPlaying(true)
-  }
-
-  function togglePlay() {
-    if (index == null) {
-      playAt(0)
-      return
-    }
-    const audio = audioRef.current
-    if (!audio) return
-    if (audio.paused) {
-      void audio.play().catch(() => undefined)
-      setIsPlaying(true)
-    } else {
-      audio.pause()
-      setIsPlaying(false)
-    }
-  }
-
-  function handleEnded() {
-    if (index == null) return
-    if (repeat === 'verse') {
-      playAt(index)
-      return
-    }
-    if (index < ayahs.length - 1) {
-      playAt(index + 1)
-      return
-    }
-    if (repeat === 'surah') {
-      playAt(0)
-      return
-    }
-    setIsPlaying(false)
-    setIndex(null)
-    notify(null)
-  }
-
-  function onReciterChange(id: string) {
-    setReciterId(id)
-    const audio = audioRef.current
-    if (index != null && audio) {
-      audio.src = audioUrl(id, ayahs[index]!.globalNumber)
-      if (isPlaying) void audio.play().catch(() => undefined)
-    }
-  }
-
-  const repeatLabels: Record<RepeatMode, string> = {
-    none: 'Repeat off',
-    verse: 'Repeat verse',
-    surah: 'Repeat surah',
-  }
+  const prev = () => { if (currentAyah > 1) setCurrentAyah(currentAyah - 1) }
+  const next = () => { if (currentAyah < totalAyahs) setCurrentAyah(currentAyah + 1) }
 
   return (
-    <div className="sticky bottom-0 z-30 border-t border-stone-200 bg-white/95 backdrop-blur dark:border-stone-800 dark:bg-stone-950/95">
-      <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-3 px-4 py-3">
-        <div className="flex items-center gap-1">
-          <Button variant="ghost" size="sm" onClick={() => playAt(index != null ? index - 1 : null)} disabled={index == null || index <= 0} aria-label="Previous verse">
-            <PrevIcon className="size-4" />
-          </Button>
-          <Button variant="primary" size="sm" onClick={togglePlay} aria-label={isPlaying ? 'Pause' : 'Play'}>
-            {isPlaying ? <PauseIcon className="size-4" /> : <PlayIcon className="size-4" />}
-          </Button>
-          <Button variant="ghost" size="sm" onClick={() => playAt(index != null ? index + 1 : 0)} disabled={index != null && index >= ayahs.length - 1} aria-label="Next verse">
-            <NextIcon className="size-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setRepeat(repeat === 'none' ? 'verse' : repeat === 'verse' ? 'surah' : 'none')}
-            aria-label={repeatLabels[repeat]}
-            title={repeatLabels[repeat]}
-            className={cn(repeat !== 'none' && 'text-emerald-700 dark:text-emerald-400')}
-          >
-            <RepeatIcon className="size-4" />
-          </Button>
-        </div>
-
-        <div className="min-w-0 flex-1 text-sm text-stone-600 dark:text-stone-300">
-          {current ? (
-            <span>
-              {current.surahNumber}:{current.numberInSurah}
-              <span className="text-stone-400"> · juz {current.juz}</span>
-            </span>
-          ) : (
-            <button
-              type="button"
-              onClick={() => playAt(0)}
-              className="font-medium text-emerald-700 hover:underline dark:text-emerald-400"
-            >
-              Play entire surah ▸
-            </button>
-          )}
-        </div>
-
-        <audio
-          ref={audioRef}
-          onEnded={handleEnded}
-          onPause={() => setIsPlaying(false)}
-          onPlay={() => setIsPlaying(true)}
-          preload="none"
-        />
-
-        <Select
-          value={reciterId}
-          onChange={(e) => onReciterChange(e.target.value)}
-          className="max-w-56 py-1.5 text-xs"
-          aria-label="Reciter"
-        >
-          {reciters.map((reciter) => (
-            <option key={reciter.id} value={reciter.id}>
-              {reciter.name}
-            </option>
-          ))}
-        </Select>
+    <div className="rounded-2xl border border-stone-200 bg-white p-4 dark:border-stone-800 dark:bg-stone-900">
+      <div className="mb-3 flex items-center gap-2">
+        <select value={reciter} onChange={e => setReciter(e.target.value)}
+          className="flex-1 rounded-xl border border-stone-200 bg-white px-3 py-2 text-xs dark:border-stone-700 dark:bg-stone-800 dark:text-stone-300">
+          {reciters.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
+        </select>
       </div>
+      <div className="flex items-center justify-center gap-3">
+        <button onClick={prev} disabled={currentAyah <= 1} className="rounded-xl p-2 text-stone-500 hover:bg-stone-100 disabled:opacity-30 dark:hover:bg-stone-800">
+          <SkipBack className="h-4 w-4" />
+        </button>
+        <button onClick={togglePlay} className="rounded-xl bg-emerald-600 p-3 text-white hover:bg-emerald-700 transition-all active:scale-95">
+          {playing ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
+        </button>
+        <button onClick={next} disabled={currentAyah >= totalAyahs} className="rounded-xl p-2 text-stone-500 hover:bg-stone-100 disabled:opacity-30 dark:hover:bg-stone-800">
+          <SkipForward className="h-4 w-4" />
+        </button>
+        <button onClick={() => setMuted(!muted)} className="rounded-xl p-2 text-stone-500 hover:bg-stone-100 dark:hover:bg-stone-800">
+          {muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+        </button>
+      </div>
+      {currentAyah > 0 && (
+        <p className="mt-2 text-center text-xs text-stone-400">
+          Ayah {currentAyah} of {totalAyahs}
+        </p>
+      )}
     </div>
   )
 }

@@ -10,6 +10,19 @@
 
 :root {
   color-scheme: light;
+  --sand-50: #fdfcfb;
+  --sand-100: #f8f6f3;
+  --sand-200: #f0ece6;
+  --sand-300: #e2dbd1;
+  --sand-400: #b8b0a4;
+  --sand-500: #8a8178;
+  --sand-600: #5c5650;
+  --sand-700: #3d3a36;
+  --sand-800: #2a2825;
+  --sand-900: #1a1917;
+  --accent: #16a34a;
+  --accent-light: #dcfce7;
+  --accent-dark: #15803d;
 }
 
 .dark {
@@ -21,7 +34,14 @@ html {
 }
 
 body {
-  @apply bg-stone-50 text-stone-900 font-sans antialiased dark:bg-stone-950 dark:text-stone-100;
+  @apply font-sans antialiased;
+  background: var(--sand-50);
+  color: var(--sand-800);
+}
+
+.dark body {
+  background: var(--sand-900);
+  color: var(--sand-200);
 }
 
 .arabic {
@@ -34,5 +54,11 @@ body {
 }
 
 ::selection {
-  @apply bg-emerald-200 text-emerald-950 dark:bg-emerald-800 dark:text-emerald-50;
+  background: var(--accent-light);
+  color: var(--accent-dark);
+}
+
+.dark ::selection {
+  background: rgba(22, 163, 74, 0.25);
+  color: #86efac;
 }

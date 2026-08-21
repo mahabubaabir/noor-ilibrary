@@ -118,7 +118,7 @@ export function SurahViewer({ surah, initialAyah, reciters }: SurahViewerProps) 
         </p>
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h1 className="text-arabic text-4xl text-stone-900 sm:text-5xl dark:text-stone-50">
+            <h1 className="arabic text-4xl text-stone-900 sm:text-5xl dark:text-stone-50">
               {meta.nameArabic}
             </h1>
             <p className="mt-2 text-lg font-medium text-stone-800 dark:text-stone-100">
@@ -158,16 +158,12 @@ export function SurahViewer({ surah, initialAyah, reciters }: SurahViewerProps) 
       </div>
 
       <div className="mx-auto max-w-3xl px-4">
-        <TafsirPanel surahNumber={meta.number} totalAyahs={meta.ayahCount} />
+        <TafsirPanel surahNumber={meta.number} />
       </div>
 
-      <AudioPlayer
-        ayahs={ayahs}
-        reciters={reciters}
-        initialAyah={initialAyah}
-        playRequest={playRequest}
-        onCurrentChange={setPlayingGlobal}
-      />
+      <div className="mx-auto max-w-3xl px-4 py-6">
+        <AudioPlayer surahNumber={meta.number} totalAyahs={meta.ayahCount} />
+      </div>
     </div>
   )
 }
