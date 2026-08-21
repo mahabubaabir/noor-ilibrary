@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import { content } from '@/lib/providers'
 import { SurahList } from '@/components/quran/surah-list'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: 'Read the Quran',
   description: 'Browse all 114 surahs of the Quran.',

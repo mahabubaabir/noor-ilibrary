@@ -5,6 +5,8 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardBody } from '@/components/ui/card'
 import { BookIcon, SearchIcon } from '@/components/icons'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: 'Noor — Islamic Knowledge Library',
   description:

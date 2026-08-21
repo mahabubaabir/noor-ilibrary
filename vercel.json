@@ -1,5 +1,5 @@
 {
   "version": 2,
-  "installCommand": "npm install && npm install lightningcss-linux-x64-gnu@1.33.0 --no-save",
+  "installCommand": "npm install",
   "buildCommand": "npx prisma generate --schema=apps/web/prisma/schema.prisma && npm run build"
 }
