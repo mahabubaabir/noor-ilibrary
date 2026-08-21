@@ -14,17 +14,67 @@ model ContentCache {
 }
 
 model User {
-  id              String            @id @default(cuid())
-  email           String            @unique
-  name            String?
-  passwordHash    String
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
-  sessions        Session[]
-  bookmarks       Bookmark[]
-  hadithBookmarks HadithBookmark[]
-  progress        ReadingProgress[]
-  preference      UserPreference?
+  id                  String               @id @default(cuid())
+  email               String               @unique
+  name                String?
+  passwordHash        String
+  role                String               @default("user")
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+  sessions            Session[]
+  bookmarks           Bookmark[]
+  hadithBookmarks     HadithBookmark[]
+  progress            ReadingProgress[]
+  preference          UserPreference?
+  passwordResetTokens PasswordResetToken[]
+  posts               BlogPost[]
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+}
+
+model BlogPost {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  titleBn     String?
+  excerpt     String
+  content     String
+  coverImage  String?
+  category    String   @default("General")
+  published   Boolean  @default(true)
+  authorId    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([slug])
+  @@index([category])
+  @@index([published, createdAt])
+}
+
+model DailyHadith {
+  id           String   @id @default(cuid())
+  date         String   @unique
+  collection   String
+  hadithNumber Int
+  arabic       String
+  english      String
+  bangla       String
+  grade        String?
+  narrator     String?
+  createdAt    DateTime @default(now())
+
+  @@index([date])
 }
 
 model Session {
@@ -61,6 +111,8 @@ model ReadingProgress {
   scope       String   @default("quran")
   surahNumber Int
   ayahNumber  Int
+  surahName   String?
+  totalAyahs  Int?     @default(7)
   updatedAt   DateTime @updatedAt
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -86,6 +138,7 @@ model HadithBookmark {
   arabic       String
   english      String
   grade        String
+  translationBn String?
   createdAt    DateTime @default(now())
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 

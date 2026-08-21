@@ -18,14 +18,15 @@ import {
 import { Button } from "./ui/button"
 
 const navItems = [
-  { href: "/quran", label: "Quran", icon: BookOpen },
-  { href: "/hadith", label: "Hadith", icon: Library },
-  { href: "/search", label: "Search", icon: Search },
+  { href: "/quran", label: "কুরআন (Quran)", icon: BookOpen },
+  { href: "/hadith", label: "হাদিস (Hadith)", icon: Library },
+  { href: "/blog", label: "ব্লগ (Blog)", icon: Heart },
+  { href: "/search", label: "খুঁজুন (Search)", icon: Search },
 ]
 
 export function Header() {
   const pathname = usePathname()
-  const [user, setUser] = useState<{ name: string; email: string } | null>(null)
+  const [user, setUser] = useState<{ name: string; email: string; role?: string } | null>(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [darkMode, setDarkMode] = useState(true)
   const [mounted, setMounted] = useState(false)
@@ -107,6 +108,14 @@ export function Header() {
 
           {user ? (
             <>
+              {user.role === "admin" && (
+                <Link
+                  href="/admin"
+                  className="hidden items-center gap-1 rounded-xl bg-amber-100/80 px-3 py-1.5 text-xs font-bold text-amber-800 transition-all hover:bg-amber-200 dark:bg-amber-900/40 dark:text-amber-300 md:flex"
+                >
+                  Admin
+                </Link>
+              )}
               <Link
                 href="/library"
                 className="hidden items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-stone-600 transition-all hover:bg-stone-100 dark:text-stone-400 dark:hover:bg-stone-800 md:flex"
@@ -168,13 +177,22 @@ export function Header() {
             <div className="my-1 h-px bg-stone-200 dark:bg-stone-800" />
             {user ? (
               <>
+                {user.role === "admin" && (
+                  <Link
+                    href="/admin"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-bold text-amber-700 hover:bg-amber-50 dark:text-amber-300 dark:hover:bg-amber-950/40"
+                  >
+                    Admin Dashboard
+                  </Link>
+                )}
                 <Link
                   href="/library"
                   onClick={() => setMobileMenuOpen(false)}
                   className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-stone-600 hover:bg-stone-100 dark:text-stone-400 dark:hover:bg-stone-800"
                 >
                   <Heart className="h-4 w-4" />
-                  My Library
+                  My Library & Profile
                 </Link>
                 <button
                   onClick={() => { logout(); setMobileMenuOpen(false) }}

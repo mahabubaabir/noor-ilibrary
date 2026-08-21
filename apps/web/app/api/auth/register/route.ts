@@ -20,7 +20,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Valid email is required' }, { status: 400 })
   }
   if (!validatePassword(password)) {
-    return NextResponse.json({ error: 'Password must be at least 8 characters' }, { status: 400 })
+    return NextResponse.json({ error: 'Password must be at least 6 characters' }, { status: 400 })
   }
 
   const existing = await prisma.user.findUnique({ where: { email } })
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
       passwordHash: await hashPassword(password),
       preference: { create: {} },
     },
-    select: { id: true, email: true, name: true },
+    select: { id: true, email: true, name: true, role: true },
   })
   const session = await createSession(user.id)
   const cookie = sessionCookie(session.token, session.expiresAt)

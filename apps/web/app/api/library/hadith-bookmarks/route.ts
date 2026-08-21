@@ -10,7 +10,7 @@ export async function GET() {
     where: { userId: user.id },
     orderBy: { createdAt: 'desc' },
   })
-  return NextResponse.json({ hadithBookmarks })
+  return NextResponse.json({ hadithBookmarks, bookmarks: hadithBookmarks })
 }
 
 export async function POST(request: Request) {
@@ -24,6 +24,7 @@ export async function POST(request: Request) {
         arabic?: string
         english?: string
         grade?: string
+        translationBn?: string
       }
     | null
 
@@ -45,12 +46,14 @@ export async function POST(request: Request) {
       hadithNumber: body.hadithNumber,
       arabic: body.arabic ?? '',
       english: body.english ?? '',
-      grade: body.grade ?? '',
+      grade: body.grade ?? 'Sahih',
+      translationBn: body.translationBn ?? null,
     },
     update: {
       arabic: body.arabic ?? '',
       english: body.english ?? '',
-      grade: body.grade ?? '',
+      grade: body.grade ?? 'Sahih',
+      translationBn: body.translationBn ?? null,
     },
   })
 
@@ -62,11 +65,17 @@ export async function DELETE(request: Request) {
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const url = new URL(request.url)
+  const id = url.searchParams.get('id')
+  if (id) {
+    await prisma.hadithBookmark.deleteMany({ where: { id, userId: user.id } })
+    return NextResponse.json({ ok: true })
+  }
+
   const collection = url.searchParams.get('collection')
   const hadithNumber = Number(url.searchParams.get('hadith'))
 
   if (!collection || !Number.isInteger(hadithNumber)) {
-    return NextResponse.json({ error: 'collection and hadith query params are required' }, { status: 400 })
+    return NextResponse.json({ error: 'id or collection and hadith query params are required' }, { status: 400 })
   }
 
   await prisma.hadithBookmark.deleteMany({

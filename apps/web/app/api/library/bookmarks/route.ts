@@ -65,11 +65,17 @@ export async function DELETE(request: Request) {
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const url = new URL(request.url)
+  const id = url.searchParams.get('id')
+  if (id) {
+    await prisma.bookmark.deleteMany({ where: { id, userId: user.id } })
+    return NextResponse.json({ ok: true })
+  }
+
   const surahNumber = Number(url.searchParams.get('surah'))
   const ayahNumber = Number(url.searchParams.get('ayah'))
 
   if (!Number.isInteger(surahNumber) || !Number.isInteger(ayahNumber)) {
-    return NextResponse.json({ error: 'surah and ayah query params are required' }, { status: 400 })
+    return NextResponse.json({ error: 'id or surah and ayah query params are required' }, { status: 400 })
   }
 
   await prisma.bookmark.deleteMany({ where: { userId: user.id, surahNumber, ayahNumber } })

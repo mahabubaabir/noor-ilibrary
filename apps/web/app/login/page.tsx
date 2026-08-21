@@ -48,6 +48,11 @@ export default function LoginPage() {
               {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
           </div>
+          <div className="flex justify-end">
+            <Link href="/forgot-password" className="text-xs font-semibold text-emerald-600 hover:underline dark:text-emerald-400">
+              পাসওয়ার্ড ভুলে গেছেন? (Forgot Password?)
+            </Link>
+          </div>
           <button type="submit" disabled={loading}
             className="w-full rounded-xl bg-emerald-600 py-2.5 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-50 transition-all active:scale-[0.98]">
             {loading ? <Loader2 className="mx-auto h-4 w-4 animate-spin" /> : "Sign In"}
