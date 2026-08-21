@@ -13,8 +13,6 @@ import { getHadith } from '@/lib/hadith'
 import { augmentAllWithBangla } from '@/lib/hadith-bn'
 import { countAyahRefs, getStudyTheme, studyThemes } from '@/lib/study/themes'
 import { themeAccents } from '@/lib/study/accents'
-
-export const dynamic = 'force-dynamic'
 import { ThemeIcon } from '@/components/study/theme-icon'
 import { Badge } from '@/components/ui/badge'
 import { CheckIcon } from '@/components/icons'
