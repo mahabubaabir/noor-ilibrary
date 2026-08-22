@@ -17,6 +17,7 @@ import {
   Compass,
 } from "lucide-react"
 import { COMPANIONS_COLLECTION, COMPANION_CATEGORIES, CompanionItem } from "@/lib/companions-data"
+import { Companions3DOrbit } from "@/components/companions/companions-3d-orbit"
 
 export default function CompanionsPage() {
   const [searchQuery, setSearchQuery] = useState("")
@@ -43,18 +44,18 @@ export default function CompanionsPage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
       {/* Header Hero Banner */}
-      <div className="relative mb-10 overflow-hidden rounded-3xl border border-emerald-500/20 bg-gradient-to-br from-emerald-950/20 via-stone-900/10 to-amber-950/20 p-6 sm:p-10 backdrop-blur-xl dark:border-emerald-500/30">
+      <div className="relative mb-8 overflow-hidden rounded-3xl border border-emerald-500/20 bg-gradient-to-br from-emerald-950/20 via-stone-900/10 to-amber-950/20 p-6 sm:p-8 backdrop-blur-xl dark:border-emerald-500/30">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <div className="inline-flex items-center gap-2 rounded-xl bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300">
               <Users className="h-3.5 w-3.5" />
-              সাহাবায়ে কেরামের জীবনগাঁথা (Companions of the Prophet)
+              সাহাবায়ে কেরামের ৩ডি অরবিট ও জীবনগাঁথা
             </div>
-            <h1 className="mt-3 text-2xl font-bold tracking-tight text-stone-900 sm:text-4xl dark:text-stone-100">
-              রাসূলুল্লাহ ﷺ-এর সাহাবীদের আত্মত্যাগ ও সোনালী ইতিহাস
+            <h1 className="mt-2 text-2xl font-bold tracking-tight text-stone-900 sm:text-3xl dark:text-stone-100">
+              রাসূলুল্লাহ ﷺ ও চারপাশের সাহাবীদের আলোকিত জীবন
             </h1>
-            <p className="mt-2 max-w-2xl text-xs sm:text-sm leading-relaxed text-stone-600 dark:text-stone-300">
-              রাসূলুল্লাহ ﷺ বলেছেন: &ldquo;আমার সাহাবীগণ আকাশের তারকারাজির ন্যায়; তোমরা তাদের যাঁরই অনুসরণ করবে, হিদায়াতপ্রাপ্ত হবে।&rdquo; (মিশকাতুল মাসাবীহ)
+            <p className="mt-1 max-w-2xl text-xs sm:text-sm leading-relaxed text-stone-600 dark:text-stone-300">
+              ৩ডি অরবিট এ সাহাবীদের কয়েন স্পর্শ করুন অথবা নিচে ব্রাউজ করে বিস্তারিত জীবনী ও অডিও বিবরণ শুনুন।
             </p>
           </div>
 
@@ -67,6 +68,11 @@ export default function CompanionsPage() {
             </Link>
           </div>
         </div>
+      </div>
+
+      {/* 3D Animated Moving Orbit Sanctuary Widget */}
+      <div className="mb-12">
+        <Companions3DOrbit />
       </div>
 
       {/* Category Pills & Search */}
