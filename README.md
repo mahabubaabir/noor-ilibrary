@@ -8,7 +8,7 @@
 [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4-38B2AC?logo=tailwindcss)](https://tailwindcss.com/)
 [![Neon Database](https://img.shields.io/badge/Database-Neon%20PostgreSQL-00E599)](https://neon.tech/)
 
-> **Noor** is an ultra-modern, minimal, and comprehensive digital Islamic Knowledge & Reading Platform featuring the Noble Quran, Hadith collections, inspiring Life Stories with a PDF/E-book Reader (multi-color text highlights and personal notes), YouTube Surah Media Player, and bi-directional Cloud Auto-Sync.
+> **Noor** is an ultra-modern, minimal, and comprehensive digital Islamic Knowledge & Reading Platform featuring the Noble Quran, Hadith collections, inspiring Life Stories with a PDF/E-book Reader (multi-color text highlights and personal notes), and bi-directional Cloud Auto-Sync.
 
 ---
 
@@ -25,25 +25,19 @@
 - Arabic text, grades, narrators, and Bengali/English translations with search & bookmarks.
 - **Hadith of the Day**: Automatic daily rotating Hadith on the home screen with manual next/shuffle buttons.
 
-### 3. 🎥 YouTube Surah Media Hub (শামসুল হক ভিডিও প্লেয়ার)
-- Curated video player for **হাফেজ শামসুল হক (Hafez Shamsul Hoque)**, Panje Surah collections, and Bangla-translated Surah recitations.
-- Interactive Surah chooser, Theater/Cinema mode, and direct link to read the Surah in the Quran reader.
-- **Custom URL & Playlist Parser**: Paste any YouTube video URL or playlist link to play it directly.
-- **Direct YouTube Link Button**: 1-click fallback to open directly on YouTube.
-
-### 4. 📚 Life Stories & History (নবীজি ﷺ ও মহামানবদের জীবনগাঁথা)
+### 3. 📚 Life Stories & History (নবীজি ﷺ ও মহামানবদের জীবনগাঁথা)
 - Authentic, heartwarming life lessons on:
   - **Prophet Muhammad ﷺ (সীরাতুন্নবী ﷺ)**: *Deen & Spirituality, Daily Routine & Lifestyle, Health & Hygiene, Food & Nutrition, Family & Spouses, Children & Youth, Halal Finance & Trade, Charity & Mercy, Honesty & High Character*.
   - **Historical Figures**: *Abu Bakr, Umar, Uthman, Ali, Khadijah, Aisha, Maryam, Yusuf, Ibrahim, and Sulaiman*.
 - **Dual Language**: Seamless **Bangla** and **English** toggle on every single story.
 
-### 5. 🖍️ PDF / E-Book Reader Engine
+### 4. 🖍️ PDF / E-Book Reader Engine
 - **Reading Modes**: 📖 E-book Paginated Mode (page turn navigation) and 📜 Continuous Scroll Mode.
 - **Multi-color Text Highlighter**: Floating toolbar with 5 colors (🟡 Gold, 🟢 Mint Green, 🔵 Sky Blue, 🟣 Lavender, 🌸 Rose Pink).
 - **Personal Notes & Reflections Drawer**: Attach thoughts to paragraphs/highlights with search, copy to clipboard, and delete options.
 - **Theme Customizer**: ☀️ Light Sand, 📜 Sepia Paper, 🌙 Dark Slate, and font sizing controls.
 
-### 6. 👤 User Profile & Cloud Data Auto-Sync
+### 5. 👤 User Profile & Cloud Data Auto-Sync
 - Customize **Full Name**, unique **Username Handle** (`@handle`), **Profile Avatar** (curated preset avatars or custom image URLs), and **Islamic Bio/Goal**.
 - Automatic bi-directional syncing of bookmarks, reading progress, highlights, and notes between browser storage and database.
 

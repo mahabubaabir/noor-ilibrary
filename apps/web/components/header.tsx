@@ -10,7 +10,6 @@ import {
   LogOut,
   Menu,
   Moon,
-  PlayCircle,
   Search,
   Sparkles,
   Sun,
@@ -22,7 +21,6 @@ import { Button } from "./ui/button"
 const navItems = [
   { href: "/quran", label: "কুরআন", icon: BookOpen },
   { href: "/hadith", label: "হাদিস", icon: Library },
-  { href: "/surah-media", label: "ভিডিও সূরা", icon: PlayCircle },
   { href: "/stories", label: "জীবনগাঁথা", icon: Sparkles },
   { href: "/blog", label: "ব্লগ", icon: Heart },
   { href: "/search", label: "খুঁজুন", icon: Search },

@@ -164,12 +164,6 @@ export default function HomePage() {
             <BookOpen className="h-4 w-4" /> কুরআন মাজীদ পড়ুন
           </Link>
           <Link
-            href="/surah-media"
-            className="inline-flex items-center gap-2 rounded-2xl border border-emerald-500/30 bg-emerald-50/80 px-5 py-3 text-sm font-bold text-emerald-900 shadow-sm hover:bg-emerald-100 dark:border-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-200 transition-all active:scale-95"
-          >
-            <Sparkles className="h-4 w-4 text-amber-500" /> ভিডিও সূরা (Media)
-          </Link>
-          <Link
             href="/stories"
             className="inline-flex items-center gap-2 rounded-2xl border border-stone-200 bg-white px-5 py-3 text-sm font-bold text-stone-800 shadow-sm hover:bg-stone-50 dark:border-stone-800 dark:bg-stone-900 dark:text-stone-200 transition-all active:scale-95"
           >
@@ -416,23 +410,7 @@ export default function HomePage() {
           </div>
         </Link>
 
-        {/* YouTube Surah Media (Shamsul haQue @shamsul_haque) */}
-        <Link href="/surah-media" className="group">
-          <div className="relative h-full overflow-hidden rounded-3xl border border-stone-200/80 bg-white p-7 transition-all duration-200 hover:-translate-y-1 hover:border-red-400 hover:shadow-xl dark:border-stone-800 dark:bg-stone-900">
-            <div className="mb-4 inline-flex rounded-2xl bg-red-600 p-3 text-white shadow-md">
-              <Sparkles className="h-6 w-6" />
-            </div>
-            <h3 className="mb-2 text-xl font-bold text-stone-900 dark:text-stone-100">
-              Shamsul haQue (@shamsul_haque)
-            </h3>
-            <p className="text-sm leading-relaxed text-stone-600 dark:text-stone-400">
-              Shamsul haQue অফিসিয়াল ইউটিউব চ্যানেলের সুমিষ্ট কুরআন তিলাওয়াত, জুমার সূরা আল-কাহফ ও রুকইয়াহ সংকলন।
-            </p>
-            <div className="mt-6 flex items-center gap-1.5 text-xs font-bold text-red-600 dark:text-red-400">
-              ভিডিও প্লেয়ার চালু করুন <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
-            </div>
-          </div>
-        </Link>
+
 
         {/* Study & Reflections */}
         <Link href="/study" className="group">
