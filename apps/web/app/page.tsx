@@ -416,17 +416,17 @@ export default function HomePage() {
           </div>
         </Link>
 
-        {/* YouTube Surah Media (Shamsul Hoque Playlist) */}
+        {/* YouTube Surah Media (Shamsul haQue @shamsul_haque) */}
         <Link href="/surah-media" className="group">
           <div className="relative h-full overflow-hidden rounded-3xl border border-stone-200/80 bg-white p-7 transition-all duration-200 hover:-translate-y-1 hover:border-red-400 hover:shadow-xl dark:border-stone-800 dark:bg-stone-900">
             <div className="mb-4 inline-flex rounded-2xl bg-red-600 p-3 text-white shadow-md">
               <Sparkles className="h-6 w-6" />
             </div>
             <h3 className="mb-2 text-xl font-bold text-stone-900 dark:text-stone-100">
-              ভিডিও সূরা ও তিলাওয়াত (Surah Media)
+              Shamsul haQue (@shamsul_haque)
             </h3>
             <p className="text-sm leading-relaxed text-stone-600 dark:text-stone-400">
-              শামসুল হক ইউটিউব প্লেলিস্ট সংকলন। থিয়েটার মোড ও কুরআনে সরাসরি পড়ার সুবিধাসহ নির্বাচিত সূরা তিলাওয়াত।
+              Shamsul haQue অফিসিয়াল ইউটিউব চ্যানেলের সুমিষ্ট কুরআন তিলাওয়াত, জুমার সূরা আল-কাহফ ও রুকইয়াহ সংকলন।
             </p>
             <div className="mt-6 flex items-center gap-1.5 text-xs font-bold text-red-600 dark:text-red-400">
               ভিডিও প্লেয়ার চালু করুন <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
