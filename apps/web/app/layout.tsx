@@ -4,6 +4,7 @@ import "./globals.css"
 
 import { Providers } from "./providers"
 import { Header } from "../components/header"
+import { Footer } from "../components/footer"
 import { BlurredGeometryBackground } from "../components/ui/blurred-geometry-background"
 
 const inter = Inter({
@@ -46,6 +47,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div className="relative z-10 flex min-h-screen flex-col">
             <Header />
             <main className="flex-1">{children}</main>
+            <Footer />
           </div>
         </Providers>
       </body>
