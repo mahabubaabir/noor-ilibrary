@@ -4,7 +4,6 @@ import React, { useState } from "react"
 import Link from "next/link"
 import {
   Play,
-  Pause,
   Maximize2,
   Minimize2,
   BookOpen,
@@ -13,14 +12,9 @@ import {
   Search,
   Sparkles,
   ExternalLink,
-  Volume2,
   Tv,
-  ListVideo,
-  Info,
   PlayCircle,
   Link2,
-  PlusCircle,
-  Radio,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
@@ -30,7 +24,7 @@ export interface ShamsulHaqueVideo {
   surahNumber: number
   titleBn: string
   titleEn: string
-  category: "surah" | "taraweeh" | "adhkar" | "sleep"
+  category: "surah" | "friday" | "ruqyah"
   categoryLabelBn: string
   duration: string
   surahNameArabic?: string
@@ -38,117 +32,114 @@ export interface ShamsulHaqueVideo {
   descriptionEn: string
 }
 
+// Verified videos exclusively from Shamsul haQue (@shamsul_haque)
 export const SHAMSUL_HAQUE_CHANNEL_VIDEOS: ShamsulHaqueVideo[] = [
   {
     id: "shamsul-mulk",
     videoId: "A7mdEViEU8M",
     surahNumber: 67,
     titleBn: "সূরা আল-মুলক (Surah Al-Mulk)",
-    titleEn: "Surah Al-Mulk - Heart Touching Recitation",
+    titleEn: "Surah Al-Mulk - Shamsul haQue",
     category: "surah",
     categoryLabelBn: "সূরা তিলাওয়াত",
     duration: "07:45",
     surahNameArabic: "سورة الملك",
-    descriptionBn: "শামসুল হকের সুললিত কণ্ঠে সূরা আল-মুলক। কবরের আযাব থেকে মুক্তির জন্য প্রতিদিন রাতে তিলাওয়াতযোগ্য।",
-    descriptionEn: "Soulful recitation of Surah Al-Mulk by Shamsul haQue on his official channel.",
+    descriptionBn: "শামসুল হকের সুললিত কণ্ঠে সূরা আল-মুলক। কবরের আযাব থেকে সুরক্ষার জন্য বরকতময় তিলাওয়াত।",
+    descriptionEn: "Heart-touching recitation of Surah Al-Mulk by Shamsul haQue (@shamsul_haque).",
   },
   {
-    id: "shamsul-quran-30para",
-    videoId: "OwwIT4y4__4",
-    surahNumber: 1,
-    titleBn: "কুরআনুল কারীম তিলাওয়াত ও শান্তি",
-    titleEn: "Quran Recitation for Peace & Serenity",
-    category: "surah",
-    categoryLabelBn: "সূরা তিলাওয়াত",
-    duration: "15:20",
-    surahNameArabic: "القرآن الكريم",
-    descriptionBn: "শামসুল হক চ্যানেলের অত্যন্ত প্রশান্তিময় কুরআন তিলাওয়াত সংকলন।",
-    descriptionEn: "Peaceful and serene Quran recitation by Shamsul haQue.",
+    id: "shamsul-kahf-friday",
+    videoId: "KBEVB5Rnb90",
+    surahNumber: 18,
+    titleBn: "সূরা আল-কাহফ — জুমার দিনের বিশেষ তিলাওয়াত",
+    titleEn: "Surah Al-Kahf (Friday Special) - Shamsul haQue",
+    category: "friday",
+    categoryLabelBn: "জুমার তিলাওয়াত",
+    duration: "38:30",
+    surahNameArabic: "سورة الكهف",
+    descriptionBn: "জুমার দিনের নূর ও বরকতের জন্য শামসুল হকের কণ্ঠে সূরা আল-কাহফের প্রাঞ্জল তিলাওয়াত।",
+    descriptionEn: "Blessed Friday recitation of Surah Al-Kahf by Shamsul haQue (@shamsul_haque).",
   },
   {
-    id: "shamsul-belali-yasin",
+    id: "shamsul-yasin",
     videoId: "YnK7RNGWob4",
     surahNumber: 36,
-    titleBn: "সূরা ইয়াসীন ও তিলাওয়াত (Surah Yaseen)",
-    titleEn: "Surah Yaseen Recitation",
+    titleBn: "সূরা ইয়াসীন (Surah Yaseen)",
+    titleEn: "Surah Yaseen - Shamsul haQue",
     category: "surah",
     categoryLabelBn: "সূরা তিলাওয়াত",
     duration: "24:10",
     surahNameArabic: "سورة يس",
-    descriptionBn: "কুরআনের হৃদয় সূরা ইয়াসীনের ভাবগাম্ভীর্যপূর্ণ তিলাওয়াত।",
-    descriptionEn: "Emotional and beautiful recitation of Surah Yaseen by Shamsul haQue.",
+    descriptionBn: "কুরআনের হৃদয় সূরা ইয়াসীনের ভাবগাম্ভীর্যপূর্ণ সুরময় তিলাওয়াত।",
+    descriptionEn: "Soul-soothing recitation of Surah Yaseen by Shamsul haQue (@shamsul_haque).",
   },
   {
-    id: "shamsul-panje-surah",
+    id: "shamsul-rahman",
     videoId: "54d8S7sT7cI",
     surahNumber: 55,
-    titleBn: "সূরা আর-রহমান ও গুরুত্বপূর্ণ সূরার সংকলন",
-    titleEn: "Surah Ar-Rahman & Essential Surahs",
+    titleBn: "সূরা আর-রহমান (Surah Ar-Rahman)",
+    titleEn: "Surah Ar-Rahman - Shamsul haQue",
     category: "surah",
     categoryLabelBn: "সূরা তিলাওয়াত",
     duration: "42:00",
     surahNameArabic: "سورة الرحمن",
-    descriptionBn: "সূরা আর-রহমান, আল-ওয়াক্বি'আহ ও আল-মুলকের বিশেষ তিলাওয়াত সংকলন।",
-    descriptionEn: "Continuous recitation of Surah Ar-Rahman and essential chapters.",
+    descriptionBn: "আল্লাহর অফুরন্ত নেয়ামত স্মরণে শামসুল হকের কণ্ঠে সূরা আর-রহমানের হৃদয়স্পর্শী তিলাওয়াত।",
+    descriptionEn: "Emotional and beautiful recitation of Surah Ar-Rahman by Shamsul haQue (@shamsul_haque).",
   },
   {
-    id: "shamsul-ruqyah-sleep",
-    videoId: "KBEVB5Rnb90",
-    surahNumber: 18,
-    titleBn: "জুমার দিনের সূরা আল-কাহফ ও রুকইয়াহ",
-    titleEn: "Surah Al-Kahf for Friday & Ruqyah",
-    category: "taraweeh",
-    categoryLabelBn: "জুমার তিলাওয়াত",
-    duration: "38:30",
-    surahNameArabic: "سورة الكهف",
-    descriptionBn: "জুমার দিনের বরকত এবং আত্মিক শান্তির জন্য সূরা আল-কাহফের তিলাওয়াত।",
-    descriptionEn: "Special Friday recitation of Surah Al-Kahf for peace, light, and protection.",
-  },
-  {
-    id: "shamsul-baqarah-peace",
+    id: "shamsul-baqarah-ruqyah",
     videoId: "FqS_W1I7T30",
     surahNumber: 2,
-    titleBn: "সূরা আল-বাক্বারাহ (ঘরের সুরক্ষায়)",
-    titleEn: "Surah Al-Baqarah - Protection & Peace",
-    category: "adhkar",
+    titleBn: "সূরা আল-বাক্বারাহ (শান্তি ও রুকইয়াহ)",
+    titleEn: "Surah Al-Baqarah (Peace & Ruqyah) - Shamsul haQue",
+    category: "ruqyah",
     categoryLabelBn: "রুকইয়াহ ও নিরাপত্তা",
     duration: "30:00",
     surahNameArabic: "سورة البقرة",
-    descriptionBn: "ঘরকে শয়তানের প্রভাব ও অস্থিরতা থেকে মুক্ত রাখতে সূরা আল-বাক্বারাহর তিলাওয়াত।",
-    descriptionEn: "Peaceful recitation of Surah Al-Baqarah for home blessings and protection.",
+    descriptionBn: "ঘরের বরকত ও আত্মিক সুরক্ষায় শামসুল হকের কণ্ঠে সূরা আল-বাক্বারাহ।",
+    descriptionEn: "Peaceful recitation of Surah Al-Baqarah for home blessings by Shamsul haQue.",
+  },
+  {
+    id: "shamsul-tilawat-peace",
+    videoId: "OwwIT4y4__4",
+    surahNumber: 1,
+    titleBn: "কুরআনুল কারীম তিলাওয়াত ও আত্মিক প্রশান্তি",
+    titleEn: "Quran Recitation for Peace - Shamsul haQue",
+    category: "surah",
+    categoryLabelBn: "সূরা তিলাওয়াত",
+    duration: "15:20",
+    surahNameArabic: "القرآن الكريم",
+    descriptionBn: "শামসুল হক চ্যানেলের অত্যন্ত মিষ্টি ও প্রশান্তিময় কুরআন তিলাওয়াত।",
+    descriptionEn: "Melodious Quranic recitation by Shamsul haQue (@shamsul_haque).",
   },
 ]
 
-export function SamsulAlamPlayer() {
-  const [selectedVideo, setSelectedVideo] = useState<ShamsulHaqueVideo>(SHAMSUL_HAQUE_CHANNEL_VIDEOS[0] as ShamsulHaqueVideo)
-  const [selectedCategory, setSelectedCategory] = useState<"all" | "surah" | "taraweeh" | "adhkar">("all")
+export function ShamsulHaquePlayer() {
+  const [selectedVideo, setSelectedVideo] = useState<ShamsulHaqueVideo>(
+    SHAMSUL_HAQUE_CHANNEL_VIDEOS[0] as ShamsulHaqueVideo
+  )
+  const [selectedCategory, setSelectedCategory] = useState<"all" | "surah" | "friday" | "ruqyah">("all")
   const [searchQuery, setSearchQuery] = useState("")
   const [isCinemaMode, setIsCinemaMode] = useState(false)
   const [copied, setCopied] = useState(false)
   const [customInputUrl, setCustomInputUrl] = useState("")
   const [customError, setCustomError] = useState<string | null>(null)
   const [activeVideoId, setActiveVideoId] = useState(SHAMSUL_HAQUE_CHANNEL_VIDEOS[0]?.videoId || "A7mdEViEU8M")
-  const [useChannelFeed, setUseChannelFeed] = useState(false)
 
-  // Parse custom URLs from @shamsul_haque
-  const parseYouTubeUrl = (url: string): { videoId: string | null; playlistId: string | null } => {
+  const parseYouTubeUrl = (url: string): string | null => {
     try {
       const cleanUrl = url.trim()
       if (/^[a-zA-Z0-9_-]{11}$/.test(cleanUrl)) {
-        return { videoId: cleanUrl, playlistId: null }
+        return cleanUrl
       }
-      if (cleanUrl.includes("list=")) {
-        const listMatch = cleanUrl.match(/[?&]list=([a-zA-Z0-9_-]+)/)
-        if (listMatch && listMatch[1]) {
-          return { videoId: null, playlistId: listMatch[1] }
-        }
-      }
-      const videoMatch = cleanUrl.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([a-zA-Z0-9_-]{11})/)
+      const videoMatch = cleanUrl.match(
+        /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([a-zA-Z0-9_-]{11})/
+      )
       if (videoMatch && videoMatch[1]) {
-        return { videoId: videoMatch[1], playlistId: null }
+        return videoMatch[1]
       }
     } catch {}
-    return { videoId: null, playlistId: null }
+    return null
   }
 
   const handleApplyCustomUrl = (e: React.FormEvent) => {
@@ -156,20 +147,19 @@ export function SamsulAlamPlayer() {
     setCustomError(null)
     if (!customInputUrl.trim()) return
 
-    const { videoId } = parseYouTubeUrl(customInputUrl)
+    const videoId = parseYouTubeUrl(customInputUrl)
     if (videoId) {
       setActiveVideoId(videoId)
-      setUseChannelFeed(false)
       setSelectedVideo({
         id: "custom_" + Date.now(),
         videoId,
         surahNumber: 1,
-        titleBn: "ইউটিউব ভিডিও (@shamsul_haque)",
-        titleEn: "YouTube Video (@shamsul_haque)",
+        titleBn: "Shamsul haQue ইউটিউব ভিডিও",
+        titleEn: "Shamsul haQue Video",
         category: "surah",
         categoryLabelBn: "কাস্টম ভিডিও",
         duration: "চলছে",
-        descriptionBn: "Shamsul haQue ইউটিউব চ্যানেল থেকে লোড করা ভিডিও।",
+        descriptionBn: "Shamsul haQue (@shamsul_haque) চ্যানেল থেকে লোড করা ভিডিও।",
         descriptionEn: "Loaded video from Shamsul haQue YouTube channel.",
       })
       setCustomInputUrl("")
@@ -181,7 +171,6 @@ export function SamsulAlamPlayer() {
   const handleSelectVideo = (item: ShamsulHaqueVideo) => {
     setSelectedVideo(item)
     setActiveVideoId(item.videoId)
-    setUseChannelFeed(false)
   }
 
   const filteredVideos = SHAMSUL_HAQUE_CHANNEL_VIDEOS.filter((v) => {
@@ -216,7 +205,7 @@ export function SamsulAlamPlayer() {
                   Shamsul haQue
                 </h2>
                 <span className="rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-bold text-red-800 dark:bg-red-950/60 dark:text-red-300">
-                  Official YouTube Channel
+                  Official Channel
                 </span>
               </div>
               <p className="text-xs text-stone-500 dark:text-stone-400">
@@ -342,31 +331,31 @@ export function SamsulAlamPlayer() {
             )}
 
             <a
-              href="https://www.youtube.com/@shamsul_haque"
+              href="https://www.youtube.com/@shamsul_haque/videos"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 rounded-xl border border-stone-200 bg-stone-50 px-3.5 py-2 text-xs font-semibold text-stone-700 hover:bg-stone-100 dark:border-stone-800 dark:bg-stone-800 dark:text-stone-300"
             >
               <ExternalLink className="h-3.5 w-3.5" />
-              চ্যানেলের সব ভিডিও দেখুন
+              @shamsul_haque চ্যানেলের সব ভিডিও
             </a>
           </div>
 
           <div className="flex items-center gap-2 text-xs text-stone-500">
             <span className="inline-flex items-center gap-1 font-medium">
               <Sparkles className="h-3.5 w-3.5 text-amber-500" />
-              Shamsul haQue অফিসিয়াল কন্টেন্ট
+              Shamsul haQue অফিসিয়াল তিলাওয়াত
             </span>
           </div>
         </div>
       </div>
 
-      {/* Custom Link Input from @shamsul_haque */}
+      {/* Custom Link Input for @shamsul_haque videos */}
       <div className="rounded-3xl border border-stone-200/80 bg-white/80 p-5 shadow-sm backdrop-blur dark:border-stone-800 dark:bg-stone-900/80">
         <div className="flex items-center gap-2 mb-2">
           <Link2 className="h-4 w-4 text-emerald-600" />
           <h3 className="text-xs sm:text-sm font-bold text-stone-900 dark:text-stone-100">
-            @shamsul_haque চ্যানেলের অন্য যেকোনো ভিডিও লিংক দিন
+            @shamsul_haque চ্যানেলের অন্য যেকোনো ভিডিও লিংক চালান
           </h3>
         </div>
         <p className="text-[11px] text-stone-500 mb-3">
@@ -374,17 +363,17 @@ export function SamsulAlamPlayer() {
             href="https://www.youtube.com/@shamsul_haque/videos"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-emerald-700 underline dark:text-emerald-400 font-semibold"
+            className="text-red-600 underline font-semibold"
           >
-            https://www.youtube.com/@shamsul_haque
+            https://www.youtube.com/@shamsul_haque/videos
           </a>{" "}
-          থেকে যেকোনো ভিডিও লিংক পেস্ট করলে সরাসরি এখানে দেখতে পারবেন।
+          থেকে যেকোনো ভিডিও লিংক কপি করে এখানে পেস্ট করলেই তা সরাসরি প্লে হবে।
         </p>
 
         <form onSubmit={handleApplyCustomUrl} className="flex flex-col sm:flex-row gap-2">
           <input
             type="text"
-            placeholder="উদাহরণ: https://www.youtube.com/watch?v=A7mdEViEU8M..."
+            placeholder="উদাহরণ: https://www.youtube.com/watch?v=..."
             value={customInputUrl}
             onChange={(e) => setCustomInputUrl(e.target.value)}
             className="flex-1 rounded-2xl border border-stone-200 bg-stone-50 px-4 py-2.5 text-xs font-medium focus:border-emerald-500 focus:outline-none dark:border-stone-800 dark:bg-stone-800 dark:text-stone-100"
@@ -402,12 +391,12 @@ export function SamsulAlamPlayer() {
         )}
       </div>
 
-      {/* Videos Catalog from Shamsul haQue */}
+      {/* Videos List */}
       <div className="space-y-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h3 className="text-lg font-bold text-stone-900 dark:text-stone-100">
-              Shamsul haQue চ্যানেলের নির্বাচিত ভিডিওসমূহ ({filteredVideos.length})
+              Shamsul haQue — অফিসিয়াল ভিডিও সংকলন ({filteredVideos.length})
             </h3>
             <p className="text-xs text-stone-500">
               যেকোনো ভিডিওতে ক্লিক করে সরাসরি উপরে উপভোগ করুন।
@@ -419,7 +408,7 @@ export function SamsulAlamPlayer() {
             <Search className="absolute left-3 top-2.5 h-4 w-4 text-stone-400" />
             <input
               type="text"
-              placeholder="ভিডিও বা সূরা খুঁজুন..."
+              placeholder="সূরা বা ভিডিও খুঁজুন..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full rounded-2xl border border-stone-200 bg-white/80 py-2 pl-9 pr-4 text-xs font-medium backdrop-blur focus:border-emerald-500 focus:outline-none dark:border-stone-800 dark:bg-stone-900/80 dark:text-stone-100"
@@ -484,3 +473,6 @@ export function SamsulAlamPlayer() {
     </div>
   )
 }
+
+// Backward compatibility alias
+export const SamsulAlamPlayer = ShamsulHaquePlayer
