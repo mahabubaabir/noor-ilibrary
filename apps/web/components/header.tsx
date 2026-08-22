@@ -15,15 +15,20 @@ import {
   Sun,
   User as UserIcon,
   X,
+  Compass,
+  Coins,
+  ShieldCheck,
 } from "lucide-react"
 import { Button } from "./ui/button"
 
 const navItems = [
   { href: "/quran", label: "কুরআন", icon: BookOpen },
   { href: "/hadith", label: "হাদিস", icon: Library },
+  { href: "/names-of-allah", label: "৯৯ নাম", icon: Sparkles },
+  { href: "/duas", label: "দু'আ ও যিকির", icon: Heart },
   { href: "/stories", label: "জীবনগাঁথা", icon: Sparkles },
-  { href: "/blog", label: "ব্লগ", icon: Heart },
-  { href: "/search", label: "খুঁজুন", icon: Search },
+  { href: "/tools", label: "টুলস", icon: Compass },
+  { href: "/blog", label: "ব্লগ", icon: BookOpen },
 ]
 
 export function Header() {

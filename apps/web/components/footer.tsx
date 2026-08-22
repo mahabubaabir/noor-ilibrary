@@ -23,7 +23,7 @@ export function Footer() {
           </div>
 
           {/* Quick Links */}
-          <div className="flex flex-wrap items-center justify-center gap-4 text-xs font-semibold text-stone-600 dark:text-stone-300">
+          <div className="flex flex-wrap items-center justify-center gap-3.5 text-xs font-semibold text-stone-600 dark:text-stone-300">
             <Link href="/quran" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
               কুরআন
             </Link>
@@ -32,16 +32,32 @@ export function Footer() {
               হাদিস
             </Link>
             <span className="text-stone-300 dark:text-stone-700">•</span>
+            <Link href="/names-of-allah" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+              ৯৯ নাম
+            </Link>
+            <span className="text-stone-300 dark:text-stone-700">•</span>
+            <Link href="/duas" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+              দু&apos;আ ও আযকার
+            </Link>
+            <span className="text-stone-300 dark:text-stone-700">•</span>
+            <Link href="/hisnul-muslim" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+              হিসনুল মুসলিম
+            </Link>
+            <span className="text-stone-300 dark:text-stone-700">•</span>
+            <Link href="/tasbih" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+              তাসবীহ
+            </Link>
+            <span className="text-stone-300 dark:text-stone-700">•</span>
+            <Link href="/zakat-calculator" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+              যাকাত
+            </Link>
+            <span className="text-stone-300 dark:text-stone-700">•</span>
             <Link href="/stories" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
               জীবনগাঁথা
             </Link>
             <span className="text-stone-300 dark:text-stone-700">•</span>
             <Link href="/library" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
               লাইব্রেরি
-            </Link>
-            <span className="text-stone-300 dark:text-stone-700">•</span>
-            <Link href="/blog" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
-              ব্লগ
             </Link>
           </div>
         </div>
