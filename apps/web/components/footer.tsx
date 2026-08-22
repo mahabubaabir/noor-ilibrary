@@ -52,6 +52,10 @@ export function Footer() {
               যাকাত
             </Link>
             <span className="text-stone-300 dark:text-stone-700">•</span>
+            <Link href="/companions" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+              সাহাবীদের জীবনী
+            </Link>
+            <span className="text-stone-300 dark:text-stone-700">•</span>
             <Link href="/stories" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
               জীবনগাঁথা
             </Link>

@@ -400,7 +400,7 @@ export default function HomePage() {
           </Link>
 
           {/* 2. COMPANION & LIFE STORIES */}
-          <Link href="/stories" className="group">
+          <Link href="/companions" className="group">
             <div className="relative h-full flex flex-col justify-between rounded-3xl border border-emerald-200/80 bg-gradient-to-b from-emerald-50/70 to-white/90 p-7 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-emerald-400 hover:shadow-xl dark:border-emerald-950 dark:from-emerald-950/20 dark:to-stone-900/90">
               <div>
                 <div className="flex items-center justify-between mb-5">
@@ -412,14 +412,14 @@ export default function HomePage() {
                   </span>
                 </div>
                 <h3 className="text-base sm:text-lg font-black text-stone-900 dark:text-stone-100 group-hover:text-emerald-700 dark:group-hover:text-emerald-400">
-                  সাহাবী ও মহামানবদের জীবনগাঁথা (COMPANION STORIES)
+                  সাহাবীদের জীবনগাঁথা (COMPANIONS OF THE PROPHET)
                 </h3>
                 <p className="mt-2 text-xs leading-relaxed text-stone-600 dark:text-stone-400">
-                  রাসূলুল্লাহ ﷺ ও খোলাফায়ে রাশেদীনের দীন, স্বাস্থ্য, দাম্পত্য, ব্যবসা ও সততার বাস্তব গল্প ই-বুক রিডারে পাঠ করুন।
+                  হযরত আবু বকর, উমর, উসমান, আলী, বিলাল, খালিদ বিন ওয়ালিদ ও খাদীজা (রাঃ) সহ সাহাবায়ে কেরামের আত্মত্যাগ ও সোনালী ইতিহাস।
                 </p>
               </div>
               <div className="mt-6 flex items-center gap-1.5 text-xs font-bold text-emerald-700 dark:text-emerald-400">
-                জীবনগাঁথা পাঠ শুরু করুন <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                সাহাবীদের জীবনী পাঠ করুন <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
               </div>
             </div>
           </Link>

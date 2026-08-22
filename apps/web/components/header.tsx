@@ -24,6 +24,7 @@ import { Button } from "./ui/button"
 const navItems = [
   { href: "/quran", label: "কুরআন", icon: BookOpen },
   { href: "/hadith", label: "হাদিস", icon: Library },
+  { href: "/companions", label: "সাহাবী", icon: ShieldCheck },
   { href: "/names-of-allah", label: "৯৯ নাম", icon: Sparkles },
   { href: "/duas", label: "দু'আ ও যিকির", icon: Heart },
   { href: "/stories", label: "জীবনগাঁথা", icon: Sparkles },
