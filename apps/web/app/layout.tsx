@@ -4,6 +4,7 @@ import "./globals.css"
 
 import { Providers } from "./providers"
 import { Header } from "../components/header"
+import { BlurredGeometryBackground } from "../components/ui/blurred-geometry-background"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -25,7 +26,7 @@ const notoBengali = Noto_Sans_Bengali({
 export const metadata: Metadata = {
   title: "Noor - Islamic Knowledge Library",
   description:
-    "Read and listen to the Quran with Arabic text, English and Bangla translations, explore Tafsir, Hadith collections, and study themed lessons.",
+    "Read and listen to the Quran with Arabic text, English and Bangla translations, explore Tafsir, Hadith collections, watch Surah video recitations, and study inspiring life stories.",
   icons: {
     icon: "/icon.svg",
   },
@@ -39,9 +40,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       suppressHydrationWarning
       className={`${inter.variable} ${notoArabic.variable} ${notoBengali.variable}`}
     >
-      <body className="min-h-screen bg-stone-50 font-sans text-stone-800 antialiased dark:bg-stone-950 dark:text-stone-200">
+      <body className="relative min-h-screen bg-stone-50/95 font-sans text-stone-800 antialiased dark:bg-stone-950/95 dark:text-stone-200">
+        <BlurredGeometryBackground />
         <Providers>
-          <div className="flex min-h-screen flex-col">
+          <div className="relative z-10 flex min-h-screen flex-col">
             <Header />
             <main className="flex-1">{children}</main>
           </div>

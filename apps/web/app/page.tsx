@@ -164,16 +164,22 @@ export default function HomePage() {
             <BookOpen className="h-4 w-4" /> কুরআন মাজীদ পড়ুন
           </Link>
           <Link
-            href="/hadith"
-            className="inline-flex items-center gap-2 rounded-2xl border border-stone-200 bg-white px-6 py-3 text-sm font-bold text-stone-800 shadow-sm hover:bg-stone-50 dark:border-stone-800 dark:bg-stone-900 dark:text-stone-200 transition-all active:scale-95"
+            href="/surah-media"
+            className="inline-flex items-center gap-2 rounded-2xl border border-emerald-500/30 bg-emerald-50/80 px-5 py-3 text-sm font-bold text-emerald-900 shadow-sm hover:bg-emerald-100 dark:border-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-200 transition-all active:scale-95"
           >
-            <Library className="h-4 w-4" /> হাদিস সংকলন
+            <Sparkles className="h-4 w-4 text-amber-500" /> ভিডিও সূরা (Media)
           </Link>
           <Link
-            href="/blog"
+            href="/stories"
             className="inline-flex items-center gap-2 rounded-2xl border border-stone-200 bg-white px-5 py-3 text-sm font-bold text-stone-800 shadow-sm hover:bg-stone-50 dark:border-stone-800 dark:bg-stone-900 dark:text-stone-200 transition-all active:scale-95"
           >
-            <Newspaper className="h-4 w-4" /> ইসলামিক ব্লগ
+            <BookMarked className="h-4 w-4 text-emerald-600" /> জীবনগাঁথা ও ইতিহাস
+          </Link>
+          <Link
+            href="/hadith"
+            className="inline-flex items-center gap-2 rounded-2xl border border-stone-200 bg-white px-5 py-3 text-sm font-bold text-stone-800 shadow-sm hover:bg-stone-50 dark:border-stone-800 dark:bg-stone-900 dark:text-stone-200 transition-all active:scale-95"
+          >
+            <Library className="h-4 w-4" /> হাদিস সংকলন
           </Link>
         </div>
       </div>
@@ -392,8 +398,44 @@ export default function HomePage() {
           </div>
         </Link>
 
+        {/* Life Stories & History (with PDF / E-Book Reader & Highlights) */}
+        <Link href="/stories" className="group">
+          <div className="relative h-full overflow-hidden rounded-3xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/5 to-transparent p-7 transition-all duration-200 hover:-translate-y-1 hover:border-emerald-500 hover:shadow-xl dark:border-emerald-500/20 dark:bg-stone-900">
+            <div className="mb-4 inline-flex rounded-2xl bg-emerald-600 p-3 text-white shadow-md">
+              <Sparkles className="h-6 w-6 text-amber-300" />
+            </div>
+            <h3 className="mb-2 text-xl font-bold text-stone-900 dark:text-stone-100">
+              জীবনগাঁথা ও ইতিহাস (Life Stories)
+            </h3>
+            <p className="text-sm leading-relaxed text-stone-600 dark:text-stone-400">
+              রাসূলুল্লাহ ﷺ ও মহামানবদের দীন, স্বাস্থ্য, খাদ্যাভ্যাস, দাম্পত্য, সন্তান, ব্যবসা ও সততার বাস্তব গল্প। পিডিএফ রিডার, হাইলাইট ও নোটস ফিচারযুক্ত।
+            </p>
+            <div className="mt-6 flex items-center gap-1.5 text-xs font-bold text-emerald-700 dark:text-emerald-400">
+              ই-বুক রিডারে পাঠ করুন <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+            </div>
+          </div>
+        </Link>
+
+        {/* YouTube Surah Media (Shamsul Hoque Playlist) */}
+        <Link href="/surah-media" className="group">
+          <div className="relative h-full overflow-hidden rounded-3xl border border-stone-200/80 bg-white p-7 transition-all duration-200 hover:-translate-y-1 hover:border-red-400 hover:shadow-xl dark:border-stone-800 dark:bg-stone-900">
+            <div className="mb-4 inline-flex rounded-2xl bg-red-600 p-3 text-white shadow-md">
+              <Sparkles className="h-6 w-6" />
+            </div>
+            <h3 className="mb-2 text-xl font-bold text-stone-900 dark:text-stone-100">
+              ভিডিও সূরা ও তিলাওয়াত (Surah Media)
+            </h3>
+            <p className="text-sm leading-relaxed text-stone-600 dark:text-stone-400">
+              শামসুল হক ইউটিউব প্লেলিস্ট সংকলন। থিয়েটার মোড ও কুরআনে সরাসরি পড়ার সুবিধাসহ নির্বাচিত সূরা তিলাওয়াত।
+            </p>
+            <div className="mt-6 flex items-center gap-1.5 text-xs font-bold text-red-600 dark:text-red-400">
+              ভিডিও প্লেয়ার চালু করুন <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+            </div>
+          </div>
+        </Link>
+
         {/* Study & Reflections */}
-        <Link href="/study" className="group sm:col-span-2 lg:col-span-1">
+        <Link href="/study" className="group">
           <div className="relative h-full overflow-hidden rounded-3xl border border-stone-200/80 bg-white p-7 transition-all duration-200 hover:-translate-y-1 hover:border-blue-400 hover:shadow-xl dark:border-stone-800 dark:bg-stone-900">
             <div className="mb-4 inline-flex rounded-2xl bg-blue-500 p-3 text-white shadow-md">
               <Compass className="h-6 w-6" />
@@ -406,6 +448,24 @@ export default function HomePage() {
             </p>
             <div className="mt-6 flex items-center gap-1.5 text-xs font-bold text-blue-700 dark:text-blue-400">
               বিষয়ভিত্তিক পাঠ শুরু করুন <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+            </div>
+          </div>
+        </Link>
+
+        {/* Blog / Articles Module */}
+        <Link href="/blog" className="group">
+          <div className="relative h-full overflow-hidden rounded-3xl border border-stone-200/80 bg-white p-7 transition-all duration-200 hover:-translate-y-1 hover:border-purple-400 hover:shadow-xl dark:border-stone-800 dark:bg-stone-900">
+            <div className="mb-4 inline-flex rounded-2xl bg-purple-600 p-3 text-white shadow-md">
+              <Newspaper className="h-6 w-6" />
+            </div>
+            <h3 className="mb-2 text-xl font-bold text-stone-900 dark:text-stone-100">
+              ইসলামিক প্রবন্ধ ও ব্লগ (Articles)
+            </h3>
+            <p className="text-sm leading-relaxed text-stone-600 dark:text-stone-400">
+              কুরআন-হাদিসের আলোকে সমসাময়িক জিজ্ঞাসা ও জীবন ঘনিষ্ঠ শিক্ষণীয় ইসলামিক আর্টিকেলের সমৃদ্ধ সংগ্রহশালা।
+            </p>
+            <div className="mt-6 flex items-center gap-1.5 text-xs font-bold text-purple-700 dark:text-purple-400">
+              সকল ব্লগ পড়ুন <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
             </div>
           </div>
         </Link>

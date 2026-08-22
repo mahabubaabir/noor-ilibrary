@@ -12,11 +12,30 @@ export interface SafeUser {
   id: string
   email: string
   name: string | null
+  username: string | null
+  avatar: string | null
+  bio: string | null
   role: string
 }
 
-function toSafeUser(user: { id: string; email: string; name: string | null; role?: string }): SafeUser {
-  return { id: user.id, email: user.email, name: user.name, role: user.role || 'user' }
+function toSafeUser(user: {
+  id: string
+  email: string
+  name: string | null
+  username?: string | null
+  avatar?: string | null
+  bio?: string | null
+  role?: string
+}): SafeUser {
+  return {
+    id: user.id,
+    email: user.email,
+    name: user.name,
+    username: user.username || null,
+    avatar: user.avatar || null,
+    bio: user.bio || null,
+    role: user.role || 'user',
+  }
 }
 
 export async function hashPassword(password: string): Promise<string> {
@@ -125,7 +144,19 @@ export async function getCurrentUser(): Promise<SafeUser | null> {
 
   const session = await prisma.session.findUnique({
     where: { token },
-    include: { user: { select: { id: true, email: true, name: true, role: true } } },
+    include: {
+      user: {
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          username: true,
+          avatar: true,
+          bio: true,
+          role: true,
+        },
+      },
+    },
   })
 
   if (!session || session.expiresAt <= new Date()) {

@@ -16,7 +16,10 @@ model ContentCache {
 model User {
   id                  String               @id @default(cuid())
   email               String               @unique
+  username            String?              @unique
   name                String?
+  avatar              String?
+  bio                 String?
   passwordHash        String
   role                String               @default("user")
   createdAt           DateTime             @default(now())
@@ -28,6 +31,8 @@ model User {
   preference          UserPreference?
   passwordResetTokens PasswordResetToken[]
   posts               BlogPost[]
+  highlights          UserHighlight[]
+  notes               UserNote[]
 }
 
 model PasswordResetToken {
@@ -145,3 +150,36 @@ model HadithBookmark {
   @@unique([userId, collection, hadithNumber])
   @@index([userId, createdAt])
 }
+
+model UserHighlight {
+  id         String   @id @default(cuid())
+  userId     String
+  targetId   String   // e.g. "prophet-life-routine", "surah-1", etc.
+  targetType String   @default("story") // "story" | "quran" | "hadith"
+  text       String
+  color      String   @default("yellow") // "yellow" | "green" | "blue" | "purple" | "pink"
+  note       String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, targetType, targetId])
+  @@index([userId, createdAt])
+}
+
+model UserNote {
+  id         String   @id @default(cuid())
+  userId     String
+  targetId   String
+  targetType String   @default("story")
+  title      String?
+  content    String
+  color      String?  @default("emerald")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, targetType, targetId])
+  @@index([userId, createdAt])
+}
+

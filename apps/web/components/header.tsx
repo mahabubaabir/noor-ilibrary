@@ -10,23 +10,33 @@ import {
   LogOut,
   Menu,
   Moon,
+  PlayCircle,
   Search,
+  Sparkles,
   Sun,
-  User,
+  User as UserIcon,
   X,
 } from "lucide-react"
 import { Button } from "./ui/button"
 
 const navItems = [
-  { href: "/quran", label: "কুরআন (Quran)", icon: BookOpen },
-  { href: "/hadith", label: "হাদিস (Hadith)", icon: Library },
-  { href: "/blog", label: "ব্লগ (Blog)", icon: Heart },
-  { href: "/search", label: "খুঁজুন (Search)", icon: Search },
+  { href: "/quran", label: "কুরআন", icon: BookOpen },
+  { href: "/hadith", label: "হাদিস", icon: Library },
+  { href: "/surah-media", label: "ভিডিও সূরা", icon: PlayCircle },
+  { href: "/stories", label: "জীবনগাঁথা", icon: Sparkles },
+  { href: "/blog", label: "ব্লগ", icon: Heart },
+  { href: "/search", label: "খুঁজুন", icon: Search },
 ]
 
 export function Header() {
   const pathname = usePathname()
-  const [user, setUser] = useState<{ name: string; email: string; role?: string } | null>(null)
+  const [user, setUser] = useState<{
+    name: string | null
+    username?: string | null
+    email: string
+    avatar?: string | null
+    role?: string
+  } | null>(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [darkMode, setDarkMode] = useState(true)
   const [mounted, setMounted] = useState(false)
@@ -118,24 +128,33 @@ export function Header() {
               )}
               <Link
                 href="/library"
-                className="hidden items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-stone-600 transition-all hover:bg-stone-100 dark:text-stone-400 dark:hover:bg-stone-800 md:flex"
+                className="hidden items-center gap-2 rounded-xl px-3 py-1.5 text-sm font-medium text-stone-600 transition-all hover:bg-stone-100 dark:text-stone-400 dark:hover:bg-stone-800 md:flex"
               >
-                <Heart className="h-4 w-4" />
-                Library
+                {user.avatar ? (
+                  <img
+                    src={user.avatar}
+                    alt={user.name || "User Avatar"}
+                    className="h-7 w-7 rounded-full object-cover ring-2 ring-emerald-500/30"
+                  />
+                ) : (
+                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-600 text-xs font-bold text-white shadow-sm">
+                    {user.name?.charAt(0)?.toUpperCase() || user.email?.charAt(0)?.toUpperCase()}
+                  </div>
+                )}
+                <span className="max-w-[120px] truncate text-xs font-semibold text-stone-800 dark:text-stone-200">
+                  {user.name || user.username || "আমার প্রোফাইল"}
+                </span>
               </Link>
-              <div className="hidden items-center gap-2 md:flex">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 text-sm font-medium text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
-                  {user.name?.charAt(0)?.toUpperCase() || user.email?.charAt(0)?.toUpperCase()}
-                </div>
-                <Button variant="ghost" size="icon" onClick={logout} title="Logout">
+              <div className="hidden items-center gap-1 md:flex">
+                <Button variant="ghost" size="icon" onClick={logout} title="Logout" className="text-stone-500 hover:text-red-600">
                   <LogOut className="h-4 w-4" />
                 </Button>
               </div>
             </>
           ) : (
             <Link href="/login" className="hidden md:block">
-              <Button variant="ghost" size="sm" className="gap-2">
-                <User className="h-4 w-4" />
+              <Button variant="ghost" size="sm" className="gap-2 text-xs font-semibold">
+                <UserIcon className="h-4 w-4" />
                 Sign In
               </Button>
             </Link>
@@ -208,7 +227,7 @@ export function Header() {
                 onClick={() => setMobileMenuOpen(false)}
                 className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-stone-600 hover:bg-stone-100 dark:text-stone-400 dark:hover:bg-stone-800"
               >
-                <User className="h-4 w-4" />
+                <UserIcon className="h-4 w-4" />
                 Sign In
               </Link>
             )}
