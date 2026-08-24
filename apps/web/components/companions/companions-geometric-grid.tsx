@@ -13,7 +13,13 @@ import {
 } from "lucide-react"
 import { COMPANIONS_COLLECTION, CompanionItem } from "@/lib/companions-data"
 
-export function CompanionsGeometricGrid() {
+interface Props {
+  initialCompanions?: CompanionItem[]
+}
+
+export function CompanionsGeometricGrid({ initialCompanions = [] }: Props) {
+  const companionsData = initialCompanions.length > 0 ? initialCompanions : COMPANIONS_COLLECTION;
+  
   const [selectedCompanion, setSelectedCompanion] = useState<CompanionItem | null>(null)
   const [language, setLanguage] = useState<"bn" | "en">("bn")
   const [isPlayingAudio, setIsPlayingAudio] = useState(false)
@@ -145,9 +151,9 @@ export function CompanionsGeometricGrid() {
 
         {/* Grid of Companions */}
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {COMPANIONS_COLLECTION.map((companion) => (
+          {companionsData.map((companion) => (
             <div
-              key={companion.id}
+              key={companion.id || companion.slug}
               onClick={() => setSelectedCompanion(companion)}
               className="group relative cursor-pointer overflow-hidden rounded-3xl border border-stone-200 bg-white/60 p-6 shadow-sm backdrop-blur transition-all duration-300 hover:-translate-y-1 hover:border-emerald-500/50 hover:bg-white hover:shadow-lg dark:border-stone-800 dark:bg-stone-900/50 dark:hover:bg-stone-900"
             >

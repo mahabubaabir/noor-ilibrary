@@ -1,45 +1,23 @@
-"use client"
-
-import React, { useState } from "react"
+import React from "react"
 import Link from "next/link"
-import {
-  Sparkles,
-  Search,
-  BookOpen,
-  ArrowRight,
-  Shield,
-  Heart,
-  Scale,
-  Zap,
-  BookMarked,
-  Award,
-  Users,
-  Compass,
-} from "lucide-react"
-import { COMPANIONS_COLLECTION, COMPANION_CATEGORIES, CompanionItem } from "@/lib/companions-data"
+import { BookOpen, Users } from "lucide-react"
 import { CompanionsGeometricGrid } from "@/components/companions/companions-geometric-grid"
+import { client } from "@/sanity/lib/client"
+import { companionsQuery } from "@/sanity/lib/queries"
 
-export default function CompanionsPage() {
-  const [searchQuery, setSearchQuery] = useState("")
-  const [selectedCategory, setSelectedCategory] = useState<string>("all")
+// Force dynamic or revalidate as needed
+export const revalidate = 3600 // revalidate at most every hour
 
-  const filteredCompanions = COMPANIONS_COLLECTION.filter((item) => {
-    const matchCategory =
-      selectedCategory === "all" || item.category === selectedCategory
-
-    const q = searchQuery.toLowerCase().trim()
-    const matchQuery =
-      !q ||
-      item.nameBn.toLowerCase().includes(q) ||
-      item.nameEn.toLowerCase().includes(q) ||
-      item.titleBn.toLowerCase().includes(q) ||
-      item.titleEn.toLowerCase().includes(q) ||
-      item.arabicName.includes(q) ||
-      item.shortBioBn.toLowerCase().includes(q) ||
-      item.keyAttributesBn.some((attr) => attr.toLowerCase().includes(q))
-
-    return matchCategory && matchQuery
-  })
+export default async function CompanionsPage() {
+  let initialCompanions = []
+  
+  try {
+    // Attempt to fetch from Sanity
+    // Note: If project ID is missing, client will throw or return empty.
+    initialCompanions = await client.fetch(companionsQuery)
+  } catch (error) {
+    console.warn("Failed to fetch companions from Sanity. Falling back to local data.", error)
+  }
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
@@ -72,7 +50,7 @@ export default function CompanionsPage() {
 
       {/* Interactive Companions Experience Widget */}
       <div className="mb-12">
-        <CompanionsGeometricGrid />
+        <CompanionsGeometricGrid initialCompanions={initialCompanions} />
       </div>
     </div>
   )
