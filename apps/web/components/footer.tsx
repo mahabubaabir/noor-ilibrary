@@ -63,6 +63,11 @@ export function Footer() {
             <Link href="/library" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
               লাইব্রেরি
             </Link>
+            <span className="text-stone-300 dark:text-stone-700">•</span>
+            <Link href="/studio" className="flex items-center gap-1 font-bold text-amber-600 hover:text-amber-700 dark:text-amber-500 dark:hover:text-amber-400 transition-colors">
+              <Sparkles className="h-3 w-3" />
+              Content Studio
+            </Link>
           </div>
         </div>
 
