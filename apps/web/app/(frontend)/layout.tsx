@@ -1,11 +1,11 @@
 import type { Metadata } from "next"
 import { Inter, Noto_Naskh_Arabic, Noto_Sans_Bengali } from "next/font/google"
-import "./globals.css"
+import "../globals.css"
 
-import { Providers } from "./providers"
-import { Header } from "../components/header"
-import { Footer } from "../components/footer"
-import { BlurredGeometryBackground } from "../components/ui/blurred-geometry-background"
+import { Providers } from "../providers"
+import { Header } from "../../components/header"
+import { Footer } from "../../components/footer"
+import { BlurredGeometryBackground } from "../../components/ui/blurred-geometry-background"
 
 const inter = Inter({
   subsets: ["latin"],

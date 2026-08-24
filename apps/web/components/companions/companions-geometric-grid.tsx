@@ -217,9 +217,9 @@ export function CompanionsGeometricGrid({ initialCompanions = [] }: Props) {
               </p>
 
               {/* Key Attributes Highlights */}
-              {selectedCompanion.keyAttributesBn?.length > 0 && (
+              {selectedCompanion.keyAttributesBn && selectedCompanion.keyAttributesBn.length > 0 && (
                 <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2 pt-4 border-t border-stone-200 dark:border-stone-800 text-xs text-stone-500 dark:text-stone-400">
-                  {(language === "bn" ? selectedCompanion.keyAttributesBn : selectedCompanion.keyAttributesEn).slice(0, 2).map((attr, i) => (
+                  {(language === "bn" ? selectedCompanion.keyAttributesBn : selectedCompanion.keyAttributesEn || []).slice(0, 2).map((attr, i) => (
                     <div key={i} className="flex items-center gap-2">
                       <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 shrink-0" />
                       <span className="font-medium">{attr}</span>

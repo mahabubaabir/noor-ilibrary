@@ -3,7 +3,7 @@ import { groq } from "next-sanity"
 export const companionsQuery = groq`*[_type == "companion"] | order(nameEn asc) {
   _id,
   id,
-  slug,
+  "slug": slug.current,
   nameBn,
   nameEn,
   arabicName,
