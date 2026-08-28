@@ -15,6 +15,7 @@ import {
   Trash2,
   Edit3,
   CheckCircle2,
+  Sparkles,
 } from "lucide-react"
 
 export default function AdminDashboardPage() {
@@ -108,7 +109,15 @@ export default function AdminDashboardPage() {
             </p>
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
+            <Link
+              href="/studio"
+              className="inline-flex items-center gap-2 rounded-2xl border border-amber-500/40 bg-amber-500/15 px-4 py-2.5 text-xs font-bold text-amber-900 shadow-sm transition-all hover:bg-amber-500/25 active:scale-95 dark:border-amber-500/30 dark:bg-amber-950/60 dark:text-amber-300"
+            >
+              <Sparkles className="h-4 w-4 text-amber-500" />
+              <span>Sanity Content Studio</span>
+            </Link>
+
             <Link
               href="/admin/posts/new"
               className="inline-flex items-center gap-2 rounded-2xl bg-emerald-600 px-5 py-2.5 text-xs font-bold text-white shadow-md hover:bg-emerald-700 transition-all active:scale-95"
