@@ -24,7 +24,7 @@ import {
   Play,
 } from "lucide-react"
 import type { DailyHadithItem } from "@/lib/daily-hadith"
-import { InteractiveAmbientHero } from "@/components/ui/interactive-ambient-hero"
+import { CinematicHero } from "@/components/home/cinematic-hero"
 import { SpotlightTiltCard } from "@/components/ui/spotlight-tilt-card"
 import { ForYouFeed } from "@/components/home/for-you-feed"
 import { trackUserInteraction } from "@/lib/recommendation/engine"
@@ -147,62 +147,21 @@ export default function HomePage() {
   }
 
   return (
-    <div className="relative min-h-screen">
-      {/* Interactive Celestial Ambient Motion Canvas */}
-      <InteractiveAmbientHero />
+    <div className="relative min-h-screen bg-stone-50 dark:bg-stone-950 transition-colors">
+      {/* 1. Full-Screen Cinematic Hero with Calligraphy, Parallax & Reciter Audio */}
+      <CinematicHero />
 
-      <div className="relative z-10 mx-auto max-w-6xl px-4 py-12 sm:py-16">
-        {/* Minimalist, Captivating Hero Header */}
-        <div className="mb-14 text-center">
-          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-50/90 px-4 py-1.5 text-xs font-black text-emerald-900 shadow-sm backdrop-blur-md dark:border-emerald-500/40 dark:bg-emerald-950/60 dark:text-emerald-300 animate-in fade-in zoom-in-95 duration-500">
-            <Sparkles className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-            নূর ইসলামিক নলেজ লাইব্রেরি • NOOR LIBRARY
-          </div>
-
-          <h1 className="mb-5 text-4xl font-black tracking-tight text-stone-900 sm:text-6xl lg:text-7xl dark:text-stone-100">
-            পবিত্র কুরআন ও সুন্নাহর{" "}
-            <span className="bg-gradient-to-r from-emerald-600 via-teal-600 to-amber-600 bg-clip-text text-transparent dark:from-emerald-400 dark:via-teal-400 dark:to-amber-400">
-              আধুনিক ডিজিটাল পাঠাগার
-            </span>
-          </h1>
-
-          <p className="mx-auto max-w-2xl text-sm sm:text-base leading-relaxed text-stone-600 dark:text-stone-300">
-            সহজ ও বিশুদ্ধ অনুবাদে কুরআন তিলাওয়াত, তাফসীর ইবনে কাসীর, বিশুদ্ধ হাদিস গ্রন্থসমূহ, আসমাউল হুসনা, মাসনূন দু&apos;আ এবং সাহাবীদের সোনালী জীবনগাঁথা।
-          </p>
-
-          {/* Minimalist Action Badges */}
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            <Link
-              href="/quran"
-              onClick={() => trackUserInteraction("quran", "hero-quran")}
-              className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 px-6 py-3.5 text-sm font-extrabold text-white shadow-xl shadow-emerald-600/30 transition-all hover:scale-105 active:scale-95"
-            >
-              <BookOpen className="h-4 w-4" /> কুরআন মাজীদ শুরু করুন
-            </Link>
-
-            <Link
-              href="/names-of-allah"
-              onClick={() => trackUserInteraction("names", "hero-names")}
-              className="inline-flex items-center gap-2 rounded-2xl border border-amber-500/40 bg-amber-50/90 px-5 py-3.5 text-sm font-extrabold text-amber-900 shadow-sm transition-all hover:bg-amber-100 hover:scale-105 active:scale-95 dark:border-amber-700 dark:bg-amber-950/60 dark:text-amber-200"
-            >
-              <Sparkles className="h-4 w-4 text-amber-500" /> আল্লাহর ৯৯ নাম
-            </Link>
-
-            <Link
-              href="/companions"
-              onClick={() => trackUserInteraction("companion", "hero-companions")}
-              className="inline-flex items-center gap-2 rounded-2xl border border-stone-200/90 bg-white/90 px-5 py-3.5 text-sm font-extrabold text-stone-800 shadow-sm transition-all hover:bg-stone-50 hover:scale-105 active:scale-95 dark:border-stone-800 dark:bg-stone-900/90 dark:text-stone-200"
-            >
-              <ShieldCheck className="h-4 w-4 text-emerald-600" /> সাহাবীদের জীবনী
-            </Link>
-          </div>
-        </div>
+      {/* 2. Content Sections Below the Fold */}
+      <div id="main-feed-section" className="relative z-10 mx-auto max-w-6xl px-4 py-12 sm:py-16">
+        
+        {/* SMART PERSONALIZED "FOR YOU" RECOMMENDATION FEED */}
+        <ForYouFeed />
 
         {/* Dynamic Hadith of the Day Card with Spotlight FX */}
         <SpotlightTiltCard
           tiltIntensity={5}
           spotlightColor="rgba(217, 119, 6, 0.16)"
-          className="mb-14 border-amber-500/30 bg-gradient-to-br from-amber-500/10 via-white/95 to-amber-500/5 p-6 sm:p-8 shadow-xl backdrop-blur-2xl dark:border-amber-500/30 dark:from-stone-900/95 dark:via-stone-900/90 dark:to-amber-950/30"
+          className="my-14 border-amber-500/30 bg-gradient-to-br from-amber-500/10 via-white/95 to-amber-500/5 p-6 sm:p-8 shadow-xl backdrop-blur-2xl dark:border-amber-500/30 dark:from-stone-900/95 dark:via-stone-900/90 dark:to-amber-950/30"
         >
           <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-amber-200/60 pb-4 dark:border-stone-800">
             <div className="flex items-center gap-3">
@@ -374,9 +333,6 @@ export default function HomePage() {
             </div>
           ) : null}
         </SpotlightTiltCard>
-
-        {/* SMART PERSONALIZED "FOR YOU" RECOMMENDATION FEED */}
-        <ForYouFeed />
 
         {/* CORE RESOURCE TILES WITH 3D SPOTLIGHT GESTURES */}
         <div className="my-16">
