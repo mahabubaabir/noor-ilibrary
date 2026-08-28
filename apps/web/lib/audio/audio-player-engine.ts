@@ -93,9 +93,13 @@ export function getAyahAudioSources(
   }
 }
 
+/**
+ * Universal Human-Voice Speech Narration Engine
+ * Features sequential sentence streaming via high-fidelity TTS CDN with seamless browser Web Speech fallback.
+ */
 export function playSafeSpeech({
   text,
-  lang = "ar-SA",
+  lang = "bn-BD",
   rate = 0.9,
   onStart,
   onEnd,
@@ -108,33 +112,110 @@ export function playSafeSpeech({
   onEnd?: () => void
   onError?: (err?: unknown) => void
 }): { cancel: () => void } {
-  if (typeof window === "undefined" || !("speechSynthesis" in window)) {
-    onError?.(new Error("Web Speech API is not supported in this browser"))
+  let isCancelled = false
+  let currentAudio: HTMLAudioElement | null = null
+
+  const cleanText = text.replace(/[\n\r\t]+/g, " ").trim()
+  if (!cleanText) {
+    onEnd?.()
     return { cancel: () => {} }
   }
 
-  try {
-    window.speechSynthesis.cancel()
+  const langCode = lang.startsWith("bn") ? "bn" : lang.startsWith("ar") ? "ar" : "en"
 
-    const utterance = new SpeechSynthesisUtterance(text)
-    utterance.lang = lang
-    utterance.rate = rate
+  // Split long descriptions into natural sentence segments (<140 chars)
+  const rawSegments = cleanText.split(/([।\.\?\!]+)/).filter(Boolean)
+  const chunks: string[] = []
+  let buffer = ""
 
-    utterance.onstart = () => onStart?.()
-    utterance.onend = () => onEnd?.()
-    utterance.onerror = (e) => {
-      console.warn("Speech synthesis error:", e)
-      onError?.(e)
+  for (let i = 0; i < rawSegments.length; i++) {
+    const segment = rawSegments[i]!
+    if ((buffer + segment).length < 140) {
+      buffer += segment
+    } else {
+      if (buffer.trim()) chunks.push(buffer.trim())
+      buffer = segment
+    }
+  }
+  if (buffer.trim()) chunks.push(buffer.trim())
+  if (chunks.length === 0) chunks.push(cleanText.slice(0, 140))
+
+  const playChunk = (index: number) => {
+    if (isCancelled) return
+    if (index >= chunks.length) {
+      onEnd?.()
+      return
     }
 
-    // Workaround for mobile browsers speech synthesis activation
-    window.speechSynthesis.speak(utterance)
+    const chunkText = chunks[index]!
+    const encoded = encodeURIComponent(chunkText)
+    const ttsUrl = `https://translate.google.com/translate_tts?ie=UTF-8&tl=${langCode}&client=tw-ob&q=${encoded}`
 
-    return {
-      cancel: () => window.speechSynthesis.cancel(),
+    const audio = new Audio(ttsUrl)
+    currentAudio = audio
+
+    audio.onplay = () => {
+      if (index === 0 && !isCancelled) onStart?.()
     }
-  } catch (err) {
-    onError?.(err)
-    return { cancel: () => {} }
+
+    audio.onended = () => {
+      if (!isCancelled) {
+        playChunk(index + 1)
+      }
+    }
+
+    audio.onerror = () => {
+      // Fallback to Native Speech Synthesis if TTS Audio fails
+      if (isCancelled) return
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        try {
+          window.speechSynthesis.cancel()
+          const utterance = new SpeechSynthesisUtterance(cleanText)
+          utterance.lang = lang
+          utterance.rate = rate
+
+          utterance.onstart = () => {
+            if (!isCancelled) onStart?.()
+          }
+          utterance.onend = () => {
+            if (!isCancelled) onEnd?.()
+          }
+          utterance.onerror = (e) => {
+            if (!isCancelled) onError?.(e)
+          }
+
+          window.speechSynthesis.speak(utterance)
+        } catch (e) {
+          onError?.(e)
+        }
+      } else {
+        onError?.(new Error("Audio speech unavailable"))
+      }
+    }
+
+    audio.play().catch(() => {
+      // If direct playback was blocked, attempt speechSynthesis
+      if (audio.onerror) {
+        audio.onerror(new Event("error"))
+      }
+    })
+  }
+
+  // Begin playback
+  playChunk(0)
+
+  return {
+    cancel: () => {
+      isCancelled = true
+      if (currentAudio) {
+        currentAudio.pause()
+        currentAudio.src = ""
+        currentAudio = null
+      }
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        window.speechSynthesis.cancel()
+      }
+      onEnd?.()
+    },
   }
 }

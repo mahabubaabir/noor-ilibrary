@@ -10,6 +10,7 @@ import {
   Pause,
   ArrowRight,
   Sparkles,
+  Loader2,
 } from "lucide-react"
 import { COMPANIONS_COLLECTION, CompanionItem } from "@/lib/companions-data"
 
@@ -25,17 +26,20 @@ export function CompanionsGeometricGrid({ initialCompanions = [] }: Props) {
   const [selectedCompanion, setSelectedCompanion] = useState<CompanionItem | null>(null)
   const [language, setLanguage] = useState<"bn" | "en">("bn")
   const [isPlayingAudio, setIsPlayingAudio] = useState(false)
+  const [isLoadingAudio, setIsLoadingAudio] = useState(false)
   const audioCancelRef = useRef<(() => void) | null>(null)
 
   // Audio speech narration
   const handleToggleNarration = () => {
     if (!selectedCompanion) return
 
-    if (isPlayingAudio) {
+    if (isPlayingAudio || isLoadingAudio) {
       audioCancelRef.current?.()
       setIsPlayingAudio(false)
+      setIsLoadingAudio(false)
     } else {
       audioCancelRef.current?.()
+      setIsLoadingAudio(true)
       const text =
         language === "bn"
           ? `${selectedCompanion.nameBn}। ${selectedCompanion.titleBn || ""}। ${selectedCompanion.shortBioBn}`
@@ -44,9 +48,18 @@ export function CompanionsGeometricGrid({ initialCompanions = [] }: Props) {
       const { cancel } = playSafeSpeech({
         text,
         lang: language === "bn" ? "bn-BD" : "en-US",
-        onStart: () => setIsPlayingAudio(true),
-        onEnd: () => setIsPlayingAudio(false),
-        onError: () => setIsPlayingAudio(false),
+        onStart: () => {
+          setIsLoadingAudio(false)
+          setIsPlayingAudio(true)
+        },
+        onEnd: () => {
+          setIsLoadingAudio(false)
+          setIsPlayingAudio(false)
+        },
+        onError: () => {
+          setIsLoadingAudio(false)
+          setIsPlayingAudio(false)
+        },
       })
       audioCancelRef.current = cancel
     }
@@ -54,9 +67,10 @@ export function CompanionsGeometricGrid({ initialCompanions = [] }: Props) {
 
   const handleCloseModal = () => {
     setSelectedCompanion(null)
-    if (isPlayingAudio) {
+    if (isPlayingAudio || isLoadingAudio) {
       audioCancelRef.current?.()
       setIsPlayingAudio(false)
+      setIsLoadingAudio(false)
     }
   }
 
@@ -242,16 +256,31 @@ export function CompanionsGeometricGrid({ initialCompanions = [] }: Props) {
 
               <button
                 onClick={handleToggleNarration}
-                className="w-full sm:w-72 inline-flex items-center justify-center gap-2 rounded-full border border-stone-200 bg-white px-6 py-3 text-sm font-bold text-stone-700 shadow-sm hover:bg-stone-50 transition-all active:scale-95 dark:border-stone-700 dark:bg-stone-800 dark:text-stone-200 dark:hover:bg-stone-700"
+                disabled={isLoadingAudio}
+                className={`w-full sm:w-72 inline-flex items-center justify-center gap-2 rounded-full border px-6 py-3 text-sm font-bold shadow-sm transition-all active:scale-95 ${
+                  isPlayingAudio
+                    ? "border-emerald-500 bg-emerald-50 text-emerald-800 ring-2 ring-emerald-500/20 dark:border-emerald-500/40 dark:bg-emerald-950/60 dark:text-emerald-300"
+                    : "border-stone-200 bg-white text-stone-700 hover:bg-stone-50 dark:border-stone-700 dark:bg-stone-800 dark:text-stone-200 dark:hover:bg-stone-700"
+                }`}
               >
-                {isPlayingAudio ? (
+                {isLoadingAudio ? (
                   <>
-                    <Pause className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                    <span>{language === "bn" ? "অডিও থামান" : "Pause Narration"}</span>
+                    <Loader2 className="h-4 w-4 animate-spin text-emerald-600 dark:text-emerald-400" />
+                    <span>{language === "bn" ? "অডিও লোড হচ্ছে..." : "Loading Audio..."}</span>
+                  </>
+                ) : isPlayingAudio ? (
+                  <>
+                    <Pause className="h-4 w-4 text-emerald-600 dark:text-emerald-400 fill-current" />
+                    <span>{language === "bn" ? "অডিও বিরতি দিন" : "Pause Narration"}</span>
+                    <span className="flex items-center gap-0.5 ml-1">
+                      <span className="h-2 w-0.5 bg-emerald-600 dark:bg-emerald-400 rounded-full animate-bounce" />
+                      <span className="h-3 w-0.5 bg-emerald-600 dark:bg-emerald-400 rounded-full animate-bounce [animation-delay:0.15s]" />
+                      <span className="h-2 w-0.5 bg-emerald-600 dark:bg-emerald-400 rounded-full animate-bounce [animation-delay:0.3s]" />
+                    </span>
                   </>
                 ) : (
                   <>
-                    <Play className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                    <Play className="h-4 w-4 text-emerald-600 dark:text-emerald-400 fill-current" />
                     <span>{language === "bn" ? "অডিও বিবরণ শুনুন" : "Listen to Audio"}</span>
                   </>
                 )}
