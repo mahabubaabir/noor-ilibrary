@@ -43,7 +43,8 @@ async function migrate() {
       await client.createOrReplace(doc)
       console.log(`✅ Successfully migrated ${companion.nameEn}`)
     } catch (error) {
-      console.error(`❌ Failed to migrate ${companion.nameEn}:`, error.message)
+      const msg = error instanceof Error ? error.message : String(error)
+      console.error(`❌ Failed to migrate ${companion.nameEn}:`, msg)
     }
   }
 

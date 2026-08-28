@@ -21,12 +21,9 @@ import {
 import Link from "next/link"
 import type { SurahDetail, Ayah } from "@noor/types"
 
-const RECITERS = [
-  { name: "Mishary Rashid Alafasy", id: "ar.alafasy" },
-  { name: "Abdul Rahman As-Sudais", id: "ar.abdurrahmaanassudais" },
-  { name: "Abu Bakr Al Shatri", id: "ar.abubakrasshatri" },
-  { name: "Saad Al-Ghamdi", id: "ar.saadalghamidi" },
-]
+import { RECITERS_LIST, getAyahAudioSources } from "@/lib/audio/audio-player-engine"
+
+const RECITERS = RECITERS_LIST.map(r => ({ name: `${r.nameBn} (${r.nameEn})`, id: r.id }))
 
 type DisplayMode = "all" | "ar+bn" | "ar+en" | "ar" | "bn"
 
@@ -129,19 +126,23 @@ export default function SurahDetailPage({
       const el = document.getElementById(`ayah-${ayah.numberInSurah}`)
       el?.scrollIntoView({ behavior: "smooth", block: "center" })
 
-      // Islamic Network CDN uses unpadded global ayah numbers (1 to 6236)
-      const primarySrc = `https://cdn.islamic.network/quran/audio/128/${reciter}/${ayah.globalNumber}.mp3`
-      const fallbackSrc = `https://everyayah.com/data/Alafasy_128kbps/${String(num).padStart(3, "0")}${String(ayah.numberInSurah).padStart(3, "0")}.mp3`
+      // Multi-tier CDN audio resolution
+      const sources = getAyahAudioSources(num, ayah.numberInSurah, reciter)
 
-      const audio = new Audio(primarySrc)
+      const audio = new Audio(sources.primary)
       audioRef.current = audio
 
       audio.onerror = () => {
-        // Attempt fallback source if primary fails
-        if (audio.src !== fallbackSrc) {
-          audio.src = fallbackSrc
+        // Attempt EveryAyah reciter fallback source if primary fails
+        if (audio.src !== sources.fallback) {
+          audio.src = sources.fallback
           audio.play().catch(() => {
-            setIsPlaying(false)
+            if (audio.src !== sources.altFallback) {
+              audio.src = sources.altFallback
+              audio.play().catch(() => setIsPlaying(false))
+            } else {
+              setIsPlaying(false)
+            }
           })
         } else {
           setIsPlaying(false)

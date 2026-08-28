@@ -172,6 +172,40 @@ export async function POST() {
     `)
     await prisma.$executeRawUnsafe(`CREATE UNIQUE INDEX IF NOT EXISTS "DailyHadith_date_key" ON "DailyHadith"("date")`)
 
+    // 11. UserHighlight
+    await prisma.$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS "UserHighlight" (
+        "id" TEXT NOT NULL PRIMARY KEY,
+        "userId" TEXT NOT NULL,
+        "targetId" TEXT NOT NULL,
+        "targetType" TEXT NOT NULL DEFAULT 'story',
+        "text" TEXT NOT NULL,
+        "color" TEXT NOT NULL DEFAULT 'yellow',
+        "note" TEXT,
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+      )
+    `)
+    await prisma.$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS "UserHighlight_userId_targetType_targetId_idx" ON "UserHighlight"("userId", "targetType", "targetId")`)
+    await prisma.$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS "UserHighlight_userId_createdAt_idx" ON "UserHighlight"("userId", "createdAt")`)
+
+    // 12. UserNote
+    await prisma.$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS "UserNote" (
+        "id" TEXT NOT NULL PRIMARY KEY,
+        "userId" TEXT NOT NULL,
+        "targetId" TEXT NOT NULL,
+        "targetType" TEXT NOT NULL DEFAULT 'story',
+        "title" TEXT,
+        "content" TEXT NOT NULL,
+        "color" TEXT DEFAULT 'emerald',
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+      )
+    `)
+    await prisma.$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS "UserNote_userId_targetType_targetId_idx" ON "UserNote"("userId", "targetType", "targetId")`)
+    await prisma.$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS "UserNote_userId_createdAt_idx" ON "UserNote"("userId", "createdAt")`)
+
     // Ensure default admin exists or can be upgraded
     const adminEmail = process.env.ADMIN_EMAIL || 'admin@noor.app'
     const existingAdmin = await prisma.user.findUnique({ where: { email: adminEmail } })

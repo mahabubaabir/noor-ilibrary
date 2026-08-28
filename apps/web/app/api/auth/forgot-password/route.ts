@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createPasswordResetToken, validateEmail } from '@/lib/auth'
 import { prisma } from '@/lib/db'
+import { sendPasswordResetEmail } from '@/lib/email'
 
 export const dynamic = 'force-dynamic'
 
@@ -10,29 +11,26 @@ export async function POST(request: Request) {
     const email = body?.email?.trim().toLowerCase() ?? ''
 
     if (!validateEmail(email)) {
-      return NextResponse.json({ error: 'Valid email is required' }, { status: 400 })
+      return NextResponse.json({ error: 'সঠিক ইমেইল এড্রেস প্রদান করুন (Valid email required)' }, { status: 400 })
     }
 
     const user = await prisma.user.findUnique({ where: { email } })
-    if (!user) {
-      // Return success without leaking whether email exists
-      return NextResponse.json({
-        ok: true,
-        message: 'If an account with this email exists, a password reset link has been created.',
+    
+    if (user) {
+      const { token } = await createPasswordResetToken(user.id)
+      
+      // Dispatch real transactional email via Resend (or secure dev logging)
+      await sendPasswordResetEmail({
+        to: user.email,
+        name: user.name,
+        token,
       })
     }
 
-    const { token } = await createPasswordResetToken(user.id)
-    
-    // In production, an email service (Resend, SendGrid, etc.) would send the link.
-    // For complete transparency and instant recovery, we return the resetUrl and token.
-    const resetUrl = `/reset-password?token=${token}`
-
+    // Always return safe generic success message to prevent user enumeration & account hijacking
     return NextResponse.json({
       ok: true,
-      message: 'Password reset link generated successfully.',
-      resetUrl,
-      token,
+      message: 'যদি এই ইমেইলে কোনো অ্যাকাউন্ট নিবন্ধিত থাকে, তবে একটি পাসওয়ার্ড রিসেট লিংক পাঠানো হয়েছে। অনুগ্রহ করে আপনার ইনবক্স এবং স্প্যাম ফোল্ডার চেক করুন।',
     })
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unknown error'

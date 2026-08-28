@@ -19,6 +19,8 @@ import {
 import { ALLAH_99_NAMES, AllahName } from "@/lib/allah-names-data"
 import { Button } from "@/components/ui/button"
 
+import { playSafeSpeech } from "@/lib/audio/audio-player-engine"
+
 export default function NamesOfAllahPage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedCategory, setSelectedCategory] = useState<string>("all")
@@ -26,6 +28,7 @@ export default function NamesOfAllahPage() {
   const [memorizedNames, setMemorizedNames] = useState<number[]>([])
   const [favoriteNames, setFavoriteNames] = useState<number[]>([])
   const [copied, setCopied] = useState(false)
+  const [speakingNumber, setSpeakingNumber] = useState<number | null>(null)
 
   // Load memorized and favorites from localStorage
   useEffect(() => {
@@ -60,12 +63,22 @@ export default function NamesOfAllahPage() {
     } catch {}
   }
 
-  const handleSpeak = (text: string) => {
-    if ("speechSynthesis" in window) {
-      const utterance = new SpeechSynthesisUtterance(text)
-      utterance.lang = "ar-SA"
-      window.speechSynthesis.speak(utterance)
+  const handleSpeak = (name: AllahName) => {
+    if (speakingNumber === name.number) {
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        window.speechSynthesis.cancel()
+      }
+      setSpeakingNumber(null)
+      return
     }
+
+    setSpeakingNumber(name.number)
+    playSafeSpeech({
+      text: `${name.arabic}. ${name.transliterationBn}.`,
+      lang: "ar-SA",
+      onEnd: () => setSpeakingNumber(null),
+      onError: () => setSpeakingNumber(null),
+    })
   }
 
   const handleShare = (name: AllahName) => {
@@ -247,10 +260,14 @@ export default function NamesOfAllahPage() {
                     <button
                       onClick={(e) => {
                         e.stopPropagation()
-                        handleSpeak(item.arabic)
+                        handleSpeak(item)
                       }}
                       title="আরবী উচ্চারণ শুনুন"
-                      className="rounded-lg p-1.5 text-stone-400 hover:bg-stone-100 hover:text-emerald-600 dark:hover:bg-stone-800"
+                      className={`rounded-lg p-1.5 transition-all ${
+                        speakingNumber === item.number
+                          ? "bg-emerald-100 text-emerald-700 animate-pulse dark:bg-emerald-950/80 dark:text-emerald-300 ring-2 ring-emerald-500/40"
+                          : "text-stone-400 hover:bg-stone-100 hover:text-emerald-600 dark:hover:bg-stone-800"
+                      }`}
                     >
                       <Volume2 className="h-4 w-4" />
                     </button>
@@ -372,10 +389,15 @@ export default function NamesOfAllahPage() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => handleSpeak(selectedName.arabic)}
-                className="gap-2 text-xs rounded-xl"
+                onClick={() => handleSpeak(selectedName)}
+                className={`gap-2 text-xs rounded-xl transition-all ${
+                  speakingNumber === selectedName.number
+                    ? "border-emerald-500 bg-emerald-50 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 animate-pulse"
+                    : ""
+                }`}
               >
-                <Volume2 className="h-4 w-4 text-emerald-600" /> উচ্চারণ শুনুন
+                <Volume2 className="h-4 w-4 text-emerald-600" />
+                {speakingNumber === selectedName.number ? "উচ্চারণ হচ্ছে..." : "উচ্চারণ শুনুন"}
               </Button>
 
               <div className="flex items-center gap-2">

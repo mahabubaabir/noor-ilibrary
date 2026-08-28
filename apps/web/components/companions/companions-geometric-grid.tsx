@@ -13,6 +13,8 @@ import {
 } from "lucide-react"
 import { COMPANIONS_COLLECTION, CompanionItem } from "@/lib/companions-data"
 
+import { playSafeSpeech } from "@/lib/audio/audio-player-engine"
+
 interface Props {
   initialCompanions?: CompanionItem[]
 }
@@ -23,38 +25,37 @@ export function CompanionsGeometricGrid({ initialCompanions = [] }: Props) {
   const [selectedCompanion, setSelectedCompanion] = useState<CompanionItem | null>(null)
   const [language, setLanguage] = useState<"bn" | "en">("bn")
   const [isPlayingAudio, setIsPlayingAudio] = useState(false)
-  const synthVoiceRef = useRef<SpeechSynthesisUtterance | null>(null)
+  const audioCancelRef = useRef<(() => void) | null>(null)
 
   // Audio speech narration
   const handleToggleNarration = () => {
     if (!selectedCompanion) return
 
     if (isPlayingAudio) {
-      window.speechSynthesis.cancel()
+      audioCancelRef.current?.()
       setIsPlayingAudio(false)
     } else {
-      window.speechSynthesis.cancel()
+      audioCancelRef.current?.()
       const text =
         language === "bn"
-          ? `${selectedCompanion.nameBn}। ${selectedCompanion.titleBn}। ${selectedCompanion.shortBioBn}`
-          : `${selectedCompanion.nameEn}. ${selectedCompanion.titleEn}. ${selectedCompanion.shortBioEn}`
+          ? `${selectedCompanion.nameBn}। ${selectedCompanion.titleBn || ""}। ${selectedCompanion.shortBioBn}`
+          : `${selectedCompanion.nameEn}. ${selectedCompanion.titleEn || ""}. ${selectedCompanion.shortBioEn}`
 
-      const utterance = new SpeechSynthesisUtterance(text)
-      utterance.lang = language === "bn" ? "bn-BD" : "en-US"
-      utterance.rate = 0.95
-      utterance.onend = () => setIsPlayingAudio(false)
-      utterance.onerror = () => setIsPlayingAudio(false)
-
-      synthVoiceRef.current = utterance
-      window.speechSynthesis.speak(utterance)
-      setIsPlayingAudio(true)
+      const { cancel } = playSafeSpeech({
+        text,
+        lang: language === "bn" ? "bn-BD" : "en-US",
+        onStart: () => setIsPlayingAudio(true),
+        onEnd: () => setIsPlayingAudio(false),
+        onError: () => setIsPlayingAudio(false),
+      })
+      audioCancelRef.current = cancel
     }
   }
 
   const handleCloseModal = () => {
     setSelectedCompanion(null)
     if (isPlayingAudio) {
-      window.speechSynthesis.cancel()
+      audioCancelRef.current?.()
       setIsPlayingAudio(false)
     }
   }
