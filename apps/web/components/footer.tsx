@@ -1,6 +1,7 @@
 import React from "react"
 import Link from "next/link"
 import { Heart, BookOpen, Library, Sparkles, User, ExternalLink } from "lucide-react"
+import { NoorLogo } from "./ui/noor-logo"
 
 export function Footer() {
   return (
@@ -9,13 +10,8 @@ export function Footer() {
         <div className="flex flex-col items-center justify-between gap-6 sm:flex-row">
           {/* Logo & Vision */}
           <div className="flex flex-col items-center gap-1.5 sm:items-start">
-            <Link href="/" className="flex items-center gap-2.5">
-              <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-600 font-bold text-white shadow-md shadow-emerald-600/20">
-                ن
-              </span>
-              <span className="font-bold text-stone-900 dark:text-stone-100">
-                নূর ইসলামিক লাইব্রেরি
-              </span>
+            <Link href="/" className="transition-opacity hover:opacity-90">
+              <NoorLogo size={32} />
             </Link>
             <p className="text-xs text-stone-500 dark:text-stone-400">
               জ্ঞানের আলো ছড়িয়ে পড়ুক বিশ্বজুড়ে • Spreading the Light of Islamic Knowledge

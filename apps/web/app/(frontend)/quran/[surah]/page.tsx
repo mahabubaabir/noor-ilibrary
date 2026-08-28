@@ -2,21 +2,24 @@
 
 import { use, useEffect, useState, useRef, useCallback } from "react"
 import {
+  Play,
+  Pause,
+  Volume2,
+  VolumeX,
+  Heart,
+  BookmarkCheck,
+  Share2,
+  Copy,
+  Check,
   ArrowLeft,
   ArrowRight,
   BookOpen,
-  Loader2,
-  Play,
-  Pause,
-  ChevronDown,
-  ChevronUp,
-  Heart,
-  BookmarkCheck,
-  Check,
-  Copy,
-  Share2,
-  Volume2,
   Sparkles,
+  Loader2,
+  ChevronDown,
+  SkipBack,
+  SkipForward,
+  X,
 } from "lucide-react"
 import Link from "next/link"
 import type { SurahDetail, Ayah } from "@noor/types"
@@ -95,13 +98,15 @@ export default function SurahDetailPage({
     return () => {
       if (audioRef.current) {
         audioRef.current.pause()
+        audioRef.current.onended = null
+        audioRef.current.onerror = null
         audioRef.current = null
       }
     }
   }, [num])
 
   const playAyah = useCallback(
-    (index: number) => {
+    (index: number, targetReciter = reciter) => {
       if (!surahData || index < 0 || index >= surahData.ayahs.length) {
         setIsPlaying(false)
         setCurrentAyahIndex(null)
@@ -115,8 +120,12 @@ export default function SurahDetailPage({
         return
       }
 
+      // Cleanup existing audio
       if (audioRef.current) {
         audioRef.current.pause()
+        audioRef.current.onended = null
+        audioRef.current.onerror = null
+        audioRef.current = null
       }
 
       setCurrentAyahIndex(index)
@@ -127,8 +136,7 @@ export default function SurahDetailPage({
       el?.scrollIntoView({ behavior: "smooth", block: "center" })
 
       // Multi-tier CDN audio resolution
-      const sources = getAyahAudioSources(num, ayah.numberInSurah, reciter)
-
+      const sources = getAyahAudioSources(num, ayah.numberInSurah, targetReciter)
       const audio = new Audio(sources.primary)
       audioRef.current = audio
 
@@ -155,7 +163,7 @@ export default function SurahDetailPage({
 
       audio.onended = () => {
         if (index + 1 < surahData.ayahs.length) {
-          playAyah(index + 1)
+          playAyah(index + 1, targetReciter)
         } else {
           setIsPlaying(false)
           setCurrentAyahIndex(null)
@@ -165,12 +173,33 @@ export default function SurahDetailPage({
     [surahData, reciter, num],
   )
 
+  // Seamless reciter switching
+  const handleReciterChange = (newReciterId: string) => {
+    setReciter(newReciterId)
+    if (isPlaying && currentAyahIndex !== null) {
+      playAyah(currentAyahIndex, newReciterId)
+    }
+  }
+
   const toggleFullSurahPlay = () => {
     if (isPlaying) {
-      if (audioRef.current) audioRef.current.pause()
+      if (audioRef.current) {
+        audioRef.current.pause()
+      }
       setIsPlaying(false)
     } else {
       playAyah(currentAyahIndex ?? 0)
+    }
+  }
+
+  const toggleSingleAyah = (index: number) => {
+    if (currentAyahIndex === index && isPlaying) {
+      if (audioRef.current) {
+        audioRef.current.pause()
+      }
+      setIsPlaying(false)
+    } else {
+      playAyah(index)
     }
   }
 
@@ -198,11 +227,11 @@ export default function SurahDetailPage({
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `Surah ${surahData?.meta.nameEnglish} ${num}:${ayah.numberInSurah}`,
+          title: `Surah ${surahData?.meta.nameEnglish} : ${ayah.numberInSurah}`,
           text,
         })
       } catch {
-        // Cancelled
+        // Ignored
       }
     } else {
       handleCopy(ayah)
@@ -210,21 +239,20 @@ export default function SurahDetailPage({
   }
 
   const handleBookmark = async (ayah: Ayah) => {
-    if (!surahData) return
     try {
-      const r = await fetch("/api/library/bookmarks", {
+      const res = await fetch("/api/library/bookmarks", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           surahNumber: num,
           ayahNumber: ayah.numberInSurah,
-          surahName: surahData.meta.nameEnglish,
-          textArabic: ayah.textArabic,
-          translationEn: ayah.translationEn || "",
-          translationBn: ayah.translationBn || "",
+          arabicText: ayah.textArabic,
+          translationBn: ayah.translationBn,
+          surahNameBn: surahData?.meta.nameTranslation,
         }),
       })
-      if (r.ok) {
+
+      if (res.ok) {
         setBookmarkedAyahs((prev) => new Set(prev).add(ayah.numberInSurah))
       }
     } catch {
@@ -233,19 +261,18 @@ export default function SurahDetailPage({
   }
 
   const handleSaveProgress = async (ayah: Ayah) => {
-    if (!surahData) return
     try {
-      const r = await fetch("/api/library/progress", {
+      const res = await fetch("/api/library/progress", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           surahNumber: num,
-          ayahNumber: ayah.numberInSurah,
-          surahName: surahData.meta.nameEnglish,
-          totalAyahs: surahData.meta.ayahCount,
+          lastAyah: ayah.numberInSurah,
+          totalAyahs: surahData?.meta.ayahCount ?? 0,
         }),
       })
-      if (r.ok) {
+
+      if (res.ok) {
         setSavedProgressAyah(ayah.numberInSurah)
         setTimeout(() => setSavedProgressAyah(null), 2500)
       }
@@ -281,7 +308,7 @@ export default function SurahDetailPage({
   const { meta, ayahs } = surahData
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8">
+    <div className="relative mx-auto max-w-4xl px-4 py-8 pb-28">
       {/* Top Breadcrumb */}
       <div className="mb-6 flex items-center justify-between">
         <Link
@@ -325,8 +352,8 @@ export default function SurahDetailPage({
 
           <select
             value={reciter}
-            onChange={(e) => setReciter(e.target.value)}
-            className="rounded-2xl border border-stone-200 bg-white px-3.5 py-2 text-xs font-medium text-stone-700 dark:border-stone-800 dark:bg-stone-800 dark:text-stone-300"
+            onChange={(e) => handleReciterChange(e.target.value)}
+            className="rounded-2xl border border-stone-200 bg-white px-3.5 py-2 text-xs font-medium text-stone-700 shadow-sm dark:border-stone-800 dark:bg-stone-800 dark:text-stone-300"
           >
             {RECITERS.map((r) => (
               <option key={r.id} value={r.id}>
@@ -335,46 +362,46 @@ export default function SurahDetailPage({
             ))}
           </select>
 
-          {/* Display Mode Dropdown */}
           <select
             value={displayMode}
             onChange={(e) => setDisplayMode(e.target.value as DisplayMode)}
-            className="rounded-2xl border border-stone-200 bg-white px-3.5 py-2 text-xs font-medium text-stone-700 dark:border-stone-800 dark:bg-stone-800 dark:text-stone-300"
+            className="rounded-2xl border border-stone-200 bg-white px-3.5 py-2 text-xs font-medium text-stone-700 shadow-sm dark:border-stone-800 dark:bg-stone-800 dark:text-stone-300"
           >
-            <option value="all">আরবি + বাংলা + English</option>
-            <option value="ar+bn">আরবি + বাংলা (Ar + Bn)</option>
-            <option value="ar+en">আরবি + English (Ar + En)</option>
-            <option value="ar">শুধু আরবি (Arabic Only)</option>
-            <option value="bn">শুধু বাংলা (Bangla Only)</option>
+            <option value="all">সব দেখুন (আরবি+বাংলা+ইংরেজি)</option>
+            <option value="ar+bn">আরবি + বাংলা</option>
+            <option value="ar+en">আরবি + ইংরেজি</option>
+            <option value="ar">শুধু আরবি</option>
+            <option value="bn">শুধু বাংলা</option>
           </select>
 
           {tafsirText && (
             <button
               onClick={() => setShowTafsir(!showTafsir)}
-              className={`inline-flex items-center gap-1.5 rounded-2xl border px-3.5 py-2 text-xs font-medium transition-all ${
+              className={`rounded-2xl border px-3.5 py-2 text-xs font-semibold transition-all ${
                 showTafsir
-                  ? "border-amber-300 bg-amber-50 text-amber-800 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-300"
+                  ? "border-emerald-600 bg-emerald-50 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300"
                   : "border-stone-200 bg-white text-stone-600 hover:bg-stone-50 dark:border-stone-800 dark:bg-stone-800 dark:text-stone-300"
               }`}
             >
-              {showTafsir ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
-              তাফসীর (Tafsir)
+              তাফসীর ইবনে কাসীর {showTafsir ? "লুকান" : "দেখুন"}
             </button>
           )}
         </div>
       </div>
 
-      {/* Tafsir Card */}
+      {/* Tafsir Accordion View */}
       {showTafsir && tafsirText && (
-        <div className="mb-8 rounded-3xl border border-amber-300/80 bg-amber-50/70 p-6 shadow-sm dark:border-amber-800/60 dark:bg-amber-950/30">
-          <div className="mb-3 flex items-center gap-2">
-            <BookOpen className="h-5 w-5 text-amber-700 dark:text-amber-400" />
-            <h3 className="text-sm font-bold text-amber-900 dark:text-amber-200">
-              তাফসীর ইবনে কাসীর (Tafsir Ibn Kathir) — সারসংক্ষেপ
+        <div className="mb-8 rounded-3xl border border-emerald-500/30 bg-emerald-50/40 p-6 shadow-sm dark:border-emerald-500/20 dark:bg-emerald-950/20 sm:p-8">
+          <div className="mb-4 flex items-center justify-between">
+            <h3 className="font-bold text-stone-900 dark:text-stone-100">
+              তাফসীর ইবনে কাসীর — সূরা {meta.nameTranslation}
             </h3>
+            <span className="rounded-lg bg-emerald-100 px-2 py-0.5 text-xs font-bold text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300">
+              আল-কুরআন একাডেমি
+            </span>
           </div>
           <div
-            className="prose prose-sm max-w-none leading-relaxed text-stone-800 dark:text-stone-200"
+            className="prose prose-stone dark:prose-invert max-w-none text-xs sm:text-sm leading-relaxed"
             dangerouslySetInnerHTML={{
               __html: tafsirText
                 .replace(/\n/g, "<br/>")
@@ -407,26 +434,34 @@ export default function SurahDetailPage({
             <div
               key={ayah.numberInSurah}
               id={`ayah-${ayah.numberInSurah}`}
-              className={`group relative rounded-3xl border p-5 sm:p-6 transition-all duration-200 ${
+              className={`group relative rounded-3xl border p-5 sm:p-6 transition-all duration-300 ${
                 isCurrent
-                  ? "border-emerald-500 bg-emerald-50/50 shadow-md ring-2 ring-emerald-500/20 dark:border-emerald-500/60 dark:bg-emerald-950/30"
+                  ? "border-emerald-500 bg-emerald-50/60 shadow-lg ring-2 ring-emerald-500/30 dark:border-emerald-400 dark:bg-emerald-950/40"
                   : "border-stone-200/80 bg-white hover:border-emerald-300 dark:border-stone-800 dark:bg-stone-900"
               }`}
             >
               {/* Ayah Number & Controls */}
               <div className="mb-4 flex items-center justify-between gap-2">
-                <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-stone-100 text-xs font-bold text-stone-700 dark:bg-stone-800 dark:text-stone-300">
+                <span className={`flex h-8 w-8 items-center justify-center rounded-xl text-xs font-bold transition-colors ${
+                  isCurrent
+                    ? "bg-emerald-600 text-white shadow-sm"
+                    : "bg-stone-100 text-stone-700 dark:bg-stone-800 dark:text-stone-300"
+                }`}>
                   {ayah.numberInSurah}
                 </span>
 
                 <div className="flex items-center gap-1">
                   {/* Play Ayah Audio */}
                   <button
-                    onClick={() => playAyah(idx)}
-                    title="এই আয়াত শুনুন"
-                    className="rounded-xl p-2 text-stone-400 hover:bg-emerald-50 hover:text-emerald-700 dark:hover:bg-emerald-950/40 dark:hover:text-emerald-400"
+                    onClick={() => toggleSingleAyah(idx)}
+                    title={isCurrent ? "তিলাওয়াত থামান" : "এই আয়াত শুনুন"}
+                    className={`rounded-xl p-2 transition-all ${
+                      isCurrent
+                        ? "bg-emerald-600 text-white shadow-sm animate-pulse"
+                        : "text-stone-400 hover:bg-emerald-50 hover:text-emerald-700 dark:hover:bg-emerald-950/40 dark:hover:text-emerald-400"
+                    }`}
                   >
-                    <Volume2 className="h-4 w-4" />
+                    {isCurrent ? <Pause className="h-4 w-4 fill-current" /> : <Volume2 className="h-4 w-4" />}
                   </button>
 
                   {/* Bookmark Ayah */}
@@ -436,7 +471,7 @@ export default function SurahDetailPage({
                     className={`rounded-xl p-2 transition-colors ${
                       isBookmarked
                         ? "text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30"
-                        : "text-stone-400 hover:bg-stone-100 hover:text-stone-700 dark:hover:bg-stone-800 dark:hover:text-stone-200"
+                        : "text-stone-400 hover:bg-stone-100 hover:text-stone-700 dark:hover:bg-stone-800 dark:text-stone-200"
                     }`}
                   >
                     <Heart className={`h-4 w-4 ${isBookmarked ? "fill-current" : ""}`} />
@@ -449,7 +484,7 @@ export default function SurahDetailPage({
                     className={`rounded-xl p-2 transition-colors ${
                       isSavedProgress
                         ? "text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40"
-                        : "text-stone-400 hover:bg-stone-100 hover:text-stone-700 dark:hover:bg-stone-800 dark:hover:text-stone-200"
+                        : "text-stone-400 hover:bg-stone-100 hover:text-stone-700 dark:hover:bg-stone-800 dark:text-stone-200"
                     }`}
                   >
                     {isSavedProgress ? <BookmarkCheck className="h-4 w-4" /> : <BookOpen className="h-4 w-4" />}
@@ -459,7 +494,7 @@ export default function SurahDetailPage({
                   <button
                     onClick={() => handleCopy(ayah)}
                     title="কপি করুন"
-                    className="rounded-xl p-2 text-stone-400 hover:bg-stone-100 hover:text-stone-700 dark:hover:bg-stone-800 dark:hover:text-stone-200"
+                    className="rounded-xl p-2 text-stone-400 hover:bg-stone-100 hover:text-stone-700 dark:hover:bg-stone-800 dark:text-stone-200"
                   >
                     {copiedAyah === ayah.numberInSurah ? (
                       <Check className="h-4 w-4 text-emerald-600" />
@@ -472,7 +507,7 @@ export default function SurahDetailPage({
                   <button
                     onClick={() => handleShare(ayah)}
                     title="শেয়ার করুন"
-                    className="rounded-xl p-2 text-stone-400 hover:bg-stone-100 hover:text-stone-700 dark:hover:bg-stone-800 dark:hover:text-stone-200"
+                    className="rounded-xl p-2 text-stone-400 hover:bg-stone-100 hover:text-stone-700 dark:hover:bg-stone-800 dark:text-stone-200"
                   >
                     <Share2 className="h-4 w-4" />
                   </button>
@@ -482,19 +517,24 @@ export default function SurahDetailPage({
               {/* Arabic Text */}
               {displayMode !== "bn" && (
                 <p
-                  className="arabic mb-4 text-right text-2xl font-medium leading-loose text-stone-900 sm:text-3xl dark:text-stone-50"
+                  className={`arabic mb-4 text-2xl sm:text-3xl leading-[2.2] tracking-wide text-right transition-colors ${
+                    isCurrent
+                      ? "text-emerald-950 dark:text-emerald-200 font-bold"
+                      : "text-stone-900 dark:text-stone-100"
+                  }`}
                   dir="rtl"
                 >
                   {ayah.textArabic}
                 </p>
               )}
 
-              {/* Bangla Translation */}
-              {(displayMode === "all" || displayMode === "ar+bn" || displayMode === "bn") && ayah.translationBn && (
-                <p className="bengali mb-2 text-sm sm:text-base leading-relaxed text-emerald-950 dark:text-emerald-100">
-                  {ayah.translationBn}
-                </p>
-              )}
+              {/* Bengali Translation */}
+              {(displayMode === "all" || displayMode === "ar+bn" || displayMode === "bn") &&
+                ayah.translationBn && (
+                  <p className="mb-2 text-sm sm:text-base leading-relaxed text-stone-800 dark:text-stone-200 font-medium">
+                    {ayah.translationBn}
+                  </p>
+                )}
 
               {/* English Translation */}
               {(displayMode === "all" || displayMode === "ar+en") && ayah.translationEn && (
@@ -550,6 +590,82 @@ export default function SurahDetailPage({
           <div />
         )}
       </div>
+
+      {/* Sticky Bottom Floating Quran Player Bar */}
+      {isPlaying && currentAyahIndex !== null && (
+        <div className="fixed bottom-4 left-1/2 z-50 w-[95%] max-w-2xl -translate-x-1/2 rounded-3xl border border-emerald-500/40 bg-white/95 p-3.5 shadow-2xl backdrop-blur-2xl dark:border-emerald-500/40 dark:bg-stone-900/95 animate-in slide-in-from-bottom-5 duration-300">
+          <div className="flex items-center justify-between gap-3">
+            {/* Current Ayah Info */}
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-2xl bg-emerald-600 text-white font-bold text-xs shadow-md">
+                {currentAyahIndex + 1}
+              </div>
+              <div className="min-w-0">
+                <div className="text-xs font-black text-stone-900 dark:text-stone-100 truncate">
+                  সূরা {meta.nameTranslation} • আয়াত {currentAyahIndex + 1} / {meta.ayahCount}
+                </div>
+                <div className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold truncate">
+                  {RECITERS.find((r) => r.id === reciter)?.name}
+                </div>
+              </div>
+            </div>
+
+            {/* Controls */}
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={() => playAyah(Math.max(0, currentAyahIndex - 1))}
+                disabled={currentAyahIndex <= 0}
+                title="পূর্ববর্তী আয়াত"
+                className="rounded-xl p-2 text-stone-500 hover:bg-stone-100 disabled:opacity-30 dark:hover:bg-stone-800 dark:text-stone-400"
+              >
+                <SkipBack className="h-4 w-4" />
+              </button>
+
+              <button
+                onClick={() => toggleSingleAyah(currentAyahIndex)}
+                className="flex h-9 w-9 items-center justify-center rounded-2xl bg-emerald-600 text-white shadow-md shadow-emerald-600/30 hover:scale-105 active:scale-95"
+              >
+                {isPlaying ? <Pause className="h-4 w-4 fill-current" /> : <Play className="h-4 w-4 fill-current ml-0.5" />}
+              </button>
+
+              <button
+                onClick={() => playAyah(Math.min(ayahs.length - 1, currentAyahIndex + 1))}
+                disabled={currentAyahIndex >= ayahs.length - 1}
+                title="পরবর্তী আয়াত"
+                className="rounded-xl p-2 text-stone-500 hover:bg-stone-100 disabled:opacity-30 dark:hover:bg-stone-800 dark:text-stone-400"
+              >
+                <SkipForward className="h-4 w-4" />
+              </button>
+            </div>
+
+            {/* Reciter quick switch & close */}
+            <div className="flex items-center gap-1.5">
+              <select
+                value={reciter}
+                onChange={(e) => handleReciterChange(e.target.value)}
+                className="hidden sm:block rounded-xl border border-stone-200 bg-stone-50 px-2 py-1 text-[11px] font-semibold text-stone-700 dark:border-stone-700 dark:bg-stone-800 dark:text-stone-300 max-w-[140px] truncate"
+              >
+                {RECITERS.map((r) => (
+                  <option key={r.id} value={r.id}>
+                    {r.name}
+                  </option>
+                ))}
+              </select>
+
+              <button
+                onClick={() => {
+                  if (audioRef.current) audioRef.current.pause()
+                  setIsPlaying(false)
+                }}
+                title="প্লেয়ার বন্ধ করুন"
+                className="rounded-xl p-2 text-stone-400 hover:bg-stone-100 hover:text-stone-700 dark:hover:bg-stone-800"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

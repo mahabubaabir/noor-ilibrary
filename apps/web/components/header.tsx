@@ -23,7 +23,7 @@ import {
   Layers,
   FileText,
 } from "lucide-react"
-import { Button } from "./ui/button"
+import { NoorLogo } from "./ui/noor-logo"
 
 interface NavDropdownGroup {
   id: string
@@ -188,18 +188,8 @@ export function Header() {
     <header className="sticky top-0 z-50 border-b border-stone-200/60 bg-white/85 backdrop-blur-2xl transition-colors dark:border-stone-800/60 dark:bg-stone-900/85">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
         {/* Brand Logo */}
-        <Link href="/" className="flex items-center gap-2.5 transition-transform hover:scale-[1.02] active:scale-98">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-emerald-700 to-teal-500 text-white shadow-md shadow-emerald-600/20">
-            <BookOpen className="h-5 w-5" />
-          </div>
-          <div className="flex flex-col">
-            <span className="text-lg font-black tracking-tight text-stone-900 dark:text-stone-100">
-              Noor
-            </span>
-            <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 -mt-1">
-              ইসলামিক লাইব্রেরি
-            </span>
-          </div>
+        <Link href="/" className="transition-transform hover:scale-[1.02] active:scale-98">
+          <NoorLogo size={36} />
         </Link>
 
         {/* Minimalist Desktop Dropdown Navigation */}
