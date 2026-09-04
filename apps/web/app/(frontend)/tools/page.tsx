@@ -65,15 +65,15 @@ export default function ToolsHubPage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
       {/* Header Banner */}
-      <div className="mb-10 rounded-3xl border border-emerald-500/20 bg-gradient-to-br from-emerald-950/20 via-stone-900/10 to-amber-950/20 p-6 sm:p-10 backdrop-blur-xl dark:border-emerald-500/30">
-        <div className="inline-flex items-center gap-2 rounded-xl bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300">
-          <Sparkles className="h-3.5 w-3.5" />
+      <div className="mb-10 rounded-3xl border border-neutral-200 bg-neutral-50 p-6 sm:p-10 backdrop-blur-xl dark:border-neutral-800 dark:bg-neutral-900">
+        <div className="inline-flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-3 py-1 text-xs font-bold text-neutral-900 dark:border-neutral-700 dark:bg-neutral-950 dark:text-white">
+          <Sparkles className="h-3.5 w-3.5 text-neutral-900 dark:text-white" />
           ইসলামিক রিসোর্স হাব
         </div>
-        <h1 className="mt-3 text-2xl font-bold tracking-tight text-stone-900 sm:text-4xl dark:text-stone-100">
+        <h1 className="mt-3 text-2xl font-bold tracking-tight text-neutral-900 sm:text-4xl dark:text-white">
           ডিজিটাল ইসলামিক টুলস ও রিসোর্স
         </h1>
-        <p className="mt-2 max-w-2xl text-xs sm:text-sm leading-relaxed text-stone-600 dark:text-stone-300">
+        <p className="mt-2 max-w-2xl text-xs sm:text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">
           প্রতিদিনের ইবাদত, যিকির ও আমলকে সহজ করতে আধুনিক ও বিশুদ্ধ ডিজিটাল ইসলামিক টুলস।
         </p>
       </div>
@@ -84,21 +84,21 @@ export default function ToolsHubPage() {
           const Icon = tool.icon
           return (
             <Link key={tool.href} href={tool.href} className="group">
-              <div className="relative h-full flex flex-col justify-between rounded-3xl border border-stone-200/80 bg-white/90 p-6 transition-all duration-200 hover:-translate-y-1 hover:border-emerald-400 hover:shadow-xl dark:border-stone-800 dark:bg-stone-900/90">
+              <div className="relative h-full flex flex-col justify-between rounded-3xl border border-neutral-200 bg-white p-6 transition-all duration-200 hover:-translate-y-1 hover:border-neutral-900 hover:shadow-xl dark:border-neutral-800 dark:bg-neutral-950 dark:hover:border-white">
                 <div>
-                  <div className="mb-4 inline-flex rounded-2xl bg-emerald-600 p-3 text-white shadow-md">
+                  <div className="mb-4 inline-flex rounded-2xl bg-neutral-900 p-3 text-white shadow-md dark:bg-white dark:text-neutral-900">
                     <Icon className="h-6 w-6" />
                   </div>
-                  <h3 className="text-base font-bold text-stone-900 dark:text-stone-100 group-hover:text-emerald-700 dark:group-hover:text-emerald-400">
+                  <h3 className="text-base font-bold text-neutral-900 dark:text-white group-hover:underline">
                     {tool.title}
                   </h3>
-                  <p className="text-xs text-stone-400 font-medium mb-2">{tool.titleEn}</p>
-                  <p className="text-xs leading-relaxed text-stone-600 dark:text-stone-300">
+                  <p className="text-xs text-neutral-400 font-medium mb-2">{tool.titleEn}</p>
+                  <p className="text-xs leading-relaxed text-neutral-600 dark:text-neutral-400">
                     {tool.desc}
                   </p>
                 </div>
 
-                <div className="mt-6 flex items-center gap-1.5 text-xs font-bold text-emerald-600 dark:text-emerald-400 border-t border-stone-100 dark:border-stone-800 pt-4">
+                <div className="mt-6 flex items-center gap-1.5 text-xs font-bold text-neutral-900 dark:text-white border-t border-neutral-100 dark:border-neutral-800 pt-4">
                   টুল চালু করুন <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
                 </div>
               </div>

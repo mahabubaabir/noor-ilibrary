@@ -27,19 +27,19 @@ export function TafsirPanel({ surahNumber }: { surahNumber: number }) {
   }
 
   return (
-    <div className="rounded-2xl border border-stone-200 bg-white dark:border-stone-800 dark:bg-stone-900">
-      <button onClick={toggle} className="flex w-full items-center justify-between p-4 text-sm font-medium text-stone-700 hover:text-stone-900 dark:text-stone-300 dark:hover:text-stone-100">
+    <div className="rounded-2xl border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-950">
+      <button onClick={toggle} className="flex w-full items-center justify-between p-4 text-sm font-medium text-neutral-700 hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-white">
         <span>Tafsir - Ibn Kathir</span>
         {open ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
       </button>
       {open && (
-        <div className="border-t border-stone-200 px-4 pb-4 dark:border-stone-800">
+        <div className="border-t border-neutral-200 px-4 pb-4 dark:border-neutral-800">
           {loading ? (
             <div className="flex items-center justify-center py-6">
-              <Loader2 className="h-5 w-5 animate-spin text-emerald-500" />
+              <Loader2 className="h-5 w-5 animate-spin text-neutral-900 dark:text-white" />
             </div>
           ) : (
-            <div className="prose prose-sm max-w-none pt-4 text-stone-700 dark:text-stone-300" dangerouslySetInnerHTML={{ __html: content.replace(/\n/g, "<br/>") }} />
+            <div className="prose prose-sm max-w-none pt-4 text-neutral-700 dark:text-neutral-300" dangerouslySetInnerHTML={{ __html: content.replace(/\n/g, "<br/>") }} />
           )}
         </div>
       )}

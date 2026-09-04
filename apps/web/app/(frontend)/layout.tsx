@@ -6,6 +6,7 @@ import { Providers } from "../providers"
 import { Header } from "../../components/header"
 import { Footer } from "../../components/footer"
 import { BlurredGeometryBackground } from "../../components/ui/blurred-geometry-background"
+import { MotionCursor } from "../../components/ui/motion-cursor"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -42,6 +43,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className={`${inter.variable} ${notoArabic.variable} ${notoBengali.variable}`}
     >
       <body className="relative min-h-screen bg-white font-sans text-neutral-900 antialiased dark:bg-black dark:text-neutral-100">
+        <MotionCursor />
         <BlurredGeometryBackground />
         <Providers>
           <div className="relative z-10 flex min-h-screen flex-col">

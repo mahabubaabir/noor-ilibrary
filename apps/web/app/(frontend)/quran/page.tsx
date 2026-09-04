@@ -163,30 +163,30 @@ export default function QuranPage() {
   }, [surahs, search, filterType])
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8">
+    <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
       {/* Header Banner */}
-      <div className="relative mb-8 overflow-hidden rounded-3xl border border-emerald-500/20 bg-gradient-to-br from-emerald-900/10 via-emerald-800/5 to-amber-500/5 p-6 sm:p-8 dark:border-emerald-500/30 dark:from-emerald-950/40 dark:via-stone-900/40">
+      <div className="relative mb-8 overflow-hidden rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm transition-all dark:border-neutral-800 dark:bg-neutral-950 sm:p-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-emerald-100/80 px-3 py-1 text-xs font-semibold text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300">
-              <Sparkles className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
-              পবিত্র আল-কুরআন (114 Surahs)
+            <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-neutral-300 bg-neutral-50 px-3 py-1 text-xs font-semibold text-neutral-800 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200">
+              <Sparkles className="h-3.5 w-3.5 text-neutral-900 dark:text-white" />
+              <span>পবিত্র আল-কুরআন (114 Surahs)</span>
             </div>
-            <h1 className="text-3xl font-bold tracking-tight text-stone-900 dark:text-stone-100 sm:text-4xl">
+            <h1 className="text-3xl font-black tracking-tight text-neutral-900 dark:text-white sm:text-4xl">
               The Noble Quran
             </h1>
-            <p className="mt-1 max-w-xl text-sm text-stone-600 dark:text-stone-400">
+            <p className="mt-1 max-w-xl text-sm text-neutral-600 dark:text-neutral-400">
               Read with Arabic script, authentic English & Bangla translations, verse-by-verse recitation, and Ibn Kathir Tafsir.
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <div className="rounded-2xl border border-emerald-500/20 bg-white/80 p-4 text-center backdrop-blur dark:border-emerald-500/30 dark:bg-stone-900/80">
-              <span className="block text-2xl font-bold text-emerald-700 dark:text-emerald-400">114</span>
-              <span className="text-xs text-stone-500 dark:text-stone-400">সূরা / Surahs</span>
+            <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-4 text-center dark:border-neutral-800 dark:bg-neutral-900">
+              <span className="block text-2xl font-bold text-neutral-900 dark:text-white font-mono">114</span>
+              <span className="text-xs text-neutral-500 dark:text-neutral-400">সূরা / Surahs</span>
             </div>
-            <div className="rounded-2xl border border-amber-500/20 bg-white/80 p-4 text-center backdrop-blur dark:border-amber-500/30 dark:bg-stone-900/80">
-              <span className="block text-2xl font-bold text-amber-600 dark:text-amber-400">6,236</span>
-              <span className="text-xs text-stone-500 dark:text-stone-400">আয়াত / Ayahs</span>
+            <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-4 text-center dark:border-neutral-800 dark:bg-neutral-900">
+              <span className="block text-2xl font-bold text-neutral-900 dark:text-white font-mono">6,236</span>
+              <span className="text-xs text-neutral-500 dark:text-neutral-400">আয়াত / Ayahs</span>
             </div>
           </div>
         </div>
@@ -195,26 +195,26 @@ export default function QuranPage() {
       {/* Search & Filter Controls */}
       <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400" />
+          <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
           <input
             type="text"
             placeholder="Search by name, number, Bangla (যেমন: ফাতিহা)..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded-2xl border border-stone-200 bg-white py-2.5 pl-10 pr-4 text-sm text-stone-900 placeholder:text-stone-400 focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 dark:border-stone-800 dark:bg-stone-900 dark:text-stone-100 dark:placeholder:text-stone-500"
+            className="w-full rounded-2xl border border-neutral-300 bg-white py-2.5 pl-10 pr-4 text-sm text-neutral-900 placeholder:text-neutral-400 transition-colors focus:border-neutral-900 focus:outline-none focus:ring-2 focus:ring-neutral-900/20 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500 dark:focus:border-white dark:focus:ring-white/20"
           />
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <div className="flex rounded-xl bg-stone-100 p-1 dark:bg-stone-800/80">
+          <div className="flex rounded-xl border border-neutral-200 bg-neutral-100 p-1 dark:border-neutral-800 dark:bg-neutral-900">
             {(["All", "Meccan", "Medinan"] as const).map((type) => (
               <button
                 key={type}
                 onClick={() => setFilterType(type)}
                 className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-all ${
                   filterType === type
-                    ? "bg-white text-emerald-700 shadow-sm dark:bg-stone-900 dark:text-emerald-400"
-                    : "text-stone-600 hover:text-stone-900 dark:text-stone-400 dark:hover:text-stone-200"
+                    ? "bg-neutral-900 text-white shadow-sm dark:bg-white dark:text-black"
+                    : "text-neutral-600 hover:text-black dark:text-neutral-400 dark:hover:text-white"
                 }`}
               >
                 {type === "All" ? "সকল (All)" : type === "Meccan" ? "মাক্কী (Meccan)" : "মাদানী (Medinan)"}
@@ -222,13 +222,13 @@ export default function QuranPage() {
             ))}
           </div>
 
-          <div className="flex rounded-xl bg-stone-100 p-1 dark:bg-stone-800/80">
+          <div className="flex rounded-xl border border-neutral-200 bg-neutral-100 p-1 dark:border-neutral-800 dark:bg-neutral-900">
             <button
               onClick={() => setView("grid")}
               className={`rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-all ${
                 view === "grid"
-                  ? "bg-white text-stone-900 shadow-sm dark:bg-stone-900 dark:text-stone-100"
-                  : "text-stone-500 hover:text-stone-900 dark:text-stone-400"
+                  ? "bg-neutral-900 text-white shadow-sm dark:bg-white dark:text-black"
+                  : "text-neutral-500 hover:text-black dark:text-neutral-400 dark:hover:text-white"
               }`}
             >
               Grid
@@ -237,8 +237,8 @@ export default function QuranPage() {
               onClick={() => setView("list")}
               className={`rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-all ${
                 view === "list"
-                  ? "bg-white text-stone-900 shadow-sm dark:bg-stone-900 dark:text-stone-100"
-                  : "text-stone-500 hover:text-stone-900 dark:text-stone-400"
+                  ? "bg-neutral-900 text-white shadow-sm dark:bg-white dark:text-black"
+                  : "text-neutral-500 hover:text-black dark:text-neutral-400 dark:hover:text-white"
               }`}
             >
               List
@@ -251,14 +251,14 @@ export default function QuranPage() {
       {loading ? (
         <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 12 }).map((_, i) => (
-            <div key={i} className="h-28 animate-pulse rounded-2xl bg-stone-200/70 dark:bg-stone-800/70" />
+            <div key={i} className="h-28 animate-pulse rounded-2xl bg-neutral-100 dark:bg-neutral-900" />
           ))}
         </div>
       ) : filteredSurahs.length === 0 ? (
-        <div className="rounded-3xl border border-dashed border-stone-300 bg-white/40 p-12 text-center dark:border-stone-800 dark:bg-stone-900/40">
-          <BookOpen className="mx-auto mb-3 h-8 w-8 text-stone-400" />
-          <h3 className="text-base font-semibold text-stone-900 dark:text-stone-100">কোনো সূরা পাওয়া যায়নি</h3>
-          <p className="mt-1 text-xs text-stone-500 dark:text-stone-400">
+        <div className="rounded-3xl border border-dashed border-neutral-300 bg-white p-12 text-center dark:border-neutral-800 dark:bg-neutral-950">
+          <BookOpen className="mx-auto mb-3 h-8 w-8 text-neutral-400" />
+          <h3 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">কোনো সূরা পাওয়া যায়নি</h3>
+          <p className="mt-1 text-xs text-neutral-500 dark:text-neutral-400">
             &quot;{search}&quot; এর জন্য কোনো ফলাফল মেলেনি। অন্য শব্দ দিয়ে অনুসন্ধান করুন।
           </p>
         </div>
@@ -268,31 +268,31 @@ export default function QuranPage() {
             const bn = BANGLE_SURAH_NAMES[surah.number]
             return (
               <Link key={surah.number} href={`/quran/${surah.number}`}>
-                <div className="group relative flex items-center gap-4 rounded-2xl border border-stone-200/80 bg-white p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-emerald-400/60 hover:shadow-lg dark:border-stone-800/80 dark:bg-stone-900/90 dark:hover:border-emerald-500/40">
+                <div className="group relative flex items-center gap-4 rounded-2xl border border-neutral-200 bg-white p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-neutral-900 hover:shadow-lg dark:border-neutral-800 dark:bg-neutral-950 dark:hover:border-white">
                   {/* Number Badge */}
-                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-emerald-50 text-sm font-bold text-emerald-800 transition-colors group-hover:bg-emerald-600 group-hover:text-white dark:bg-emerald-950/40 dark:text-emerald-300 dark:group-hover:bg-emerald-600 dark:group-hover:text-white">
+                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl border border-neutral-200 bg-neutral-50 text-sm font-bold text-neutral-900 transition-colors group-hover:bg-neutral-900 group-hover:text-white dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-100 dark:group-hover:bg-white dark:group-hover:text-black font-mono">
                     {surah.number}
                   </div>
 
                   {/* Main Details */}
                   <div className="min-w-0 flex-1">
                     <div className="flex items-baseline justify-between gap-1.5">
-                      <h3 className="truncate text-sm font-bold text-stone-900 dark:text-stone-100">
+                      <h3 className="truncate text-sm font-bold text-neutral-900 dark:text-white">
                         {surah.nameEnglish}
                       </h3>
-                      <span className="font-arabic text-xl leading-none text-emerald-800 dark:text-emerald-400">
+                      <span className="font-arabic text-xl leading-none text-neutral-800 dark:text-neutral-200">
                         {surah.nameArabic}
                       </span>
                     </div>
 
-                    <div className="mt-1 flex items-center justify-between text-xs text-stone-500 dark:text-stone-400">
+                    <div className="mt-1 flex items-center justify-between text-xs text-neutral-500 dark:text-neutral-400">
                       <span className="truncate">
                         {bn ? `${bn.bnName} (${bn.bnMeaning})` : surah.nameTranslation}
                       </span>
                     </div>
 
-                    <div className="mt-1.5 flex items-center gap-2 text-[11px] text-stone-400 dark:text-stone-500">
-                      <span className="rounded-md bg-stone-100 px-1.5 py-0.5 font-medium text-stone-600 dark:bg-stone-800 dark:text-stone-400">
+                    <div className="mt-1.5 flex items-center gap-2 text-[11px] text-neutral-400 dark:text-neutral-500">
+                      <span className="rounded-md border border-neutral-200 bg-neutral-50 px-1.5 py-0.5 font-medium text-neutral-700 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-300">
                         {surah.ayahCount} আয়াত
                       </span>
                       <span>·</span>
@@ -305,24 +305,24 @@ export default function QuranPage() {
           })}
         </div>
       ) : (
-        <div className="divide-y divide-stone-100 rounded-2xl border border-stone-200 bg-white dark:divide-stone-800 dark:border-stone-800 dark:bg-stone-900">
+        <div className="divide-y divide-neutral-100 rounded-2xl border border-neutral-200 bg-white dark:divide-neutral-900 dark:border-neutral-800 dark:bg-neutral-950">
           {filteredSurahs.map((surah) => {
             const bn = BANGLE_SURAH_NAMES[surah.number]
             return (
               <Link key={surah.number} href={`/quran/${surah.number}`}>
-                <div className="flex items-center gap-4 px-4 py-3.5 transition-colors hover:bg-emerald-50/50 dark:hover:bg-emerald-950/20">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-stone-100 text-xs font-bold text-stone-700 dark:bg-stone-800 dark:text-stone-300">
+                <div className="flex items-center gap-4 px-4 py-3.5 transition-colors hover:bg-neutral-50 dark:hover:bg-neutral-900/60">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-xl border border-neutral-200 bg-neutral-50 text-xs font-bold text-neutral-900 dark:border-neutral-800 dark:bg-neutral-900 dark:text-white font-mono">
                     {surah.number}
                   </span>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-stone-900 dark:text-stone-100">{surah.nameEnglish}</span>
-                      {bn && <span className="text-xs text-emerald-700 dark:text-emerald-400">({bn.bnName})</span>}
+                      <span className="text-sm font-semibold text-neutral-900 dark:text-white">{surah.nameEnglish}</span>
+                      {bn && <span className="text-xs text-neutral-500 dark:text-neutral-400">({bn.bnName})</span>}
                     </div>
-                    <p className="text-xs text-stone-400">{bn?.bnMeaning || surah.nameTranslation} · {surah.ayahCount} Ayahs</p>
+                    <p className="text-xs text-neutral-400">{bn?.bnMeaning || surah.nameTranslation} · {surah.ayahCount} Ayahs</p>
                   </div>
-                  <span className="font-arabic text-xl text-emerald-800 dark:text-emerald-400">{surah.nameArabic}</span>
-                  <ArrowRight className="h-4 w-4 text-stone-300 group-hover:text-emerald-600 dark:text-stone-600" />
+                  <span className="font-arabic text-xl text-neutral-800 dark:text-neutral-200">{surah.nameArabic}</span>
+                  <ArrowRight className="h-4 w-4 text-neutral-400 group-hover:text-black dark:text-neutral-600 dark:group-hover:text-white" />
                 </div>
               </Link>
             )

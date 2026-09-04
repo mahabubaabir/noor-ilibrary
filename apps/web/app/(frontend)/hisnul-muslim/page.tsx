@@ -65,17 +65,17 @@ export default function HisnulMuslimPage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
       {/* Header Banner */}
-      <div className="relative mb-8 overflow-hidden rounded-3xl border border-emerald-500/20 bg-gradient-to-br from-emerald-950/20 via-stone-900/10 to-amber-950/20 p-6 sm:p-10 backdrop-blur-xl dark:border-emerald-500/30">
+      <div className="relative mb-8 overflow-hidden rounded-3xl border border-neutral-200 bg-neutral-50 p-6 sm:p-10 backdrop-blur-xl dark:border-neutral-800 dark:bg-neutral-900">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <div className="inline-flex items-center gap-2 rounded-xl bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300">
-              <ShieldCheck className="h-3.5 w-3.5" />
+            <div className="inline-flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-3 py-1 text-xs font-bold text-neutral-900 dark:border-neutral-700 dark:bg-neutral-950 dark:text-white">
+              <ShieldCheck className="h-3.5 w-3.5 text-neutral-900 dark:text-white" />
               হিসনুল মুসলিম (Fortress of the Muslim)
             </div>
-            <h1 className="mt-3 text-2xl font-bold tracking-tight text-stone-900 sm:text-4xl dark:text-stone-100">
+            <h1 className="mt-3 text-2xl font-bold tracking-tight text-neutral-900 sm:text-4xl dark:text-white">
               হিসনুল মুসলিম — মুমিনের দুর্গ
             </h1>
-            <p className="mt-2 max-w-2xl text-xs sm:text-sm leading-relaxed text-stone-600 dark:text-stone-300">
+            <p className="mt-2 max-w-2xl text-xs sm:text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">
               শায়েখ সাঈদ ইবনে আলী আল-ক্বাহত্বানী (রহ.) সংকলিত প্রাত্যহিক জীবনের সকল মুহূর্তের অত্যন্ত নির্ভরযোগ্য সহীহ মাসনূন দু&apos;আ ও জিকির।
             </p>
           </div>
@@ -83,7 +83,7 @@ export default function HisnulMuslimPage() {
           <div className="flex items-center gap-2">
             <Link
               href="/duas"
-              className="inline-flex items-center gap-2 rounded-2xl bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white shadow-md hover:bg-emerald-700 transition-all"
+              className="inline-flex items-center gap-2 rounded-2xl bg-neutral-900 px-4 py-2.5 text-xs font-bold text-white shadow-md hover:bg-neutral-800 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200 transition-all"
             >
               <BookOpen className="h-4 w-4" /> দু&apos;আ ও আযকার কেন্দ্র
             </Link>
@@ -95,8 +95,8 @@ export default function HisnulMuslimPage() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
         {/* Left Chapters Sidebar */}
         <div className="lg:col-span-4 space-y-4">
-          <div className="rounded-3xl border border-stone-200/80 bg-white/80 p-4 shadow-sm backdrop-blur dark:border-stone-800 dark:bg-stone-900/80">
-            <h3 className="mb-3 px-2 text-xs font-bold uppercase tracking-wider text-stone-400">
+          <div className="rounded-3xl border border-neutral-200 bg-white p-4 shadow-sm dark:border-neutral-800 dark:bg-neutral-950">
+            <h3 className="mb-3 px-2 text-xs font-bold uppercase tracking-wider text-neutral-400">
               অধ্যায়সমূহ ({HISNUL_MUSLIM_CHAPTERS.length})
             </h3>
 
@@ -112,8 +112,8 @@ export default function HisnulMuslimPage() {
                     }}
                     className={`flex w-full items-center justify-between rounded-2xl px-3.5 py-3 text-left text-xs font-bold transition-all ${
                       isActive
-                        ? "bg-emerald-600 text-white shadow-md"
-                        : "text-stone-700 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-800"
+                        ? "bg-neutral-900 text-white shadow-md dark:bg-white dark:text-neutral-900"
+                        : "text-neutral-700 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-900"
                     }`}
                   >
                     <div className="flex items-center gap-2.5">
@@ -122,7 +122,7 @@ export default function HisnulMuslimPage() {
                     </div>
                     <span
                       className={`text-[10px] ${
-                        isActive ? "text-emerald-100" : "text-stone-400"
+                        isActive ? "text-neutral-300 dark:text-neutral-700" : "text-neutral-400"
                       }`}
                     >
                       {chapter.duas.length} দু&apos;আ
@@ -138,19 +138,19 @@ export default function HisnulMuslimPage() {
         <div className="lg:col-span-8 space-y-6">
           {/* Search Box */}
           <div className="relative">
-            <Search className="absolute left-3.5 top-3 h-4 w-4 text-stone-400" />
+            <Search className="absolute left-3.5 top-3 h-4 w-4 text-neutral-400" />
             <input
               type="text"
               placeholder="হিসনুল মুসলিম থেকে যেকোনো দু'আ খুঁজুন..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-2xl border border-stone-200 bg-white/90 py-2.5 pl-10 pr-4 text-xs font-medium backdrop-blur focus:border-emerald-500 focus:outline-none dark:border-stone-800 dark:bg-stone-900/90 dark:text-stone-100"
+              className="w-full rounded-2xl border border-neutral-200 bg-white py-2.5 pl-10 pr-4 text-xs font-medium focus:border-neutral-900 focus:outline-none dark:border-neutral-800 dark:bg-neutral-900 dark:text-white dark:focus:border-white transition-colors"
             />
           </div>
 
           {/* Chapter Title Badge */}
           {!searchQuery.trim() && (
-            <div className="flex items-center gap-2 text-sm font-bold text-stone-800 dark:text-stone-200">
+            <div className="flex items-center gap-2 text-sm font-bold text-neutral-900 dark:text-white">
               <span className="text-lg">{activeChapter.icon}</span>
               <h2>{activeChapter.titleBn}</h2>
             </div>
@@ -165,10 +165,10 @@ export default function HisnulMuslimPage() {
               return (
                 <div
                   key={dua.id}
-                  className="rounded-3xl border border-stone-200/80 bg-white/90 p-6 shadow-sm backdrop-blur-xl transition-all hover:shadow-md dark:border-stone-800/80 dark:bg-stone-900/90"
+                  className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-950 transition-all hover:shadow-md"
                 >
-                  <div className="flex items-center justify-between border-b border-stone-200/50 pb-3 dark:border-stone-800/50">
-                    <h3 className="font-bold text-stone-900 dark:text-stone-100 text-xs sm:text-sm">
+                  <div className="flex items-center justify-between border-b border-neutral-200 dark:border-neutral-800 pb-3">
+                    <h3 className="font-bold text-neutral-900 dark:text-white text-xs sm:text-sm">
                       {dua.titleBn}
                     </h3>
 
@@ -176,7 +176,7 @@ export default function HisnulMuslimPage() {
                       <button
                         onClick={() => handleSpeak(dua.arabic)}
                         title="আরবী শুনুন"
-                        className="rounded-xl p-1.5 text-stone-400 hover:bg-stone-100 hover:text-emerald-600 dark:hover:bg-stone-800"
+                        className="rounded-xl p-1.5 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-900 dark:hover:bg-neutral-800 dark:hover:text-white"
                       >
                         <Volume2 className="h-4 w-4" />
                       </button>
@@ -184,39 +184,39 @@ export default function HisnulMuslimPage() {
                       <button
                         onClick={() => handleCopy(dua.id, copyText)}
                         title="কপি করুন"
-                        className="rounded-xl p-1.5 text-stone-400 hover:bg-stone-100 hover:text-emerald-600 dark:hover:bg-stone-800"
+                        className="rounded-xl p-1.5 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-900 dark:hover:bg-neutral-800 dark:hover:text-white"
                       >
-                        {isCopied ? <Check className="h-4 w-4 text-emerald-600" /> : <Copy className="h-4 w-4" />}
+                        {isCopied ? <Check className="h-4 w-4 text-neutral-900 dark:text-white" /> : <Copy className="h-4 w-4" />}
                       </button>
                     </div>
                   </div>
 
                   {/* Arabic Display */}
-                  <div className="my-4 rounded-2xl bg-emerald-50/40 p-5 text-center dark:bg-emerald-950/20">
-                    <p className="arabic text-2xl font-bold leading-loose text-stone-900 dark:text-stone-100 sm:text-3xl" dir="rtl">
+                  <div className="my-4 rounded-2xl bg-neutral-50 border border-neutral-200 p-5 text-center dark:bg-neutral-900 dark:border-neutral-800">
+                    <p className="arabic text-2xl font-bold leading-loose text-neutral-900 dark:text-white sm:text-3xl" dir="rtl">
                       {dua.arabic}
                     </p>
                   </div>
 
                   {/* Transliteration & Translation */}
                   <div className="space-y-2.5 text-xs sm:text-sm">
-                    <div className="rounded-2xl bg-stone-50 p-3.5 dark:bg-stone-800/50">
-                      <p className="font-semibold text-stone-700 dark:text-stone-300">
-                        <span className="font-bold text-emerald-600">উচ্চারণ:</span> {dua.transliterationBn}
+                    <div className="rounded-2xl bg-neutral-50 border border-neutral-200 p-3.5 dark:bg-neutral-900 dark:border-neutral-800">
+                      <p className="font-semibold text-neutral-700 dark:text-neutral-300">
+                        <span className="font-bold text-neutral-900 dark:text-white">উচ্চারণ:</span> {dua.transliterationBn}
                       </p>
                     </div>
 
-                    <div className="rounded-2xl border border-stone-200/60 bg-white p-3.5 dark:border-stone-800 dark:bg-stone-900">
-                      <p className="leading-relaxed text-stone-800 dark:text-stone-200">
-                        <span className="font-bold text-emerald-600">অর্থ:</span> {dua.translationBn}
+                    <div className="rounded-2xl border border-neutral-200 bg-white p-3.5 dark:border-neutral-800 dark:bg-neutral-950">
+                      <p className="leading-relaxed text-neutral-800 dark:text-neutral-200">
+                        <span className="font-bold text-neutral-900 dark:text-white">অর্থ:</span> {dua.translationBn}
                       </p>
                     </div>
                   </div>
 
                   {/* Instruction or Reference */}
-                  <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-[11px] text-stone-500">
+                  <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-[11px] text-neutral-500">
                     {dua.instructionBn && (
-                      <span className="font-medium text-amber-700 dark:text-amber-300">
+                      <span className="font-medium text-neutral-700 dark:text-neutral-300">
                         নিয়ম: {dua.instructionBn}
                       </span>
                     )}

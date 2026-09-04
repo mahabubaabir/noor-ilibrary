@@ -5,11 +5,11 @@ const badgeVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-stone-100 text-stone-700 dark:bg-stone-800 dark:text-stone-300",
-        primary: "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
-        secondary: "bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
-        destructive: "bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400",
-        outline: "border border-stone-200 text-stone-600 dark:border-stone-700 dark:text-stone-400",
+        default: "border border-neutral-200 bg-neutral-100 text-neutral-800 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-200",
+        primary: "border border-neutral-900 bg-neutral-900 text-white dark:border-white dark:bg-white dark:text-black",
+        secondary: "border border-neutral-300 bg-neutral-50 text-neutral-700 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-300",
+        destructive: "border border-neutral-800 bg-neutral-900 text-neutral-100 dark:border-neutral-200 dark:bg-white dark:text-black",
+        outline: "border border-neutral-300 text-neutral-700 dark:border-neutral-700 dark:text-neutral-300",
       },
     },
     defaultVariants: {

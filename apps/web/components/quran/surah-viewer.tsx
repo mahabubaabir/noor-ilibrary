@@ -113,17 +113,17 @@ export function SurahViewer({ surah, initialAyah, reciters }: SurahViewerProps) 
   return (
     <div>
       <div className="mx-auto max-w-3xl px-4 pt-8">
-        <p className="mb-1 text-sm text-stone-500 dark:text-stone-400">
+        <p className="mb-1 text-sm text-neutral-500 dark:text-neutral-400">
           Surah {meta.number} · {meta.revelationType} · {meta.ayahCount} ayahs
         </p>
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h1 className="arabic text-4xl text-stone-900 sm:text-5xl dark:text-stone-50">
+            <h1 className="arabic text-4xl text-neutral-900 sm:text-5xl dark:text-white">
               {meta.nameArabic}
             </h1>
-            <p className="mt-2 text-lg font-medium text-stone-800 dark:text-stone-100">
+            <p className="mt-2 text-lg font-medium text-neutral-800 dark:text-neutral-200">
               {meta.nameEnglish}
-              <span className="text-stone-400"> — {meta.nameTranslation}</span>
+              <span className="text-neutral-400"> — {meta.nameTranslation}</span>
             </p>
           </div>
           <Select
@@ -205,18 +205,18 @@ function AyahBlock({
     <section
       id={`ayah-${ayah.numberInSurah}`}
       className={cn(
-        'scroll-mt-20 rounded-2xl border border-stone-200 bg-white p-5 transition-colors dark:border-stone-800 dark:bg-stone-900',
+        'scroll-mt-20 rounded-2xl border border-neutral-200 bg-white p-5 transition-colors dark:border-neutral-800 dark:bg-neutral-950',
         isPlaying &&
-          'border-emerald-600/60 bg-emerald-50 dark:border-emerald-500/40 dark:bg-emerald-950/30',
+          'border-neutral-900/60 bg-neutral-100 dark:border-neutral-100/40 dark:bg-neutral-900',
       )}
     >
       <div className="mb-4 flex items-center justify-between gap-2">
-        <span className="inline-flex size-9 items-center justify-center rounded-lg border border-emerald-700/30 font-semibold text-emerald-800 dark:border-emerald-400/30 dark:text-emerald-300">
+        <span className="inline-flex size-9 items-center justify-center rounded-lg border border-neutral-300 font-semibold text-neutral-900 dark:border-neutral-700 dark:text-neutral-100">
           {ayah.numberInSurah}
         </span>
         <div className="flex items-center gap-1">
           {ayah.sajda && (
-            <Badge className="bg-amber-500/15 text-amber-700 dark:text-amber-400">سجدة</Badge>
+            <Badge className="bg-neutral-200 text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100">سجدة</Badge>
           )}
           <Button variant="ghost" size="sm" onClick={onPlay} aria-label="Play this verse">
             <PlayIcon className="size-4" />
@@ -231,7 +231,7 @@ function AyahBlock({
             aria-label="Copy verse"
           >
             {copied ? (
-              <CheckIcon className="size-4 text-emerald-600" />
+              <CheckIcon className="size-4 text-neutral-900 dark:text-white" />
             ) : (
               <CopyIcon className="size-4" />
             )}
@@ -244,22 +244,22 @@ function AyahBlock({
 
       {(mode === 'ar' || mode === 'ar+en' || mode === 'ar+bn') && (
         <p
-          className="arabic text-right text-2xl text-stone-900 sm:text-3xl dark:text-stone-50"
+          className="arabic text-right text-2xl text-neutral-900 sm:text-3xl dark:text-white"
           dir="rtl"
         >
           {ayah.textArabic}
         </p>
       )}
       {(mode === 'en' || mode === 'ar+en') && (
-        <p className="mt-3 text-stone-700 dark:text-stone-200">{ayah.translationEn}</p>
+        <p className="mt-3 text-neutral-700 dark:text-neutral-300">{ayah.translationEn}</p>
       )}
       {(mode === 'bn' || mode === 'ar+bn') && (
-        <p className="bengali mt-3 leading-relaxed text-stone-700 dark:text-stone-200">
+        <p className="bengali mt-3 leading-relaxed text-neutral-700 dark:text-neutral-300">
           {ayah.translationBn}
         </p>
       )}
 
-      <p className="mt-3 text-xs text-stone-400">
+      <p className="mt-3 text-xs text-neutral-400">
         {meta.nameEnglish} {meta.number}:{ayah.numberInSurah} · juz {ayah.juz} · page {ayah.page}
       </p>
       <div className="mt-4 flex flex-wrap gap-2">
@@ -290,7 +290,7 @@ export function SurahBackLink({ surahNumber }: { surahNumber: number }) {
   return (
     <Link
       href={`/quran/${surahNumber}`}
-      className="inline-flex items-center gap-1 text-sm text-emerald-700 hover:underline dark:text-emerald-400"
+      className="inline-flex items-center gap-1 text-sm text-neutral-900 hover:underline dark:text-white"
     >
       ← Back to surah
     </Link>

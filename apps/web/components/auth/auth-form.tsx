@@ -49,7 +49,7 @@ export function AuthForm({ mode }: { mode: 'login' | 'register' }) {
           {mode === 'register' && <Input name="name" placeholder="Name (optional)" />}
           <Input name="email" type="email" placeholder="Email" required />
           <Input name="password" type="password" placeholder="Password" minLength={8} required />
-          {error && <p className="text-sm text-amber-600 dark:text-amber-400">{error}</p>}
+          {error && <p className="text-xs font-semibold text-neutral-900 dark:text-white bg-neutral-100 dark:bg-neutral-800 p-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700">{error}</p>}
           <Button type="submit" disabled={loading} className="w-full">
             {loading ? 'Please wait…' : mode === 'login' ? 'Login' : 'Create account'}
           </Button>

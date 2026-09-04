@@ -236,7 +236,7 @@ export function SalahTimeWidget() {
           <div>
             <div className="flex items-center gap-2">
               <span className="inline-flex items-center gap-1.5 rounded-full border border-neutral-300 px-2.5 py-0.5 text-[10px] font-semibold tracking-wider uppercase text-neutral-900 dark:border-neutral-700 dark:text-neutral-100">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="h-1.5 w-1.5 rounded-full bg-neutral-900 dark:bg-white animate-pulse" />
                 লাইভ ওয়াক্ত
               </span>
               <span className="text-[11px] text-neutral-500 dark:text-neutral-400 font-medium">
@@ -413,7 +413,7 @@ export function SalahTimeWidget() {
           </div>
 
           <div className="flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400">
-            <span className="inline-block h-2 w-2 rounded-full bg-emerald-500" />
+            <span className="inline-block h-2 w-2 rounded-full bg-neutral-900 dark:bg-white" />
             <span>অবস্থান: {locationName}</span>
           </div>
         </div>

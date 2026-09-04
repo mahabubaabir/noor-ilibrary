@@ -105,12 +105,12 @@ export function InteractiveAmbientHero() {
           width * 0.4
         )
         if (isDark) {
-          gradient.addColorStop(0, "rgba(5, 150, 105, 0.12)")
-          gradient.addColorStop(0.5, "rgba(217, 119, 6, 0.04)")
+          gradient.addColorStop(0, "rgba(255, 255, 255, 0.08)")
+          gradient.addColorStop(0.5, "rgba(255, 255, 255, 0.02)")
           gradient.addColorStop(1, "rgba(0, 0, 0, 0)")
         } else {
-          gradient.addColorStop(0, "rgba(5, 150, 105, 0.08)")
-          gradient.addColorStop(0.5, "rgba(245, 158, 11, 0.03)")
+          gradient.addColorStop(0, "rgba(0, 0, 0, 0.05)")
+          gradient.addColorStop(0.5, "rgba(0, 0, 0, 0.015)")
           gradient.addColorStop(1, "rgba(255, 255, 255, 0)")
         }
 
@@ -146,12 +146,12 @@ export function InteractiveAmbientHero() {
           }
         }
 
-        // Draw particle node
+        // Draw particle node in monochrome
         ctx.beginPath()
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2)
-        ctx.fillStyle = p.hue === 160
-          ? `hsla(158, 70%, ${isDark ? "60%" : "40%"}, ${p.alpha})`
-          : `hsla(40, 90%, ${isDark ? "65%" : "45%"}, ${p.alpha * 0.8})`
+        ctx.fillStyle = isDark
+          ? `rgba(255, 255, 255, ${p.alpha * 0.7})`
+          : `rgba(15, 15, 15, ${p.alpha * 0.5})`
         ctx.fill()
 
         // Draw constellation connective lines
@@ -165,8 +165,10 @@ export function InteractiveAmbientHero() {
             ctx.beginPath()
             ctx.moveTo(p.x, p.y)
             ctx.lineTo(p2.x, p2.y)
-            const lineAlpha = (1 - dist / 110) * (isDark ? 0.18 : 0.1)
-            ctx.strokeStyle = `hsla(158, 60%, 50%, ${lineAlpha})`
+            const lineAlpha = (1 - dist / 110) * (isDark ? 0.15 : 0.08)
+            ctx.strokeStyle = isDark
+              ? `rgba(255, 255, 255, ${lineAlpha})`
+              : `rgba(0, 0, 0, ${lineAlpha})`
             ctx.lineWidth = 0.75
             ctx.stroke()
           }

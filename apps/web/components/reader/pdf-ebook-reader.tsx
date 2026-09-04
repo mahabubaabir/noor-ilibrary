@@ -330,26 +330,26 @@ export function PdfEbookReader({ story }: ReaderProps) {
   const getThemeClasses = () => {
     switch (theme) {
       case "sepia":
-        return "bg-[#fbf0d9] text-[#3f2e1e] border-[#e8d5b5]"
+        return "bg-neutral-100 text-neutral-900 border-neutral-300 dark:bg-neutral-900 dark:text-neutral-100 dark:border-neutral-800"
       case "dark":
-        return "bg-[#18181b] text-stone-200 border-stone-800"
+        return "bg-neutral-950 text-neutral-100 border-neutral-800"
       case "emerald":
-        return "bg-[#062419] text-emerald-100 border-emerald-800/60"
+        return "bg-neutral-900 text-neutral-100 border-neutral-800"
       default:
-        return "bg-white text-stone-800 border-stone-200/80"
+        return "bg-white text-neutral-900 border-neutral-200"
     }
   }
 
   const getPageContainerClasses = () => {
     switch (theme) {
       case "sepia":
-        return "bg-[#f4e4c1] shadow-xl border-[#dfcca0]"
+        return "bg-neutral-100/90 shadow-xl border-neutral-300 dark:bg-neutral-900/90 dark:border-neutral-800"
       case "dark":
-        return "bg-[#202024] shadow-2xl border-stone-800"
+        return "bg-neutral-950 shadow-2xl border-neutral-800"
       case "emerald":
-        return "bg-[#0b3323] shadow-2xl border-emerald-800/40"
+        return "bg-neutral-900 shadow-2xl border-neutral-800"
       default:
-        return "bg-white shadow-xl border-stone-200"
+        return "bg-white shadow-xl border-neutral-200"
     }
   }
 
@@ -389,7 +389,7 @@ export function PdfEbookReader({ story }: ReaderProps) {
           {/* Language Toggle */}
           <button
             onClick={() => setLang(lang === "bn" ? "en" : "bn")}
-            className="flex items-center gap-1.5 rounded-xl bg-emerald-50 px-3 py-1.5 text-xs font-bold text-emerald-800 transition-all hover:bg-emerald-100 dark:bg-emerald-950/60 dark:text-emerald-300"
+            className="flex items-center gap-1.5 rounded-xl bg-neutral-100 px-3 py-1.5 text-xs font-bold text-neutral-900 transition-all hover:bg-neutral-200 dark:bg-neutral-800 dark:text-neutral-100 dark:hover:bg-neutral-700"
             title="ভাষা পরিবর্তন করুন"
           >
             <Languages className="h-3.5 w-3.5" />
@@ -400,7 +400,7 @@ export function PdfEbookReader({ story }: ReaderProps) {
         {/* View Mode & Page Progress */}
         <div className="flex items-center gap-2">
           {viewMode === "paginated" && (
-            <div className="flex items-center gap-1 text-xs font-bold text-stone-600 dark:text-stone-300">
+            <div className="flex items-center gap-1 text-xs font-bold text-neutral-600 dark:text-neutral-400">
               <Button
                 variant="ghost"
                 size="icon"
@@ -427,24 +427,24 @@ export function PdfEbookReader({ story }: ReaderProps) {
 
           {/* Sync Status Badge */}
           <div
-            className="hidden sm:flex items-center gap-1 text-[11px] font-medium text-emerald-700 dark:text-emerald-400"
+            className="hidden sm:flex items-center gap-1 text-[11px] font-medium text-neutral-600 dark:text-neutral-400"
             title="স্বয়ংক্রিয় ডেটা সিঙ্ক সক্রিয়"
           >
             <Sparkles className="h-3 w-3" />
             <span>{syncStatus === "synced" ? "স্বয়ংক্রিয় সিঙ্ক" : "সংরক্ষিত"}</span>
           </div>
 
-          <div className="h-4 w-px bg-stone-200 dark:bg-stone-800" />
+          <div className="h-4 w-px bg-neutral-200 dark:bg-neutral-800" />
 
           {/* Highlights & Notes Drawer Toggle */}
           <button
             onClick={() => setNotesDrawerOpen(!notesDrawerOpen)}
-            className="relative flex items-center gap-1.5 rounded-xl border border-stone-200 bg-stone-50 px-3 py-1.5 text-xs font-bold text-stone-700 hover:bg-stone-100 dark:border-stone-800 dark:bg-stone-800 dark:text-stone-200"
+            className="relative flex items-center gap-1.5 rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-1.5 text-xs font-bold text-neutral-700 hover:bg-neutral-100 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-300"
           >
-            <Highlighter className="h-3.5 w-3.5 text-amber-500" />
+            <Highlighter className="h-3.5 w-3.5 text-neutral-900 dark:text-white" />
             <span className="hidden sm:inline">নোটস ও হাইলাইট</span>
             {(highlights.length > 0 || notes.length > 0) && (
-              <span className="flex h-4 w-4 items-center justify-center rounded-full bg-emerald-600 text-[10px] text-white">
+              <span className="flex h-4 w-4 items-center justify-center rounded-full bg-neutral-900 text-[10px] text-white dark:bg-white dark:text-neutral-900">
                 {highlights.length + notes.length}
               </span>
             )}
@@ -455,7 +455,7 @@ export function PdfEbookReader({ story }: ReaderProps) {
             variant="ghost"
             size="icon"
             onClick={() => setSettingsOpen(!settingsOpen)}
-            className="rounded-xl text-stone-600 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-800"
+            className="rounded-xl text-neutral-600 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-800"
             title="রিডার সেটিংস"
           >
             <Sliders className="h-4 w-4" />
@@ -465,14 +465,14 @@ export function PdfEbookReader({ story }: ReaderProps) {
 
       {/* Reader Settings Dropdown Panel */}
       {settingsOpen && (
-        <div className="mb-6 rounded-3xl border border-stone-200 bg-white/95 p-5 shadow-2xl backdrop-blur-xl dark:border-stone-800 dark:bg-stone-900/95">
+        <div className="mb-6 rounded-3xl border border-neutral-200 bg-white/95 p-5 shadow-2xl backdrop-blur-xl dark:border-neutral-800 dark:bg-neutral-900/95">
           <div className="mb-4 flex items-center justify-between">
-            <h3 className="text-sm font-bold text-stone-900 dark:text-stone-100">
+            <h3 className="text-sm font-bold text-neutral-900 dark:text-white">
               রিডার কাস্টমাইজেশন ও পড়ার ধরন (Reader Preferences)
             </h3>
             <button
               onClick={() => setSettingsOpen(false)}
-              className="rounded-lg p-1 text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800"
+              className="rounded-lg p-1 text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800"
             >
               <X className="h-4 w-4" />
             </button>
@@ -481,7 +481,7 @@ export function PdfEbookReader({ story }: ReaderProps) {
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
             {/* Theme Selector */}
             <div>
-              <label className="mb-1.5 block text-xs font-bold text-stone-500">কালার থিম (Theme)</label>
+              <label className="mb-1.5 block text-xs font-bold text-neutral-500">কালার থিম (Theme)</label>
               <div className="flex gap-2">
                 <button
                   onClick={() => {
@@ -490,8 +490,8 @@ export function PdfEbookReader({ story }: ReaderProps) {
                   }}
                   className={`flex-1 rounded-xl border p-2 text-xs font-semibold ${
                     theme === "light"
-                      ? "border-emerald-600 bg-stone-100 font-bold text-stone-900"
-                      : "border-stone-200 bg-white text-stone-700"
+                      ? "border-neutral-900 bg-neutral-100 font-bold text-neutral-900 dark:border-white dark:bg-neutral-800 dark:text-white"
+                      : "border-neutral-200 bg-white text-neutral-700 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-300"
                   }`}
                 >
                   ☀️ হালকা
@@ -503,8 +503,8 @@ export function PdfEbookReader({ story }: ReaderProps) {
                   }}
                   className={`flex-1 rounded-xl border p-2 text-xs font-semibold ${
                     theme === "sepia"
-                      ? "border-amber-600 bg-[#f4e4c1] font-bold text-[#3f2e1e]"
-                      : "border-amber-200 bg-[#fbf0d9] text-[#3f2e1e]"
+                      ? "border-neutral-900 bg-neutral-100 font-bold text-neutral-900 dark:border-white dark:bg-neutral-800 dark:text-white"
+                      : "border-neutral-200 bg-white text-neutral-700 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-300"
                   }`}
                 >
                   📜 সেপিয়া
@@ -516,8 +516,8 @@ export function PdfEbookReader({ story }: ReaderProps) {
                   }}
                   className={`flex-1 rounded-xl border p-2 text-xs font-semibold ${
                     theme === "dark"
-                      ? "border-emerald-500 bg-stone-800 font-bold text-stone-100"
-                      : "border-stone-700 bg-stone-900 text-stone-300"
+                      ? "border-neutral-900 bg-neutral-100 font-bold text-neutral-900 dark:border-white dark:bg-neutral-800 dark:text-white"
+                      : "border-neutral-200 bg-white text-neutral-700 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-300"
                   }`}
                 >
                   🌙 ডার্ক
@@ -527,7 +527,7 @@ export function PdfEbookReader({ story }: ReaderProps) {
 
             {/* Font Size */}
             <div>
-              <label className="mb-1.5 block text-xs font-bold text-stone-500">ফন্ট সাইজ (Font Size)</label>
+              <label className="mb-1.5 block text-xs font-bold text-neutral-500">ফন্ট সাইজ (Font Size)</label>
               <div className="flex gap-2">
                 {(["sm", "base", "lg", "xl"] as FontSize[]).map((sz) => (
                   <button
@@ -538,8 +538,8 @@ export function PdfEbookReader({ story }: ReaderProps) {
                     }}
                     className={`flex-1 rounded-xl border py-2 text-xs font-semibold uppercase ${
                       fontSize === sz
-                        ? "border-emerald-600 bg-emerald-50 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300"
-                        : "border-stone-200 bg-white text-stone-700 dark:border-stone-800 dark:bg-stone-800 dark:text-stone-300"
+                        ? "border-neutral-900 bg-neutral-900 text-white dark:border-white dark:bg-white dark:text-neutral-900"
+                        : "border-neutral-200 bg-white text-neutral-700 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-300"
                     }`}
                   >
                     {sz === "sm" ? "ছোট" : sz === "base" ? "স্বাভাবিক" : sz === "lg" ? "বড়" : "অধিক বড়"}
@@ -550,7 +550,7 @@ export function PdfEbookReader({ story }: ReaderProps) {
 
             {/* View Mode (Paginated E-book vs Continuous Scroll) */}
             <div>
-              <label className="mb-1.5 block text-xs font-bold text-stone-500">পড়ার ভিউ (Layout)</label>
+              <label className="mb-1.5 block text-xs font-bold text-neutral-500">পড়ার ভিউ (Layout)</label>
               <div className="flex gap-2">
                 <button
                   onClick={() => {
@@ -559,8 +559,8 @@ export function PdfEbookReader({ story }: ReaderProps) {
                   }}
                   className={`flex-1 rounded-xl border p-2 text-xs font-semibold ${
                     viewMode === "paginated"
-                      ? "border-emerald-600 bg-emerald-50 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300"
-                      : "border-stone-200 bg-white text-stone-700 dark:border-stone-800 dark:bg-stone-800 dark:text-stone-300"
+                      ? "border-neutral-900 bg-neutral-900 text-white dark:border-white dark:bg-white dark:text-neutral-900"
+                      : "border-neutral-200 bg-white text-neutral-700 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-300"
                   }`}
                 >
                   📖 ই-বুক পৃষ্ঠা মোড
@@ -572,8 +572,8 @@ export function PdfEbookReader({ story }: ReaderProps) {
                   }}
                   className={`flex-1 rounded-xl border p-2 text-xs font-semibold ${
                     viewMode === "scroll"
-                      ? "border-emerald-600 bg-emerald-50 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300"
-                      : "border-stone-200 bg-white text-stone-700 dark:border-stone-800 dark:bg-stone-800 dark:text-stone-300"
+                      ? "border-neutral-900 bg-neutral-900 text-white dark:border-white dark:bg-white dark:text-neutral-900"
+                      : "border-neutral-200 bg-white text-neutral-700 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-300"
                   }`}
                 >
                   📜 স্ক্রোল মোড
@@ -626,7 +626,7 @@ export function PdfEbookReader({ story }: ReaderProps) {
           {/* Add Note Button */}
           <button
             onClick={() => handleOpenAddNote(currentPage > 0 ? currentPage - 1 : 0)}
-            className="flex items-center gap-1 rounded-xl bg-emerald-600 px-2.5 py-1 text-[11px] font-bold text-white shadow-sm hover:bg-emerald-500 active:scale-95"
+            className="flex items-center gap-1 rounded-xl bg-neutral-900 px-2.5 py-1 text-[11px] font-bold text-white shadow-sm hover:bg-neutral-800 active:scale-95 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200"
           >
             <MessageSquare className="h-3 w-3" />
             নোট লিখুন
@@ -645,30 +645,30 @@ export function PdfEbookReader({ story }: ReaderProps) {
             {/* Page 0: Cover & Key Takeaways Overview */}
             {currentPage === 0 && (
               <div className="space-y-8 animate-in fade-in duration-200">
-                <div className="border-b border-stone-200/60 pb-6 dark:border-stone-800/60">
-                  <span className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-100/80 px-3 py-1 text-xs font-bold text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300">
-                    <Sparkles className="h-3.5 w-3.5 text-amber-500" />
+                <div className="border-b border-neutral-200 pb-6 dark:border-neutral-800">
+                  <span className="inline-flex items-center gap-1.5 rounded-xl bg-neutral-100 px-3 py-1 text-xs font-bold text-neutral-900 dark:bg-neutral-800 dark:text-white">
+                    <Sparkles className="h-3.5 w-3.5 text-neutral-900 dark:text-white" />
                     {lang === "bn" ? story.categoryLabelBn : story.categoryLabelEn} • {story.readTime}
                   </span>
 
-                  <h1 className="mt-4 text-2xl font-bold tracking-tight sm:text-3xl lg:text-4xl">
+                  <h1 className="mt-4 text-2xl font-bold tracking-tight sm:text-3xl lg:text-4xl text-neutral-900 dark:text-white">
                     {title}
                   </h1>
-                  <p className="mt-2 text-sm sm:text-base leading-relaxed opacity-85">
+                  <p className="mt-2 text-sm sm:text-base leading-relaxed text-neutral-600 dark:text-neutral-400">
                     {subtitle}
                   </p>
                 </div>
 
                 {/* Key Takeaways Box */}
-                <div className="rounded-2xl border border-emerald-500/30 bg-emerald-50/50 p-5 dark:border-emerald-500/20 dark:bg-emerald-950/20">
-                  <h3 className="text-sm font-bold text-emerald-900 dark:text-emerald-200 flex items-center gap-2">
-                    <Sparkles className="h-4 w-4 text-amber-500" />
+                <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-5 dark:border-neutral-800 dark:bg-neutral-900">
+                  <h3 className="text-sm font-bold text-neutral-900 dark:text-white flex items-center gap-2">
+                    <Sparkles className="h-4 w-4 text-neutral-900 dark:text-white" />
                     {lang === "bn" ? "মূল শিক্ষা ও দৈনন্দিন আমল (Key Takeaways)" : "Key Lessons & Daily Practices"}
                   </h3>
-                  <ul className="mt-3 space-y-2 text-xs sm:text-sm leading-relaxed text-emerald-950 dark:text-emerald-100">
+                  <ul className="mt-3 space-y-2 text-xs sm:text-sm leading-relaxed text-neutral-700 dark:text-neutral-300">
                     {takeaways.map((item, idx) => (
                       <li key={idx} className="flex items-start gap-2">
-                        <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-600" />
+                        <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-neutral-900 dark:bg-white" />
                         <span>{item}</span>
                       </li>
                     ))}
@@ -678,7 +678,7 @@ export function PdfEbookReader({ story }: ReaderProps) {
                 <div className="flex justify-center pt-4">
                   <Button
                     onClick={() => setCurrentPage(1)}
-                    className="gap-2 rounded-2xl bg-emerald-600 px-6 py-3 font-bold text-white shadow-lg hover:bg-emerald-700 active:scale-95"
+                    className="gap-2 rounded-2xl bg-neutral-900 px-6 py-3 font-bold text-white shadow-lg hover:bg-neutral-800 active:scale-95 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200"
                   >
                     পড়া শুরু করুন (Start Reading) <ChevronRight className="h-4 w-4" />
                   </Button>
@@ -695,20 +695,20 @@ export function PdfEbookReader({ story }: ReaderProps) {
                   const secIdx = currentPage - 1
                   return (
                     <div>
-                      <div className="mb-4 flex items-center justify-between border-b border-stone-200/50 pb-3 dark:border-stone-800/50">
-                        <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
+                      <div className="mb-4 flex items-center justify-between border-b border-neutral-200 pb-3 dark:border-neutral-800">
+                        <span className="text-xs font-bold uppercase tracking-wider text-neutral-500">
                           অধ্যায় {currentPage} / {activeSections.length}
                         </span>
 
                         <button
                           onClick={() => handleOpenAddNote(secIdx)}
-                          className="flex items-center gap-1 text-xs font-semibold text-stone-500 hover:text-emerald-600"
+                          className="flex items-center gap-1 text-xs font-semibold text-neutral-500 hover:text-neutral-900 dark:hover:text-white"
                         >
                           <Plus className="h-3.5 w-3.5" /> এই অধ্যায়ে নোট যোগ করুন
                         </button>
                       </div>
 
-                      <h2 className="text-xl font-bold tracking-tight sm:text-2xl">
+                      <h2 className="text-xl font-bold tracking-tight sm:text-2xl text-neutral-900 dark:text-white">
                         {sec.heading}
                       </h2>
 
@@ -717,17 +717,17 @@ export function PdfEbookReader({ story }: ReaderProps) {
                       </p>
 
                       {sec.hadithOrAyahRef && (
-                        <div className="mt-6 rounded-2xl border-l-4 border-emerald-600 bg-stone-100/60 p-4 text-xs sm:text-sm font-medium italic dark:bg-stone-800/50">
+                        <div className="mt-6 rounded-2xl border-l-4 border-neutral-900 bg-neutral-100 p-4 text-xs sm:text-sm font-medium italic text-neutral-800 dark:border-white dark:bg-neutral-900 dark:text-neutral-200">
                           {sec.hadithOrAyahRef}
                         </div>
                       )}
 
                       {sec.reflection && (
-                        <div className="mt-4 rounded-2xl border border-amber-500/30 bg-amber-50/40 p-4 text-xs sm:text-sm dark:bg-amber-950/20">
-                          <strong className="text-amber-900 dark:text-amber-300 block mb-1">
+                        <div className="mt-4 rounded-2xl border border-neutral-200 bg-neutral-50 p-4 text-xs sm:text-sm dark:border-neutral-800 dark:bg-neutral-900">
+                          <strong className="text-neutral-900 dark:text-white block mb-1">
                             💡 {lang === "bn" ? "অনুপ্রেরণামূলক উপলব্ধি" : "Practical Reflection"}:
                           </strong>
-                          <span className="text-stone-700 dark:text-stone-300">{sec.reflection}</span>
+                          <span className="text-neutral-700 dark:text-neutral-300">{sec.reflection}</span>
                         </div>
                       )}
                     </div>
@@ -735,7 +735,7 @@ export function PdfEbookReader({ story }: ReaderProps) {
                 })()}
 
                 {/* Page Navigation Bottom Bar */}
-                <div className="mt-10 flex items-center justify-between border-t border-stone-200/60 pt-6 dark:border-stone-800/60">
+                <div className="mt-10 flex items-center justify-between border-t border-neutral-200 pt-6 dark:border-neutral-800">
                   <Button
                     variant="outline"
                     onClick={() => setCurrentPage((p) => Math.max(0, p - 1))}
@@ -744,21 +744,21 @@ export function PdfEbookReader({ story }: ReaderProps) {
                     <ChevronLeft className="h-4 w-4" /> পূর্ববর্তী পৃষ্ঠা
                   </Button>
 
-                  <span className="text-xs font-bold text-stone-500">
+                  <span className="text-xs font-bold text-neutral-500">
                     পৃষ্ঠা {currentPage + 1} / {totalPages}
                   </span>
 
                   {currentPage < totalPages - 1 ? (
                     <Button
                       onClick={() => setCurrentPage((p) => p + 1)}
-                      className="gap-1 rounded-xl bg-emerald-600 text-xs font-bold text-white hover:bg-emerald-700"
+                      className="gap-1 rounded-xl bg-neutral-900 text-xs font-bold text-white hover:bg-neutral-800 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200"
                     >
                       পরবর্তী পৃষ্ঠা <ChevronRight className="h-4 w-4" />
                     </Button>
                   ) : (
                     <Link
                       href="/stories"
-                      className="inline-flex items-center gap-1 rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white hover:bg-emerald-700"
+                      className="inline-flex items-center gap-1 rounded-xl bg-neutral-900 px-4 py-2 text-xs font-bold text-white hover:bg-neutral-800 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200"
                     >
                       সমাপ্ত • অন্যান্য গল্পসমূহ <ChevronRight className="h-4 w-4" />
                     </Link>
@@ -770,16 +770,16 @@ export function PdfEbookReader({ story }: ReaderProps) {
         ) : (
           /* VIEW 2: CONTINUOUS SCROLL MODE */
           <div className="space-y-10">
-            <div className="border-b border-stone-200/60 pb-6 dark:border-stone-800/60">
-              <span className="inline-flex items-center gap-1.5 rounded-xl bg-emerald-100/80 px-3 py-1 text-xs font-bold text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300">
-                <Sparkles className="h-3.5 w-3.5 text-amber-500" />
+            <div className="border-b border-neutral-200 pb-6 dark:border-neutral-800">
+              <span className="inline-flex items-center gap-1.5 rounded-xl bg-neutral-100 px-3 py-1 text-xs font-bold text-neutral-900 dark:bg-neutral-800 dark:text-white">
+                <Sparkles className="h-3.5 w-3.5 text-neutral-900 dark:text-white" />
                 {lang === "bn" ? story.categoryLabelBn : story.categoryLabelEn} • {story.readTime}
               </span>
 
-              <h1 className="mt-4 text-2xl font-bold tracking-tight sm:text-3xl lg:text-4xl">
+              <h1 className="mt-4 text-2xl font-bold tracking-tight sm:text-3xl lg:text-4xl text-neutral-900 dark:text-white">
                 {title}
               </h1>
-              <p className="mt-2 text-sm sm:text-base leading-relaxed opacity-85">
+              <p className="mt-2 text-sm sm:text-base leading-relaxed text-neutral-600 dark:text-neutral-400">
                 {subtitle}
               </p>
             </div>
@@ -788,16 +788,16 @@ export function PdfEbookReader({ story }: ReaderProps) {
             {activeSections.map((sec, idx) => (
               <div
                 key={idx}
-                className="group relative rounded-2xl border border-transparent p-4 transition-all hover:border-stone-200 dark:hover:border-stone-800"
+                className="group relative rounded-2xl border border-transparent p-4 transition-all hover:border-neutral-200 dark:hover:border-neutral-800"
               >
                 <div className="mb-2 flex items-center justify-between">
-                  <h2 className="text-xl font-bold tracking-tight">
+                  <h2 className="text-xl font-bold tracking-tight text-neutral-900 dark:text-white">
                     {idx + 1}. {sec.heading}
                   </h2>
 
                   <button
                     onClick={() => handleOpenAddNote(idx)}
-                    className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 rounded-lg bg-emerald-50 px-2 py-1 text-xs font-semibold text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300"
+                    className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 rounded-lg bg-neutral-100 px-2 py-1 text-xs font-semibold text-neutral-900 dark:bg-neutral-800 dark:text-white"
                   >
                     <MessageSquare className="h-3.5 w-3.5" /> নোট লিখুন
                   </button>
@@ -808,17 +808,17 @@ export function PdfEbookReader({ story }: ReaderProps) {
                 </p>
 
                 {sec.hadithOrAyahRef && (
-                  <div className="mt-4 rounded-2xl border-l-4 border-emerald-600 bg-stone-100/60 p-4 text-xs sm:text-sm font-medium italic dark:bg-stone-800/50">
+                  <div className="mt-4 rounded-2xl border-l-4 border-neutral-900 bg-neutral-100 p-4 text-xs sm:text-sm font-medium italic text-neutral-800 dark:border-white dark:bg-neutral-900 dark:text-neutral-200">
                     {sec.hadithOrAyahRef}
                   </div>
                 )}
 
                 {sec.reflection && (
-                  <div className="mt-3 rounded-2xl border border-amber-500/30 bg-amber-50/40 p-4 text-xs sm:text-sm dark:bg-amber-950/20">
-                    <strong className="text-amber-900 dark:text-amber-300 block mb-1">
+                  <div className="mt-3 rounded-2xl border border-neutral-200 bg-neutral-50 p-4 text-xs sm:text-sm dark:border-neutral-800 dark:bg-neutral-900">
+                    <strong className="text-neutral-900 dark:text-white block mb-1">
                       💡 {lang === "bn" ? "অনুপ্রেরণামূলক উপলব্ধি" : "Practical Reflection"}:
                     </strong>
-                    <span className="text-stone-700 dark:text-stone-300">{sec.reflection}</span>
+                    <span className="text-neutral-700 dark:text-neutral-300">{sec.reflection}</span>
                   </div>
                 )}
               </div>
@@ -829,33 +829,33 @@ export function PdfEbookReader({ story }: ReaderProps) {
 
       {/* Slide-out Drawer: Highlights & Notes Panel */}
       {notesDrawerOpen && (
-        <div className="fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col border-l border-stone-200 bg-white shadow-2xl backdrop-blur-2xl dark:border-stone-800 dark:bg-stone-900">
-          <div className="flex items-center justify-between border-b border-stone-200 p-4 dark:border-stone-800">
+        <div className="fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col border-l border-neutral-200 bg-white shadow-2xl backdrop-blur-2xl dark:border-neutral-800 dark:bg-neutral-950">
+          <div className="flex items-center justify-between border-b border-neutral-200 p-4 dark:border-neutral-800">
             <div className="flex items-center gap-2">
-              <Highlighter className="h-5 w-5 text-amber-500" />
-              <h3 className="font-bold text-stone-900 dark:text-stone-100">
+              <Highlighter className="h-5 w-5 text-neutral-900 dark:text-white" />
+              <h3 className="font-bold text-neutral-900 dark:text-white">
                 আমার হাইলাইট ও নোটস ({highlights.length + notes.length})
               </h3>
             </div>
 
             <button
               onClick={() => setNotesDrawerOpen(false)}
-              className="rounded-xl p-1 text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800"
+              className="rounded-xl p-1 text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800"
             >
               <X className="h-5 w-5" />
             </button>
           </div>
 
           {/* Search within notes */}
-          <div className="border-b border-stone-200 p-3 dark:border-stone-800">
+          <div className="border-b border-neutral-200 p-3 dark:border-neutral-800">
             <div className="relative">
-              <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-stone-400" />
+              <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-neutral-400" />
               <input
                 type="text"
                 placeholder="নোট বা হাইলাইট খুঁজুন..."
                 value={searchNotes}
                 onChange={(e) => setSearchNotes(e.target.value)}
-                className="w-full rounded-xl border border-stone-200 bg-stone-50 py-2 pl-8 pr-3 text-xs focus:border-emerald-500 focus:outline-none dark:border-stone-800 dark:bg-stone-800 dark:text-stone-100"
+                className="w-full rounded-xl border border-neutral-200 bg-neutral-50 py-2 pl-8 pr-3 text-xs focus:border-neutral-900 focus:outline-none dark:border-neutral-800 dark:bg-neutral-900 dark:text-white dark:focus:border-white transition-colors"
               />
             </div>
           </div>
@@ -864,44 +864,34 @@ export function PdfEbookReader({ story }: ReaderProps) {
           <div className="flex-1 overflow-y-auto p-4 space-y-4">
             {/* Highlights Section */}
             <div>
-              <h4 className="mb-2 text-xs font-bold uppercase tracking-wider text-stone-500">
+              <h4 className="mb-2 text-xs font-bold uppercase tracking-wider text-neutral-500">
                 হাইলাইটসমূহ ({highlights.length})
               </h4>
               {highlights.length === 0 ? (
-                <p className="text-xs text-stone-400 italic">কোনো টেক্সট হাইলাইট করা হয়নি। টেক্সট সিলেক্ট করে রঙ নির্বাচন করুন।</p>
+                <p className="text-xs text-neutral-400 italic">কোনো টেক্সট হাইলাইট করা হয়নি। টেক্সট সিলেক্ট করে রঙ নির্বাচন করুন।</p>
               ) : (
                 <div className="space-y-2">
                   {highlights.map((hl) => (
                     <div
                       key={hl.id}
-                      className={`rounded-xl border p-3 text-xs transition-all ${
-                        hl.color === "yellow"
-                          ? "border-yellow-300 bg-yellow-50/80 text-yellow-950 dark:bg-yellow-950/30 dark:text-yellow-100"
-                          : hl.color === "green"
-                          ? "border-emerald-300 bg-emerald-50/80 text-emerald-950 dark:bg-emerald-950/30 dark:text-emerald-100"
-                          : hl.color === "blue"
-                          ? "border-sky-300 bg-sky-50/80 text-sky-950 dark:bg-sky-950/30 dark:text-sky-100"
-                          : hl.color === "purple"
-                          ? "border-purple-300 bg-purple-50/80 text-purple-950 dark:bg-purple-950/30 dark:text-purple-100"
-                          : "border-pink-300 bg-pink-50/80 text-pink-950 dark:bg-pink-950/30 dark:text-pink-100"
-                      }`}
+                      className="rounded-xl border border-neutral-200 bg-neutral-50 p-3 text-xs dark:border-neutral-800 dark:bg-neutral-900"
                     >
-                      <p className="font-medium italic leading-relaxed">
+                      <p className="font-medium italic leading-relaxed text-neutral-900 dark:text-white">
                         &quot;{hl.text}&quot;
                       </p>
-                      <div className="mt-2 flex items-center justify-between border-t border-black/10 pt-2 text-[10px] opacity-70">
-                        <span>{new Date(hl.createdAt).toLocaleDateString()}</span>
+                      <div className="mt-2 flex items-center justify-between border-t border-neutral-200 dark:border-neutral-800 pt-2 text-[10px] opacity-70">
+                        <span className="text-neutral-500">{new Date(hl.createdAt).toLocaleDateString()}</span>
                         <div className="flex items-center gap-1">
                           <button
                             onClick={() => handleCopy(hl.text, hl.id)}
-                            className="p-1 hover:opacity-100"
+                            className="p-1 hover:opacity-100 text-neutral-700 dark:text-neutral-300"
                             title="কপি করুন"
                           >
-                            {copiedId === hl.id ? <Check className="h-3 w-3 text-emerald-600" /> : <Copy className="h-3 w-3" />}
+                            {copiedId === hl.id ? <Check className="h-3 w-3 text-neutral-900 dark:text-white" /> : <Copy className="h-3 w-3" />}
                           </button>
                           <button
                             onClick={() => removeHighlight(hl.id)}
-                            className="p-1 hover:text-red-600"
+                            className="p-1 hover:text-red-600 text-neutral-500"
                             title="মুছে ফেলুন"
                           >
                             <Trash2 className="h-3 w-3" />
@@ -915,38 +905,38 @@ export function PdfEbookReader({ story }: ReaderProps) {
             </div>
 
             {/* Personal Notes Section */}
-            <div className="border-t border-stone-200 pt-4 dark:border-stone-800">
-              <h4 className="mb-2 text-xs font-bold uppercase tracking-wider text-stone-500">
+            <div className="border-t border-neutral-200 pt-4 dark:border-neutral-800">
+              <h4 className="mb-2 text-xs font-bold uppercase tracking-wider text-neutral-500">
                 ব্যক্তিগত নোট ও মন্তব্য ({notes.length})
               </h4>
               {filteredNotes.length === 0 ? (
-                <p className="text-xs text-stone-400 italic">এখনো কোনো ব্যক্তিগত নোট যোগ করা হয়নি।</p>
+                <p className="text-xs text-neutral-400 italic">এখনো কোনো ব্যক্তিগত নোট যোগ করা হয়নি।</p>
               ) : (
                 <div className="space-y-2">
                   {filteredNotes.map((nt) => (
                     <div
                       key={nt.id}
-                      className="rounded-xl border border-stone-200 bg-stone-50 p-3 text-xs dark:border-stone-800 dark:bg-stone-800"
+                      className="rounded-xl border border-neutral-200 bg-neutral-50 p-3 text-xs dark:border-neutral-800 dark:bg-neutral-900"
                     >
-                      <span className="block font-bold text-emerald-700 dark:text-emerald-400 mb-1">
+                      <span className="block font-bold text-neutral-900 dark:text-white mb-1">
                         📌 {nt.sectionHeading}
                       </span>
-                      <p className="leading-relaxed text-stone-800 dark:text-stone-200">
+                      <p className="leading-relaxed text-neutral-700 dark:text-neutral-300">
                         {nt.content}
                       </p>
-                      <div className="mt-2 flex items-center justify-between border-t border-stone-200 pt-2 text-[10px] text-stone-400 dark:border-stone-700">
+                      <div className="mt-2 flex items-center justify-between border-t border-neutral-200 pt-2 text-[10px] text-neutral-400 dark:border-neutral-800">
                         <span>{new Date(nt.createdAt).toLocaleDateString()}</span>
                         <div className="flex items-center gap-1">
                           <button
                             onClick={() => handleCopy(nt.content, nt.id)}
-                            className="p-1 hover:text-stone-700 dark:hover:text-stone-200"
+                            className="p-1 hover:text-neutral-900 dark:hover:text-white text-neutral-600"
                             title="কপি করুন"
                           >
-                            {copiedId === nt.id ? <Check className="h-3 w-3 text-emerald-600" /> : <Copy className="h-3 w-3" />}
+                            {copiedId === nt.id ? <Check className="h-3 w-3 text-neutral-900 dark:text-white" /> : <Copy className="h-3 w-3" />}
                           </button>
                           <button
                             onClick={() => removeNote(nt.id)}
-                            className="p-1 hover:text-red-600"
+                            className="p-1 hover:text-red-600 text-neutral-500"
                             title="মুছে ফেলুন"
                           >
                             <Trash2 className="h-3 w-3" />
@@ -965,15 +955,15 @@ export function PdfEbookReader({ story }: ReaderProps) {
       {/* Add Note Modal */}
       {noteModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-lg rounded-3xl border border-stone-200 bg-white p-6 shadow-2xl dark:border-stone-800 dark:bg-stone-900">
+          <div className="w-full max-w-lg rounded-3xl border border-neutral-200 bg-white p-6 shadow-2xl dark:border-neutral-800 dark:bg-neutral-950">
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
-                <MessageSquare className="h-4 w-4 text-emerald-600" />
+              <h3 className="font-bold text-neutral-900 dark:text-white flex items-center gap-2">
+                <MessageSquare className="h-4 w-4 text-neutral-900 dark:text-white" />
                 ব্যক্তিগত নোট বা মন্তব্য যুক্ত করুন
               </h3>
               <button
                 onClick={() => setNoteModalOpen(false)}
-                className="rounded-lg p-1 text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800"
+                className="rounded-lg p-1 text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -984,7 +974,7 @@ export function PdfEbookReader({ story }: ReaderProps) {
               placeholder="আপনার অনুভূতি, শিক্ষা বা কোনো প্রতিফলন লিখুন..."
               value={currentNoteText}
               onChange={(e) => setCurrentNoteText(e.target.value)}
-              className="w-full rounded-2xl border border-stone-200 bg-stone-50 p-3 text-xs sm:text-sm focus:border-emerald-500 focus:outline-none dark:border-stone-800 dark:bg-stone-800 dark:text-stone-100"
+              className="w-full rounded-2xl border border-neutral-200 bg-neutral-50 p-3 text-xs sm:text-sm focus:border-neutral-900 focus:outline-none dark:border-neutral-800 dark:bg-neutral-900 dark:text-white dark:focus:border-white transition-colors"
             />
 
             <div className="mt-4 flex justify-end gap-2">
@@ -999,7 +989,7 @@ export function PdfEbookReader({ story }: ReaderProps) {
               <Button
                 size="sm"
                 onClick={handleSaveNote}
-                className="rounded-xl bg-emerald-600 text-xs font-bold text-white hover:bg-emerald-700"
+                className="rounded-xl bg-neutral-900 text-xs font-bold text-white hover:bg-neutral-800 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200"
               >
                 সংরক্ষণ করুন (Save Note)
               </Button>
