@@ -77,7 +77,8 @@ export function toBengaliNumerals(str: string): string {
 
 export function calculateNextPrayer(
   timings: Record<string, string>,
-  now: Date = new Date()
+  now: Date = new Date(),
+  targetTimezone?: string
 ): {
   currentPrayer: { nameEn: string; nameBn: string }
   nextPrayer: {
@@ -88,8 +89,12 @@ export function calculateNextPrayer(
     remainingFormatted: string
   }
 } {
+  const targetNow = targetTimezone
+    ? new Date(now.toLocaleString("en-US", { timeZone: targetTimezone }))
+    : now
+
   const prayers = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"]
-  const currentMinutes = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60
+  const currentMinutes = targetNow.getHours() * 60 + targetNow.getMinutes() + targetNow.getSeconds() / 60
 
   const prayerMinutesList = prayers.map((p) => {
     const cleaned = cleanTimeStr(timings[p] || "12:00")
@@ -101,27 +106,51 @@ export function calculateNextPrayer(
     }
   })
 
-  // Determine current and next prayer
-  let currentPrayer = prayers[prayers.length - 1]!
+  // Check sunrise time
+  const sunriseClean = cleanTimeStr(timings.Sunrise || "")
+  let sunriseMinutes = 0
+  if (sunriseClean) {
+    const [sh, sm] = sunriseClean.split(":").map(Number)
+    sunriseMinutes = (sh ?? 0) * 60 + (sm ?? 0)
+  }
+
+  const fajrMinutes = prayerMinutesList[0]!.minutes
+  const dhuhrMinutes = prayerMinutesList[1]!.minutes
+
+  let currentPrayer = ""
   let nextPrayer = prayerMinutesList[0]!
   let diffMinutes = 0
 
-  for (let i = 0; i < prayerMinutesList.length; i++) {
-    const p = prayerMinutesList[i]!
-    if (currentMinutes >= p.minutes) {
-      currentPrayer = p.name
-    } else {
-      nextPrayer = p
-      diffMinutes = p.minutes - currentMinutes
-      break
-    }
-  }
-
-  // If past Isha, next prayer is Fajr tomorrow
-  if (currentMinutes >= (prayerMinutesList[prayerMinutesList.length - 1]?.minutes ?? 1440)) {
+  if (currentMinutes < fajrMinutes) {
+    // Before Fajr (Tahajjud / Sehri time)
     currentPrayer = "Isha"
     nextPrayer = prayerMinutesList[0]!
-    diffMinutes = 1440 - currentMinutes + nextPrayer.minutes
+    diffMinutes = fajrMinutes - currentMinutes
+  } else if (sunriseMinutes && currentMinutes >= fajrMinutes && currentMinutes < sunriseMinutes) {
+    // Fajr is active until Sunrise
+    currentPrayer = "Fajr"
+    nextPrayer = { name: "Sunrise", time: sunriseClean, minutes: sunriseMinutes }
+    diffMinutes = sunriseMinutes - currentMinutes
+  } else if (sunriseMinutes && currentMinutes >= sunriseMinutes && currentMinutes < dhuhrMinutes) {
+    // Sunrise passed, waiting for Dhuhr (Ishraq / Chasht)
+    currentPrayer = ""
+    nextPrayer = prayerMinutesList[1]!
+    diffMinutes = dhuhrMinutes - currentMinutes
+  } else {
+    for (let i = 1; i < prayerMinutesList.length; i++) {
+      const p = prayerMinutesList[i]!
+      if (currentMinutes >= p.minutes) {
+        currentPrayer = p.name
+        if (i < prayerMinutesList.length - 1) {
+          nextPrayer = prayerMinutesList[i + 1]!
+          diffMinutes = nextPrayer.minutes - currentMinutes
+        } else {
+          // Past Isha -> next is Fajr
+          nextPrayer = prayerMinutesList[0]!
+          diffMinutes = 1440 - currentMinutes + nextPrayer.minutes
+        }
+      }
+    }
   }
 
   const remainingSeconds = Math.max(0, Math.round(diffMinutes * 60))
@@ -134,7 +163,7 @@ export function calculateNextPrayer(
   return {
     currentPrayer: {
       nameEn: currentPrayer,
-      nameBn: PRAYER_NAMES[currentPrayer]?.bn || currentPrayer,
+      nameBn: currentPrayer ? PRAYER_NAMES[currentPrayer]?.bn || currentPrayer : "ওয়াক্তের বিরতি",
     },
     nextPrayer: {
       nameEn: nextPrayer.name,
@@ -146,7 +175,7 @@ export function calculateNextPrayer(
   }
 }
 
-// Built-in offline fallback timings for major regions
+// Built-in fallback timings for major regions
 export function getOfflinePrayerFallback(city = "Dhaka", country = "Bangladesh"): PrayerTimesData {
   const now = new Date()
   const timings = {
@@ -160,32 +189,32 @@ export function getOfflinePrayerFallback(city = "Dhaka", country = "Bangladesh")
     Midnight: "00:06",
   }
 
-  const { currentPrayer, nextPrayer } = calculateNextPrayer(timings, now)
+  const { currentPrayer, nextPrayer } = calculateNextPrayer(timings, now, "Asia/Dhaka")
 
   return {
     city,
     country,
     date: {
-      gregorian: now.toLocaleDateString("en-US", {
+      gregorian: now.toLocaleDateString("bn-BD", {
         weekday: "long",
         year: "numeric",
         month: "long",
         day: "numeric",
       }),
       hijri: {
-        day: "14",
+        day: "১৫",
         monthEn: "Ramadan",
         monthAr: "رمضان",
-        year: "1447",
+        year: "১৪৪৭",
       },
     },
     timings,
     currentPrayer,
     nextPrayer,
     meta: {
-      methodName: "University of Islamic Sciences, Karachi (Fallback)",
-      source: "Offline Sync Engine",
-      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "Asia/Dhaka",
+      methodName: "ইসলামিক ফাউন্ডেশন পদ্ধতি",
+      source: "স্ট্যান্ডার্ড ওয়াক্ত",
+      timezone: "Asia/Dhaka",
       isFallback: true,
     },
   }

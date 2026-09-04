@@ -43,12 +43,47 @@ export async function GET(request: Request) {
   const lng = searchParams.get('lng')
   const city = searchParams.get('city')?.trim() || 'Dhaka'
   const country = searchParams.get('country')?.trim() || 'Bangladesh'
+  let locationName = searchParams.get('locationName')?.trim() || ''
 
   try {
     let aladhanUrl: string
     if (lat && lng) {
       const timestamp = Math.floor(Date.now() / 1000)
       aladhanUrl = `https://api.aladhan.com/v1/timings/${timestamp}?latitude=${lat}&longitude=${lng}&method=1`
+
+      // Server-side reverse geocoding for human-readable location name if not provided
+      if (!locationName) {
+        try {
+          const geoController = new AbortController()
+          const geoTimeout = setTimeout(() => geoController.abort(), 3500)
+          const geoRes = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=10`,
+            {
+              signal: geoController.signal,
+              headers: {
+                'User-Agent': 'Noor-Islamic-Library/1.0',
+                'Accept-Language': 'bn,en',
+              },
+            }
+          ).finally(() => clearTimeout(geoTimeout))
+
+          if (geoRes.ok) {
+            const geo = await geoRes.json()
+            const cName =
+              geo.address?.city ||
+              geo.address?.town ||
+              geo.address?.state_district ||
+              geo.address?.state ||
+              ''
+            const coName = geo.address?.country || ''
+            if (cName) {
+              locationName = `${cName}${coName ? `, ${coName}` : ''}`
+            }
+          }
+        } catch {
+          // fallback coordinate string
+        }
+      }
     } else {
       aladhanUrl = `https://api.aladhan.com/v1/timingsByCity?city=${encodeURIComponent(
         city
@@ -56,7 +91,7 @@ export async function GET(request: Request) {
     }
 
     const controller = new AbortController()
-    const timeout = setTimeout(() => controller.abort(), 4500)
+    const timeout = setTimeout(() => controller.abort(), 8000)
 
     const res = await fetch(aladhanUrl, {
       signal: controller.signal,
@@ -64,16 +99,15 @@ export async function GET(request: Request) {
         Accept: 'application/json',
         'User-Agent': 'Noor-Islamic-Library/1.0',
       },
-      next: { revalidate: 1800 },
     }).finally(() => clearTimeout(timeout))
 
     if (!res.ok) {
-      throw new Error(`Aladhan API responded with status ${res.status}`)
+      throw new Error(`Prayer service responded with status ${res.status}`)
     }
 
     const json: AladhanResponse = await res.json()
     if (!json.data || !json.data.timings) {
-      throw new Error('Malformed prayer response from Aladhan')
+      throw new Error('Malformed prayer response')
     }
 
     const d = json.data
@@ -88,11 +122,16 @@ export async function GET(request: Request) {
       Midnight: cleanTimeStr(d.timings.Midnight || '00:06'),
     }
 
+    const timezone = d.meta.timezone || 'Asia/Dhaka'
     const now = new Date()
-    const { currentPrayer, nextPrayer } = calculateNextPrayer(cleanTimings, now)
+    const { currentPrayer, nextPrayer } = calculateNextPrayer(cleanTimings, now, timezone)
+
+    const displayCity = lat && lng
+      ? (locationName || `${Number(lat).toFixed(2)}°N, ${Number(lng).toFixed(2)}°E`)
+      : city
 
     const result: PrayerTimesData = {
-      city: lat && lng ? (searchParams.get('locationName') || `${lat.slice(0, 5)}°, ${lng.slice(0, 5)}°`) : city,
+      city: displayCity,
       country,
       date: {
         gregorian: `${d.date.gregorian.weekday.en}, ${d.date.gregorian.month.en} ${d.date.gregorian.year}`,
@@ -107,9 +146,9 @@ export async function GET(request: Request) {
       currentPrayer,
       nextPrayer,
       meta: {
-        methodName: d.meta.method.name,
-        source: 'Aladhan Open API',
-        timezone: d.meta.timezone,
+        methodName: d.meta.method.name || 'Islamic Foundation',
+        source: 'স্ট্যান্ডার্ড ওয়াক্ত',
+        timezone,
         isFallback: false,
       },
     }

@@ -155,7 +155,7 @@ export default function HomePage() {
       {/* 2. Content Sections Below the Fold */}
       <div id="main-feed-section" className="relative z-10 mx-auto max-w-6xl px-4 py-8 sm:py-12">
         
-        {/* FRONT SALAH TIME WIDGET WITH LIVE OPEN API SYNC & AUTO LOCATION */}
+        {/* FRONT SALAH TIME WIDGET WITH LIVE WAQT SCHEDULE & SALAH TRACKER */}
         <SalahTimeWidget />
 
         {/* SMART PERSONALIZED "FOR YOU" RECOMMENDATION FEED */}
