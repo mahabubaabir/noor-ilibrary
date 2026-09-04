@@ -20,10 +20,10 @@ import {
   ShieldCheck,
   ChevronDown,
   BookMarked,
-  Layers,
   FileText,
 } from "lucide-react"
 import { NoorLogo } from "./ui/noor-logo"
+import { HeaderSalahPill } from "./header-salah-pill"
 
 interface NavDropdownGroup {
   id: string
@@ -185,15 +185,21 @@ export function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-stone-200/60 bg-white/85 backdrop-blur-2xl transition-colors dark:border-stone-800/60 dark:bg-stone-900/85">
+    <header className="sticky top-0 z-50 border-b border-neutral-200 bg-white/90 backdrop-blur-xl transition-colors dark:border-neutral-800 dark:bg-black/90">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-        {/* Brand Logo */}
-        <Link href="/" className="transition-transform hover:scale-[1.02] active:scale-98">
-          <NoorLogo size={36} />
-        </Link>
+        
+        {/* Brand Logo & Salah Live Indicator */}
+        <div className="flex items-center gap-4">
+          <Link href="/" className="transition-transform hover:scale-[1.02] active:scale-98">
+            <NoorLogo size={34} />
+          </Link>
+
+          {/* Quick Header Salah Pill */}
+          <HeaderSalahPill />
+        </div>
 
         {/* Minimalist Desktop Dropdown Navigation */}
-        <nav className="hidden items-center gap-1.5 md:flex" onMouseLeave={handleMouseLeave}>
+        <nav className="hidden items-center gap-1 md:flex" onMouseLeave={handleMouseLeave}>
           {navGroups.map((group) => {
             const isGroupActive = group.items.some(
               (item) => pathname === item.href || pathname?.startsWith(item.href + "/")
@@ -209,16 +215,16 @@ export function Header() {
                 <button
                   type="button"
                   onClick={() => setActiveDropdown(isOpen ? null : group.id)}
-                  className={`inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-bold transition-all ${
+                  className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold transition-all ${
                     isGroupActive || isOpen
-                      ? "bg-emerald-50 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 shadow-sm"
-                      : "text-stone-600 hover:bg-stone-100 hover:text-stone-900 dark:text-stone-300 dark:hover:bg-stone-800/80 dark:hover:text-stone-100"
+                      ? "bg-neutral-100 text-black dark:bg-neutral-800 dark:text-white"
+                      : "text-neutral-600 hover:bg-neutral-50 hover:text-black dark:text-neutral-400 dark:hover:bg-neutral-900 dark:hover:text-white"
                   }`}
                 >
                   <span>{group.label}</span>
                   <ChevronDown
                     className={`h-3.5 w-3.5 transition-transform duration-200 ${
-                      isOpen ? "rotate-180 text-emerald-600 dark:text-emerald-400" : "text-stone-400"
+                      isOpen ? "rotate-180" : "opacity-60"
                     }`}
                   />
                 </button>
@@ -226,7 +232,7 @@ export function Header() {
                 {/* Dropdown Menu Panel */}
                 {isOpen && (
                   <div
-                    className="absolute left-0 top-full mt-2 w-80 rounded-3xl border border-stone-200/80 bg-white/95 p-2.5 shadow-2xl backdrop-blur-xl animate-in fade-in slide-in-from-top-2 duration-150 dark:border-stone-800/80 dark:bg-stone-900/95"
+                    className="absolute left-0 top-full mt-2 w-80 rounded-2xl border border-neutral-200 bg-white p-2 shadow-2xl backdrop-blur-2xl animate-in fade-in zoom-in-95 duration-100 dark:border-neutral-800 dark:bg-neutral-950"
                     onMouseEnter={() => handleMouseEnter(group.id)}
                   >
                     <div className="flex flex-col gap-1">
@@ -238,17 +244,17 @@ export function Header() {
                           <Link
                             key={item.href}
                             href={item.href}
-                            className={`group flex items-start gap-3 rounded-2xl p-2.5 transition-all ${
+                            className={`group flex items-start gap-3 rounded-xl p-2.5 transition-all ${
                               isCurrent
-                                ? "bg-emerald-50/80 dark:bg-emerald-950/40"
-                                : "hover:bg-stone-50 dark:hover:bg-stone-800/60"
+                                ? "bg-neutral-100 dark:bg-neutral-900"
+                                : "hover:bg-neutral-50 dark:hover:bg-neutral-900/60"
                             }`}
                           >
                             <div
-                              className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl transition-colors ${
+                              className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg border transition-colors ${
                                 isCurrent
-                                  ? "bg-emerald-600 text-white"
-                                  : "bg-stone-100 text-stone-600 group-hover:bg-emerald-600 group-hover:text-white dark:bg-stone-800 dark:text-stone-300"
+                                  ? "border-black bg-black text-white dark:border-white dark:bg-white dark:text-black"
+                                  : "border-neutral-200 bg-neutral-50 text-neutral-600 group-hover:border-neutral-400 group-hover:text-black dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-300"
                               }`}
                             >
                               <Icon className="h-4 w-4" />
@@ -259,19 +265,19 @@ export function Header() {
                                 <span
                                   className={`text-xs font-bold transition-colors ${
                                     isCurrent
-                                      ? "text-emerald-800 dark:text-emerald-300"
-                                      : "text-stone-900 group-hover:text-emerald-700 dark:text-stone-100 dark:group-hover:text-emerald-400"
+                                      ? "text-black dark:text-white"
+                                      : "text-neutral-800 group-hover:text-black dark:text-neutral-200 dark:group-hover:text-white"
                                   }`}
                                 >
                                   {item.title}
                                 </span>
                                 {item.badge && (
-                                  <span className="rounded-full bg-emerald-100 px-1.5 py-0.5 text-[9px] font-extrabold text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+                                  <span className="rounded border border-neutral-300 px-1.5 py-0.2 text-[9px] font-mono font-bold text-neutral-800 dark:border-neutral-700 dark:text-neutral-200">
                                     {item.badge}
                                   </span>
                                 )}
                               </div>
-                              <p className="mt-0.5 text-[11px] leading-tight text-stone-500 line-clamp-1 dark:text-stone-400">
+                              <p className="mt-0.5 text-[11px] leading-tight text-neutral-500 line-clamp-1 dark:text-neutral-400">
                                 {item.desc}
                               </p>
                             </div>
@@ -287,12 +293,12 @@ export function Header() {
         </nav>
 
         {/* Action Controls & User Section */}
-        <div className="flex items-center gap-1.5 sm:gap-2">
+        <div className="flex items-center gap-2">
           {/* Quick Search */}
           <Link
             href="/search"
             title="অনুসন্ধান করুন"
-            className="flex h-9 w-9 items-center justify-center rounded-xl text-stone-500 transition-colors hover:bg-stone-100 hover:text-stone-900 dark:text-stone-400 dark:hover:bg-stone-800 dark:hover:text-stone-100"
+            className="flex h-9 w-9 items-center justify-center rounded-xl border border-neutral-200 text-neutral-600 transition-colors hover:bg-neutral-100 hover:text-black dark:border-neutral-800 dark:text-neutral-400 dark:hover:bg-neutral-900 dark:hover:text-white"
           >
             <Search className="h-4 w-4" />
           </Link>
@@ -302,7 +308,7 @@ export function Header() {
             <button
               onClick={toggleTheme}
               title={darkMode ? "লাইট মোড" : "ডার্ক মোড"}
-              className="flex h-9 w-9 items-center justify-center rounded-xl text-stone-500 transition-colors hover:bg-stone-100 hover:text-stone-900 dark:text-stone-400 dark:hover:bg-stone-800 dark:hover:text-stone-100"
+              className="flex h-9 w-9 items-center justify-center rounded-xl border border-neutral-200 text-neutral-600 transition-colors hover:bg-neutral-100 hover:text-black dark:border-neutral-800 dark:text-neutral-400 dark:hover:bg-neutral-900 dark:hover:text-white"
             >
               {darkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </button>
@@ -310,11 +316,11 @@ export function Header() {
 
           {/* User Auth Info */}
           {user ? (
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-2">
               {user.role === "admin" && (
                 <Link
                   href="/admin"
-                  className="hidden items-center rounded-xl bg-amber-100/90 px-2.5 py-1 text-[11px] font-extrabold text-amber-800 transition-colors hover:bg-amber-200 dark:bg-amber-950/60 dark:text-amber-300 sm:flex"
+                  className="hidden items-center rounded-xl border border-neutral-300 px-2.5 py-1 text-[11px] font-bold text-neutral-800 transition-colors hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-200 sm:flex"
                 >
                   Admin
                 </Link>
@@ -322,16 +328,16 @@ export function Header() {
 
               <Link
                 href="/library"
-                className="flex items-center gap-2 rounded-xl border border-stone-200 bg-stone-50/80 px-2.5 py-1 text-xs font-bold text-stone-700 transition-all hover:bg-stone-100 dark:border-stone-800 dark:bg-stone-800/80 dark:text-stone-200"
+                className="flex items-center gap-2 rounded-xl border border-neutral-200 bg-neutral-50 px-2.5 py-1 text-xs font-bold text-neutral-800 transition-all hover:bg-neutral-100 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-200"
               >
                 {user.avatar ? (
                   <img
                     src={user.avatar}
                     alt={user.name || "User Avatar"}
-                    className="h-5 w-5 rounded-full object-cover ring-1 ring-emerald-500/40"
+                    className="h-5 w-5 rounded-full object-cover"
                   />
                 ) : (
-                  <div className="flex h-5 w-5 items-center justify-center rounded-full bg-emerald-600 text-[10px] font-black text-white">
+                  <div className="flex h-5 w-5 items-center justify-center rounded-full bg-black text-[10px] font-bold text-white dark:bg-white dark:text-black">
                     {user.name?.charAt(0)?.toUpperCase() || user.email?.charAt(0)?.toUpperCase()}
                   </div>
                 )}
@@ -343,14 +349,14 @@ export function Header() {
               <button
                 onClick={logout}
                 title="লগআউট"
-                className="hidden h-9 w-9 items-center justify-center rounded-xl text-stone-400 transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/30 sm:flex"
+                className="hidden h-9 w-9 items-center justify-center rounded-xl border border-neutral-200 text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-black dark:border-neutral-800 dark:text-neutral-400 dark:hover:bg-neutral-900 dark:hover:text-white sm:flex"
               >
                 <LogOut className="h-4 w-4" />
               </button>
             </div>
           ) : (
             <Link href="/login" className="hidden sm:block">
-              <button className="inline-flex items-center gap-1.5 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-600 px-3.5 py-1.5 text-xs font-bold text-white shadow-sm transition-all hover:shadow hover:scale-[1.02] active:scale-98">
+              <button className="inline-flex items-center gap-1.5 rounded-xl border border-neutral-900 bg-neutral-900 px-3.5 py-1.5 text-xs font-bold text-white shadow-sm transition-all hover:bg-neutral-800 active:scale-95 dark:border-white dark:bg-white dark:text-black dark:hover:bg-neutral-200">
                 <UserIcon className="h-3.5 w-3.5" />
                 <span>সাইন ইন</span>
               </button>
@@ -360,7 +366,7 @@ export function Header() {
           {/* Mobile Hamburger Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="flex h-9 w-9 items-center justify-center rounded-xl text-stone-600 transition-colors hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-800 md:hidden"
+            className="flex h-9 w-9 items-center justify-center rounded-xl border border-neutral-200 text-neutral-700 transition-colors hover:bg-neutral-100 dark:border-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-900 md:hidden"
           >
             {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
@@ -369,25 +375,28 @@ export function Header() {
 
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
-        <div className="max-h-[85vh] overflow-y-auto border-t border-stone-200/80 bg-white/95 px-4 pb-6 pt-3 shadow-2xl backdrop-blur-2xl dark:border-stone-800/80 dark:bg-stone-900/95 md:hidden animate-in slide-in-from-top-4 duration-200">
+        <div className="max-h-[85vh] overflow-y-auto border-t border-neutral-200 bg-white px-4 pb-6 pt-3 shadow-2xl backdrop-blur-2xl dark:border-neutral-800 dark:bg-black md:hidden animate-in slide-in-from-top-4 duration-200">
           <div className="flex flex-col gap-2">
             {navGroups.map((group) => {
               const isExpanded = mobileExpandedGroup === group.id
 
               return (
-                <div key={group.id} className="rounded-2xl border border-stone-200/60 bg-stone-50/50 dark:border-stone-800/60 dark:bg-stone-800/30 overflow-hidden">
+                <div
+                  key={group.id}
+                  className="rounded-xl border border-neutral-200 bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-900/40 overflow-hidden"
+                >
                   <button
                     onClick={() => setMobileExpandedGroup(isExpanded ? null : group.id)}
-                    className="flex w-full items-center justify-between p-3 text-xs font-bold text-stone-800 dark:text-stone-200"
+                    className="flex w-full items-center justify-between p-3 text-xs font-bold text-neutral-800 dark:text-neutral-200"
                   >
                     <span>{group.label}</span>
                     <ChevronDown
-                      className={`h-4 w-4 text-stone-400 transition-transform ${isExpanded ? "rotate-180 text-emerald-600" : ""}`}
+                      className={`h-4 w-4 text-neutral-400 transition-transform ${isExpanded ? "rotate-180 text-black dark:text-white" : ""}`}
                     />
                   </button>
 
                   {isExpanded && (
-                    <div className="flex flex-col gap-1 border-t border-stone-200/40 p-2 dark:border-stone-800/40">
+                    <div className="flex flex-col gap-1 border-t border-neutral-200 p-2 dark:border-neutral-800">
                       {group.items.map((item) => {
                         const Icon = item.icon
                         const isCurrent = pathname === item.href || pathname?.startsWith(item.href + "/")
@@ -397,10 +406,10 @@ export function Header() {
                             key={item.href}
                             href={item.href}
                             onClick={() => setMobileMenuOpen(false)}
-                            className={`flex items-center gap-3 rounded-xl p-2.5 text-xs font-semibold transition-all ${
+                            className={`flex items-center gap-3 rounded-lg p-2.5 text-xs font-semibold transition-all ${
                               isCurrent
-                                ? "bg-emerald-600 text-white"
-                                : "text-stone-700 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-800"
+                                ? "bg-black text-white dark:bg-white dark:text-black"
+                                : "text-neutral-700 hover:bg-neutral-200/60 dark:text-neutral-300 dark:hover:bg-neutral-800"
                             }`}
                           >
                             <Icon className="h-4 w-4" />
@@ -408,7 +417,7 @@ export function Header() {
                               <div className="flex items-center gap-1.5">
                                 <span>{item.title}</span>
                                 {item.badge && (
-                                  <span className={`rounded-full px-1.5 py-0.2 text-[8px] font-bold ${isCurrent ? "bg-white/20 text-white" : "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"}`}>
+                                  <span className={`rounded px-1.5 py-0.2 text-[8px] font-bold ${isCurrent ? "bg-white/20 text-white" : "border border-neutral-300 dark:border-neutral-700"}`}>
                                     {item.badge}
                                   </span>
                                 )}
@@ -423,7 +432,7 @@ export function Header() {
               )
             })}
 
-            <div className="my-2 h-px bg-stone-200 dark:bg-stone-800" />
+            <div className="my-2 h-px bg-neutral-200 dark:bg-neutral-800" />
 
             {/* Mobile Auth Links */}
             {user ? (
@@ -432,7 +441,7 @@ export function Header() {
                   <Link
                     href="/admin"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center gap-3 rounded-xl bg-amber-50 p-2.5 text-xs font-bold text-amber-900 dark:bg-amber-950/40 dark:text-amber-300"
+                    className="flex items-center gap-3 rounded-xl border border-neutral-300 bg-neutral-100 p-2.5 text-xs font-bold text-neutral-900 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
                   >
                     Admin Dashboard
                   </Link>
@@ -440,9 +449,9 @@ export function Header() {
                 <Link
                   href="/library"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-3 rounded-xl bg-emerald-50 p-2.5 text-xs font-bold text-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-300"
+                  className="flex items-center gap-3 rounded-xl border border-neutral-200 p-2.5 text-xs font-bold text-neutral-900 dark:border-neutral-800 dark:text-neutral-100"
                 >
-                  <Heart className="h-4 w-4 text-emerald-600" />
+                  <Heart className="h-4 w-4" />
                   আমার লাইব্রেরি ও বুকমার্ক
                 </Link>
                 <button
@@ -450,7 +459,7 @@ export function Header() {
                     logout()
                     setMobileMenuOpen(false)
                   }}
-                  className="flex items-center gap-3 rounded-xl p-2.5 text-xs font-bold text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30"
+                  className="flex items-center gap-3 rounded-xl p-2.5 text-xs font-bold text-neutral-600 hover:bg-neutral-100 dark:text-neutral-400 dark:hover:bg-neutral-900"
                 >
                   <LogOut className="h-4 w-4" />
                   সাইন আউট (Sign Out)
@@ -460,7 +469,7 @@ export function Header() {
               <Link
                 href="/login"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-600 py-3 text-xs font-bold text-white shadow-md shadow-emerald-600/20"
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-black py-3 text-xs font-bold text-white shadow dark:bg-white dark:text-black"
               >
                 <UserIcon className="h-4 w-4" />
                 সাইন ইন করুন

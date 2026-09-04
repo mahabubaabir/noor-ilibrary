@@ -17,27 +17,47 @@ export function HadithBookmarkButton({ collection, hadithNumber, text }: HadithB
     setLoading(true)
     try {
       if (bookmarked) {
-        await fetch("/api/library/hadith-bookmarks", {
+        const res = await fetch("/api/library/hadith-bookmarks", {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ collection, hadithNumber }),
         })
+        if (res.status === 401) {
+          const redirect = encodeURIComponent(window.location.pathname + window.location.search)
+          window.location.href = `/login?redirect=${redirect}&intent=hadith`
+          return
+        }
         setBookmarked(false)
       } else {
-        await fetch("/api/library/hadith-bookmarks", {
+        const res = await fetch("/api/library/hadith-bookmarks", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ collection, hadithNumber, text }),
         })
-        setBookmarked(true)
+        if (res.status === 401) {
+          const redirect = encodeURIComponent(window.location.pathname + window.location.search)
+          window.location.href = `/login?redirect=${redirect}&intent=hadith`
+          return
+        }
+        if (res.ok) {
+          setBookmarked(true)
+        }
       }
     } catch {}
     setLoading(false)
   }
 
   return (
-    <button onClick={toggle} disabled={loading} title={bookmarked ? "Remove bookmark" : "Add bookmark"}
-      className={`rounded-xl p-2 transition-all ${bookmarked ? "bg-red-50 text-red-500 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400" : "text-stone-400 hover:bg-stone-100 hover:text-stone-600 dark:hover:bg-stone-800"}`}>
+    <button
+      onClick={toggle}
+      disabled={loading}
+      title={bookmarked ? "বুকমার্ক মুছে ফেলুন" : "হাদিস বুকমার্ক করুন"}
+      className={`rounded-xl p-2 transition-all ${
+        bookmarked
+          ? "border border-neutral-900 bg-neutral-900 text-white dark:border-white dark:bg-white dark:text-black"
+          : "border border-neutral-200 text-neutral-500 hover:border-neutral-300 hover:text-black dark:border-neutral-800 dark:text-neutral-400 dark:hover:border-neutral-700 dark:hover:text-white"
+      }`}
+    >
       <Heart className={`h-4 w-4 ${bookmarked ? "fill-current" : ""}`} />
     </button>
   )

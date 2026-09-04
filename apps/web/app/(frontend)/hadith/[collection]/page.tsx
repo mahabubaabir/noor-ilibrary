@@ -12,7 +12,6 @@ import {
   Check,
   Share2,
   Sparkles,
-  Search,
 } from "lucide-react"
 import type { HadithRecord, HadithCollection } from "@noor/types"
 
@@ -118,6 +117,13 @@ export default function CollectionDetailPage({
           translationBn: h.translationBn || "",
         }),
       })
+
+      if (r.status === 401) {
+        const redirect = encodeURIComponent(window.location.pathname + window.location.search)
+        window.location.href = `/login?redirect=${redirect}&intent=hadith`
+        return
+      }
+
       if (r.ok) {
         setBookmarkedIds((prev) => new Set(prev).add(h.hadithNumber))
       }
@@ -141,27 +147,27 @@ export default function CollectionDetailPage({
       <div className="mb-6 flex items-center justify-between">
         <Link
           href="/hadith"
-          className="inline-flex items-center gap-2 text-sm font-medium text-stone-500 transition-colors hover:text-amber-600 dark:text-stone-400 dark:hover:text-amber-400"
+          className="inline-flex items-center gap-2 text-xs font-semibold text-neutral-500 transition-colors hover:text-black dark:text-neutral-400 dark:hover:text-white"
         >
           <ArrowLeft className="h-4 w-4" /> হাদিস সংকলনে ফিরে যান
         </Link>
       </div>
 
       {/* Collection Hero Header */}
-      <div className="relative mb-8 overflow-hidden rounded-3xl border border-amber-500/20 bg-gradient-to-b from-white via-amber-50/20 to-white p-6 text-center shadow-sm sm:p-8 dark:border-amber-500/30 dark:from-stone-900 dark:via-amber-950/20 dark:to-stone-900">
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-100/80 px-3 py-1 text-xs font-bold text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">
-          <Sparkles className="h-3.5 w-3.5" />
+      <div className="relative mb-8 rounded-2xl border border-neutral-200 bg-white p-6 text-center shadow-sm sm:p-8 dark:border-neutral-800 dark:bg-neutral-950">
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-neutral-300 px-3 py-0.5 text-xs font-bold text-neutral-800 dark:border-neutral-700 dark:text-neutral-200">
+          <Sparkles className="h-3 w-3" />
           {collectionMeta?.reliability || "বিশুদ্ধ হাদিস সংকলন"}
         </span>
 
-        <h1 className="arabic my-3 text-3xl font-bold text-stone-900 dark:text-stone-100 sm:text-4xl">
+        <h1 className="arabic my-3 text-3xl font-bold text-neutral-900 dark:text-white sm:text-4xl">
           {collectionMeta?.arabicName || collection}
         </h1>
 
-        <h2 className="text-xl font-bold text-stone-800 dark:text-stone-200 capitalize">
+        <h2 className="text-xl font-bold text-neutral-900 dark:text-white capitalize">
           {collectionMeta?.name || collection}
         </h2>
-        <p className="text-xs text-stone-500 dark:text-stone-400">
+        <p className="text-xs text-neutral-500 dark:text-neutral-400">
           {collectionMeta?.author} · মোট {collectionMeta?.totalHadiths?.toLocaleString() || "হাজারো"} হাদিস
         </p>
 
@@ -173,13 +179,13 @@ export default function CollectionDetailPage({
             min={1}
             value={jumpInput}
             onChange={(e) => setJumpInput(e.target.value)}
-            className="w-full rounded-xl border border-stone-200 bg-white px-3.5 py-1.5 text-xs text-stone-900 placeholder:text-stone-400 focus:border-amber-500 focus:outline-none dark:border-stone-800 dark:bg-stone-800 dark:text-stone-100"
+            className="w-full rounded-xl border border-neutral-200 bg-neutral-50 px-3.5 py-1.5 text-xs text-neutral-900 placeholder:text-neutral-400 focus:border-black focus:outline-none dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-100 dark:focus:border-white"
           />
           <button
             type="submit"
-            className="rounded-xl bg-amber-600 px-4 py-1.5 text-xs font-semibold text-white hover:bg-amber-700 active:scale-95"
+            className="rounded-xl bg-black px-4 py-1.5 text-xs font-semibold text-white hover:bg-neutral-800 active:scale-95 dark:bg-white dark:text-black dark:hover:bg-neutral-200"
           >
-            Jump
+            যান
           </button>
         </form>
       </div>
@@ -188,18 +194,18 @@ export default function CollectionDetailPage({
       {loading ? (
         <div className="space-y-4">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-44 animate-pulse rounded-3xl bg-stone-200/70 dark:bg-stone-800/70" />
+            <div key={i} className="h-44 animate-pulse rounded-2xl bg-neutral-100 dark:bg-neutral-900" />
           ))}
         </div>
       ) : error ? (
-        <div className="rounded-3xl border border-red-200 bg-red-50 p-8 text-center dark:border-red-900/50 dark:bg-red-950/20">
-          <p className="text-sm font-semibold text-red-700 dark:text-red-400">{error}</p>
+        <div className="rounded-2xl border border-neutral-200 bg-neutral-50 p-8 text-center dark:border-neutral-800 dark:bg-neutral-900">
+          <p className="text-sm font-semibold text-neutral-800 dark:text-neutral-200">{error}</p>
         </div>
       ) : hadiths.length === 0 ? (
-        <div className="rounded-3xl border border-dashed border-stone-300 bg-white/40 p-12 text-center dark:border-stone-800 dark:bg-stone-900/40">
-          <BookOpen className="mx-auto mb-3 h-8 w-8 text-stone-400" />
-          <h3 className="text-base font-semibold text-stone-900 dark:text-stone-100">হাদিস পাওয়া যায়নি</h3>
-          <p className="mt-1 text-xs text-stone-500">অন্য কোনো হাদিস নম্বর দিয়ে চেষ্টা করুন।</p>
+        <div className="rounded-2xl border border-dashed border-neutral-300 bg-neutral-50/40 p-12 text-center dark:border-neutral-800 dark:bg-neutral-900/40">
+          <BookOpen className="mx-auto mb-3 h-8 w-8 text-neutral-400" />
+          <h3 className="text-base font-semibold text-neutral-900 dark:text-white">হাদিস পাওয়া যায়নি</h3>
+          <p className="mt-1 text-xs text-neutral-500">অন্য কোনো হাদিস নম্বর দিয়ে চেষ্টা করুন।</p>
         </div>
       ) : (
         <div className="space-y-6">
@@ -210,16 +216,16 @@ export default function CollectionDetailPage({
               <div
                 key={h.id || h.hadithNumber}
                 id={`hadith-${h.hadithNumber}`}
-                className="group relative rounded-3xl border border-stone-200/80 bg-white p-6 shadow-sm transition-all hover:border-amber-300 hover:shadow-md dark:border-stone-800 dark:bg-stone-900"
+                className="group relative rounded-2xl border border-neutral-200 bg-white p-6 shadow-sm transition-all hover:border-neutral-400 dark:border-neutral-800 dark:bg-neutral-950 dark:hover:border-neutral-700"
               >
                 {/* Header bar */}
-                <div className="mb-4 flex items-center justify-between gap-2 border-b border-stone-100 pb-3 dark:border-stone-800">
+                <div className="mb-4 flex items-center justify-between gap-2 border-b border-neutral-100 pb-3 dark:border-neutral-900">
                   <div className="flex items-center gap-2">
-                    <span className="flex h-8 items-center justify-center rounded-xl bg-amber-50 px-3 text-xs font-bold text-amber-800 dark:bg-amber-950/50 dark:text-amber-300">
-                      হাদিস নং: {h.hadithNumber}
+                    <span className="flex h-7 items-center justify-center rounded-lg border border-neutral-200 bg-neutral-50 px-2.5 text-xs font-mono font-bold text-neutral-900 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-100">
+                      হাদিস #{h.hadithNumber}
                     </span>
                     {h.grade && (
-                      <span className="rounded-lg bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300">
+                      <span className="rounded-md border border-neutral-300 px-2 py-0.5 text-[10px] font-semibold text-neutral-700 dark:border-neutral-700 dark:text-neutral-300">
                         {h.grade}
                       </span>
                     )}
@@ -229,10 +235,10 @@ export default function CollectionDetailPage({
                     <button
                       onClick={() => handleBookmark(h)}
                       title="বুকমার্ক করুন"
-                      className={`rounded-xl p-2 transition-colors ${
+                      className={`rounded-xl border p-2 transition-colors ${
                         isBookmarked
-                          ? "text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30"
-                          : "text-stone-400 hover:bg-stone-100 hover:text-stone-700 dark:hover:bg-stone-800 dark:hover:text-stone-200"
+                          ? "border-black bg-black text-white dark:border-white dark:bg-white dark:text-black"
+                          : "border-neutral-200 text-neutral-400 hover:border-neutral-300 hover:text-black dark:border-neutral-800 dark:hover:border-neutral-700 dark:hover:text-white"
                       }`}
                     >
                       <Heart className={`h-4 w-4 ${isBookmarked ? "fill-current" : ""}`} />
@@ -240,10 +246,10 @@ export default function CollectionDetailPage({
                     <button
                       onClick={() => handleCopy(h)}
                       title="কপি করুন"
-                      className="rounded-xl p-2 text-stone-400 hover:bg-stone-100 hover:text-stone-700 dark:hover:bg-stone-800 dark:hover:text-stone-200"
+                      className="rounded-xl border border-neutral-200 p-2 text-neutral-400 hover:border-neutral-300 hover:text-black dark:border-neutral-800 dark:hover:border-neutral-700 dark:hover:text-white"
                     >
                       {copiedId === h.hadithNumber ? (
-                        <Check className="h-4 w-4 text-emerald-600" />
+                        <Check className="h-4 w-4 text-black dark:text-white" />
                       ) : (
                         <Copy className="h-4 w-4" />
                       )}
@@ -251,7 +257,7 @@ export default function CollectionDetailPage({
                     <button
                       onClick={() => handleShare(h)}
                       title="শেয়ার করুন"
-                      className="rounded-xl p-2 text-stone-400 hover:bg-stone-100 hover:text-stone-700 dark:hover:bg-stone-800 dark:hover:text-stone-200"
+                      className="rounded-xl border border-neutral-200 p-2 text-neutral-400 hover:border-neutral-300 hover:text-black dark:border-neutral-800 dark:hover:border-neutral-700 dark:hover:text-white"
                     >
                       <Share2 className="h-4 w-4" />
                     </button>
@@ -261,7 +267,7 @@ export default function CollectionDetailPage({
                 {/* Arabic Text */}
                 {h.arabic && (
                   <p
-                    className="arabic mb-4 text-right text-xl font-medium leading-loose text-stone-900 sm:text-2xl dark:text-stone-50"
+                    className="arabic mb-4 text-right text-xl font-medium leading-loose text-neutral-900 sm:text-2xl dark:text-neutral-100"
                     dir="rtl"
                   >
                     {h.arabic}
@@ -270,11 +276,11 @@ export default function CollectionDetailPage({
 
                 {/* Bangla Translation */}
                 {h.translationBn && (
-                  <div className="mb-3 rounded-2xl bg-amber-50/40 p-4 dark:bg-amber-950/20">
-                    <span className="mb-1 block text-[11px] font-bold uppercase tracking-wider text-amber-800 dark:text-amber-400">
+                  <div className="mb-3 rounded-xl bg-neutral-50 p-4 dark:bg-neutral-900/60 border border-neutral-100 dark:border-neutral-900">
+                    <span className="mb-1 block text-[10px] font-bold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
                       বাংলা অনুবাদ
                     </span>
-                    <p className="bengali text-sm sm:text-base leading-relaxed text-stone-900 dark:text-stone-100">
+                    <p className="bengali text-sm sm:text-base leading-relaxed text-neutral-900 dark:text-neutral-100 font-medium">
                       {h.translationBn}
                     </p>
                   </div>
@@ -282,8 +288,8 @@ export default function CollectionDetailPage({
 
                 {/* English Translation */}
                 {h.english && (
-                  <div className="text-xs sm:text-sm leading-relaxed text-stone-600 dark:text-stone-400">
-                    <span className="mb-1 block text-[10px] font-bold uppercase tracking-wider text-stone-400">
+                  <div className="text-xs sm:text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">
+                    <span className="mb-1 block text-[10px] font-bold uppercase tracking-wider text-neutral-400">
                       English
                     </span>
                     <p>{h.english}</p>
@@ -296,23 +302,23 @@ export default function CollectionDetailPage({
       )}
 
       {/* Pagination Controls */}
-      <div className="mt-10 flex items-center justify-between border-t border-stone-200 pt-6 dark:border-stone-800">
+      <div className="mt-10 flex items-center justify-between border-t border-neutral-200 pt-6 dark:border-neutral-800">
         <button
           onClick={() => setRangeStart(Math.max(1, rangeStart - pageSize))}
           disabled={rangeStart <= 1 || loading}
-          className="inline-flex items-center gap-2 rounded-2xl border border-stone-200 bg-white px-5 py-2.5 text-sm font-semibold text-stone-700 shadow-sm hover:bg-stone-50 disabled:opacity-40 dark:border-stone-800 dark:bg-stone-900 dark:text-stone-300"
+          className="inline-flex items-center gap-2 rounded-xl border border-neutral-200 bg-white px-5 py-2.5 text-xs font-semibold text-neutral-800 shadow-sm hover:bg-neutral-50 disabled:opacity-40 dark:border-neutral-800 dark:bg-neutral-950 dark:text-neutral-200"
         >
           <ArrowLeft className="h-4 w-4" /> পূর্ববর্তী ({Math.max(1, rangeStart - pageSize)} - {rangeStart - 1})
         </button>
 
-        <span className="text-xs font-semibold text-stone-500">
+        <span className="text-xs font-mono font-semibold text-neutral-500">
           হাদিস {rangeStart} - {rangeEnd}
         </span>
 
         <button
           onClick={() => setRangeStart(rangeStart + pageSize)}
           disabled={loading}
-          className="inline-flex items-center gap-2 rounded-2xl border border-stone-200 bg-white px-5 py-2.5 text-sm font-semibold text-stone-700 shadow-sm hover:bg-stone-50 disabled:opacity-40 dark:border-stone-800 dark:bg-stone-900 dark:text-stone-300"
+          className="inline-flex items-center gap-2 rounded-xl border border-neutral-200 bg-white px-5 py-2.5 text-xs font-semibold text-neutral-800 shadow-sm hover:bg-neutral-50 disabled:opacity-40 dark:border-neutral-800 dark:bg-neutral-950 dark:text-neutral-200"
         >
           পরবর্তী ({rangeStart + pageSize} - {rangeEnd + pageSize}) <ArrowRight className="h-4 w-4" />
         </button>

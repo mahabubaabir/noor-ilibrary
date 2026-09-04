@@ -12,8 +12,8 @@ interface SpotlightTiltCardProps extends React.HTMLAttributes<HTMLDivElement> {
 export function SpotlightTiltCard({
   children,
   className = "",
-  spotlightColor = "rgba(5, 150, 105, 0.15)",
-  tiltIntensity = 6,
+  spotlightColor = "rgba(180, 180, 180, 0.15)",
+  tiltIntensity = 4,
   ...props
 }: SpotlightTiltCardProps) {
   const cardRef = useRef<HTMLDivElement | null>(null)
@@ -36,7 +36,7 @@ export function SpotlightTiltCard({
     const rotateY = ((x - centerX) / centerX) * tiltIntensity
 
     setTransformStyle(
-      `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) scale3d(1.015, 1.015, 1.015)`
+      `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) scale3d(1.01, 1.01, 1.01)`
     )
   }
 
@@ -61,15 +61,15 @@ export function SpotlightTiltCard({
           ? "transform 0.12s ease-out, box-shadow 0.2s ease"
           : "transform 0.5s ease-out, box-shadow 0.3s ease",
       }}
-      className={`relative overflow-hidden rounded-3xl border will-change-transform ${className}`}
+      className={`relative overflow-hidden rounded-2xl border will-change-transform ${className}`}
       {...props}
     >
-      {/* Dynamic Cursor Spotlight Aura */}
+      {/* Subtle Cursor Spotlight Aura */}
       <div
-        className="pointer-events-none absolute -inset-px opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+        className="pointer-events-none absolute -inset-px opacity-0 transition-opacity duration-300"
         style={{
           opacity: isHovered ? 1 : 0,
-          background: `radial-gradient(450px circle at ${coords.x}px ${coords.y}px, ${spotlightColor}, transparent 75%)`,
+          background: `radial-gradient(400px circle at ${coords.x}px ${coords.y}px, ${spotlightColor}, transparent 75%)`,
         }}
       />
       <div className="relative z-10 h-full">{children}</div>

@@ -1,8 +1,12 @@
 "use client"
 
-import { useCallback, useEffect, useRef, useState } from "react"
-import { Pause, Play, SkipBack, SkipForward, Volume2, VolumeX, Loader2, RefreshCw } from "lucide-react"
-import { RECITERS_LIST, getAyahAudioSources } from "@/lib/audio/audio-player-engine"
+import { useCallback, useEffect, useState } from "react"
+import { Pause, Play, SkipBack, SkipForward, Volume2, VolumeX, Loader2 } from "lucide-react"
+import {
+  RECITERS_LIST,
+  audioManager,
+  type AudioPlaybackState,
+} from "@/lib/audio/audio-player-engine"
 
 interface AudioPlayerProps {
   surahNumber: number
@@ -21,92 +25,54 @@ export function AudioPlayer({
   const [currentAyah, setCurrentAyah] = useState(0)
   const [reciter, setReciter] = useState(initialReciter)
   const [muted, setMuted] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [hasError, setHasError] = useState(false)
-  const audioRef = useRef<HTMLAudioElement | null>(null)
+  const [playbackState, setPlaybackState] = useState<AudioPlaybackState>("idle")
 
   useEffect(() => {
-    if (!playing || currentAyah === 0) return
-
-    setIsLoading(true)
-    setHasError(false)
-
-    const sources = getAyahAudioSources(surahNumber, currentAyah, reciter)
-    const audio = new Audio(sources.primary)
-    audioRef.current = audio
-    audio.volume = muted ? 0 : 1
-
-    audio.oncanplay = () => {
-      setIsLoading(false)
-    }
-
-    audio.onerror = () => {
-      // If primary CDN fails, switch to EveryAyah reciter folder
-      if (audio.src !== sources.fallback) {
-        audio.src = sources.fallback
-        audio.play().catch(() => {
-          // If secondary fallback fails, try default Alafasy fallback
-          if (audio.src !== sources.altFallback) {
-            audio.src = sources.altFallback
-            audio.play().catch(() => {
-              setIsLoading(false)
-              setHasError(true)
-              setPlaying(false)
-            })
-          } else {
-            setIsLoading(false)
-            setHasError(true)
-            setPlaying(false)
-          }
-        })
-      } else {
-        setIsLoading(false)
-        setHasError(true)
+    audioManager.setListeners({
+      stateChange: (state) => {
+        setPlaybackState(state)
+        setPlaying(state === "playing" || state === "loading")
+      },
+      ended: () => {
+        if (currentAyah < totalAyahs) {
+          const nextAyah = currentAyah + 1
+          setCurrentAyah(nextAyah)
+          onAyahChange?.(nextAyah)
+          audioManager.playAyah(surahNumber, nextAyah, reciter)
+        } else {
+          setPlaying(false)
+          setCurrentAyah(0)
+        }
+      },
+      error: () => {
+        setPlaybackState("error")
         setPlaying(false)
-      }
-    }
-
-    audio.play().catch(() => {
-      setIsLoading(false)
-      setPlaying(false)
+      },
     })
 
-    audio.onended = () => {
-      if (currentAyah < totalAyahs) {
-        const nextAyah = currentAyah + 1
-        setCurrentAyah(nextAyah)
-        onAyahChange?.(nextAyah)
-      } else {
-        setPlaying(false)
-        setCurrentAyah(0)
-      }
-    }
-
     return () => {
-      audio.pause()
-      audio.onended = null
-      audio.onerror = null
-      audioRef.current = null
+      audioManager.stop()
     }
-  }, [currentAyah, surahNumber, totalAyahs, playing, muted, reciter, onAyahChange])
+  }, [currentAyah, surahNumber, totalAyahs, reciter, onAyahChange])
 
   const togglePlay = useCallback(() => {
     if (playing) {
-      audioRef.current?.pause()
+      audioManager.pause()
       setPlaying(false)
     } else {
       const startAyah = currentAyah === 0 ? 1 : currentAyah
       setCurrentAyah(startAyah)
       onAyahChange?.(startAyah)
-      setPlaying(true)
+      audioManager.playAyah(surahNumber, startAyah, reciter)
     }
-  }, [playing, currentAyah, onAyahChange])
+  }, [playing, currentAyah, surahNumber, reciter, onAyahChange])
 
   const prev = () => {
     if (currentAyah > 1) {
       const prevAyah = currentAyah - 1
       setCurrentAyah(prevAyah)
       onAyahChange?.(prevAyah)
+      audioManager.playAyah(surahNumber, prevAyah, reciter)
     }
   }
 
@@ -115,26 +81,34 @@ export function AudioPlayer({
       const nextAyah = currentAyah + 1
       setCurrentAyah(nextAyah)
       onAyahChange?.(nextAyah)
+      audioManager.playAyah(surahNumber, nextAyah, reciter)
+    }
+  }
+
+  const handleMute = () => {
+    const nextMute = !muted
+    setMuted(nextMute)
+    audioManager.setMute(nextMute)
+  }
+
+  const handleReciterChange = (newReciter: string) => {
+    setReciter(newReciter)
+    if (playing && currentAyah > 0) {
+      audioManager.playAyah(surahNumber, currentAyah, newReciter)
     }
   }
 
   return (
-    <div className="rounded-3xl border border-stone-200/80 bg-white/90 p-5 shadow-lg backdrop-blur-xl dark:border-stone-800/80 dark:bg-stone-900/90">
+    <div className="rounded-2xl border border-neutral-200 bg-white p-5 shadow-sm dark:border-neutral-800 dark:bg-neutral-950">
       {/* Reciter Selector */}
-      <div className="mb-4 flex items-center justify-between gap-3">
-        <label className="text-xs font-bold text-stone-500 dark:text-stone-400">
+      <div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <label className="text-xs font-semibold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
           ক্বারী নির্বাচন করুন:
         </label>
         <select
           value={reciter}
-          onChange={(e) => {
-            setReciter(e.target.value)
-            if (playing && audioRef.current) {
-              audioRef.current.pause()
-              setPlaying(true)
-            }
-          }}
-          className="rounded-xl border border-stone-200 bg-stone-50 px-3 py-1.5 text-xs font-semibold text-stone-800 transition-all focus:border-emerald-500 focus:outline-none dark:border-stone-700 dark:bg-stone-800 dark:text-stone-200"
+          onChange={(e) => handleReciterChange(e.target.value)}
+          className="rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-1.5 text-xs font-semibold text-neutral-900 transition-all focus:border-black focus:outline-none dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-100 dark:focus:border-white"
         >
           {RECITERS_LIST.map((r) => (
             <option key={r.id} value={r.id}>
@@ -145,23 +119,23 @@ export function AudioPlayer({
       </div>
 
       {/* Controls Bar */}
-      <div className="flex items-center justify-between gap-2 border-t border-stone-100 pt-3 dark:border-stone-800">
-        <div className="flex items-center gap-1.5">
+      <div className="flex items-center justify-between gap-2 border-t border-neutral-100 pt-3 dark:border-neutral-900">
+        <div className="flex items-center gap-2">
           <button
             onClick={prev}
             disabled={currentAyah <= 1}
             title="পূর্ববর্তী আয়াত"
-            className="rounded-xl p-2.5 text-stone-500 transition-colors hover:bg-stone-100 hover:text-stone-900 disabled:opacity-30 dark:hover:bg-stone-800 dark:text-stone-400"
+            className="rounded-xl border border-neutral-200 p-2.5 text-neutral-600 transition-colors hover:bg-neutral-100 hover:text-black disabled:opacity-30 dark:border-neutral-800 dark:text-neutral-400 dark:hover:bg-neutral-900 dark:hover:text-white"
           >
             <SkipBack className="h-4 w-4" />
           </button>
 
           <button
             onClick={togglePlay}
-            disabled={isLoading && !playing}
-            className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-600/30 transition-all hover:scale-105 active:scale-95 disabled:opacity-60"
+            disabled={playbackState === "loading" && !playing}
+            className="flex h-11 w-11 items-center justify-center rounded-xl bg-black text-white shadow-sm transition-all hover:bg-neutral-800 active:scale-95 disabled:opacity-60 dark:bg-white dark:text-black dark:hover:bg-neutral-200"
           >
-            {isLoading ? (
+            {playbackState === "loading" ? (
               <Loader2 className="h-5 w-5 animate-spin" />
             ) : playing ? (
               <Pause className="h-5 w-5 fill-current" />
@@ -174,30 +148,30 @@ export function AudioPlayer({
             onClick={next}
             disabled={currentAyah >= totalAyahs}
             title="পরবর্তী আয়াত"
-            className="rounded-xl p-2.5 text-stone-500 transition-colors hover:bg-stone-100 hover:text-stone-900 disabled:opacity-30 dark:hover:bg-stone-800 dark:text-stone-400"
+            className="rounded-xl border border-neutral-200 p-2.5 text-neutral-600 transition-colors hover:bg-neutral-100 hover:text-black disabled:opacity-30 dark:border-neutral-800 dark:text-neutral-400 dark:hover:bg-neutral-900 dark:hover:text-white"
           >
             <SkipForward className="h-4 w-4" />
           </button>
         </div>
 
         {/* Current status display */}
-        <div className="text-right">
-          {hasError ? (
+        <div className="text-center">
+          {playbackState === "error" ? (
             <span className="text-[11px] font-bold text-red-500">অডিও লোড ব্যর্থ</span>
           ) : currentAyah > 0 ? (
-            <div className="text-xs font-bold text-emerald-700 dark:text-emerald-400">
+            <div className="text-xs font-bold text-neutral-900 dark:text-white font-mono">
               আয়াত {currentAyah} / {totalAyahs}
             </div>
           ) : (
-            <span className="text-xs text-stone-400">সম্পূর্ণ সূরা শুনুন</span>
+            <span className="text-xs text-neutral-600 dark:text-neutral-300">সম্পূর্ণ সূরা শুনুন</span>
           )}
         </div>
 
         {/* Mute Button */}
         <button
-          onClick={() => setMuted(!muted)}
+          onClick={handleMute}
           title={muted ? "আনমিউট করুন" : "মিউট করুন"}
-          className="rounded-xl p-2 text-stone-400 transition-colors hover:bg-stone-100 hover:text-stone-700 dark:hover:bg-stone-800 dark:hover:text-stone-300"
+          className="rounded-xl border border-neutral-200 p-2.5 text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-black dark:border-neutral-800 dark:text-neutral-400 dark:hover:bg-neutral-900 dark:hover:text-white"
         >
           {muted ? <VolumeX className="h-4 w-4 text-red-500" /> : <Volume2 className="h-4 w-4" />}
         </button>

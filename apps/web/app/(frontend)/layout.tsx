@@ -27,7 +27,7 @@ const notoBengali = Noto_Sans_Bengali({
 export const metadata: Metadata = {
   title: "Noor - Islamic Knowledge Library",
   description:
-    "Read and listen to the Quran with Arabic text, English and Bangla translations, explore Tafsir, Hadith collections, watch Surah video recitations, and study inspiring life stories.",
+    "Read and listen to the Quran with Arabic text, English and Bangla translations, explore Tafsir, Hadith collections, and study inspiring life stories in a minimal editorial setting.",
   icons: {
     icon: "/icon.svg",
   },
@@ -41,7 +41,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       suppressHydrationWarning
       className={`${inter.variable} ${notoArabic.variable} ${notoBengali.variable}`}
     >
-      <body className="relative min-h-screen bg-stone-50/95 font-sans text-stone-800 antialiased dark:bg-stone-950/95 dark:text-stone-200">
+      <body className="relative min-h-screen bg-white font-sans text-neutral-900 antialiased dark:bg-black dark:text-neutral-100">
         <BlurredGeometryBackground />
         <Providers>
           <div className="relative z-10 flex min-h-screen flex-col">

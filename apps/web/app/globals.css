@@ -10,23 +10,30 @@
 
 :root {
   color-scheme: light;
-  --sand-50: #fdfcfb;
-  --sand-100: #f8f6f3;
-  --sand-200: #f0ece6;
-  --sand-300: #e2dbd1;
-  --sand-400: #b8b0a4;
-  --sand-500: #8a8178;
-  --sand-600: #5c5650;
-  --sand-700: #3d3a36;
-  --sand-800: #2a2825;
-  --sand-900: #1a1917;
-  --accent: #16a34a;
-  --accent-light: #dcfce7;
-  --accent-dark: #15803d;
+  --bg-primary: #ffffff;
+  --bg-secondary: #fafafa;
+  --bg-tertiary: #f5f5f5;
+  --text-primary: #0a0a0a;
+  --text-secondary: #525252;
+  --text-muted: #737373;
+  --border-subtle: #e5e5e5;
+  --border-strong: #a3a3a3;
+  --accent: #000000;
+  --accent-contrast: #ffffff;
 }
 
 .dark {
   color-scheme: dark;
+  --bg-primary: #000000;
+  --bg-secondary: #0a0a0a;
+  --bg-tertiary: #141414;
+  --text-primary: #fafafa;
+  --text-secondary: #d4d4d4;
+  --text-muted: #a3a3a3;
+  --border-subtle: #262626;
+  --border-strong: #525252;
+  --accent: #ffffff;
+  --accent-contrast: #000000;
 }
 
 html {
@@ -35,18 +42,14 @@ html {
 
 body {
   @apply font-sans antialiased;
-  background: var(--sand-50);
-  color: var(--sand-800);
-}
-
-.dark body {
-  background: var(--sand-900);
-  color: var(--sand-200);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .arabic {
   font-family: var(--font-arabic);
-  line-height: 2.2;
+  line-height: 2.3;
 }
 
 .bengali {
@@ -54,100 +57,64 @@ body {
 }
 
 ::selection {
-  background: var(--accent-light);
-  color: var(--accent-dark);
+  background: #000000;
+  color: #ffffff;
 }
 
 .dark ::selection {
-  background: rgba(22, 163, 74, 0.25);
-  color: #86efac;
+  background: #ffffff;
+  color: #000000;
 }
 
-/* Reader Highlighting Markers */
+/* Reader Highlighting Markers (Monochrome & Subtle Grayscale) */
 .highlight-yellow {
-  background-color: rgba(254, 240, 138, 0.65);
-  border-bottom: 2px solid #eab308;
+  background-color: rgba(229, 231, 235, 0.85);
+  border-bottom: 2px solid #000000;
   border-radius: 2px;
   padding: 1px 2px;
 }
 .dark .highlight-yellow {
-  background-color: rgba(234, 179, 8, 0.25);
-  border-bottom: 2px solid #facc15;
-  color: #fef08a;
+  background-color: rgba(38, 38, 38, 0.85);
+  border-bottom: 2px solid #ffffff;
+  color: #fafafa;
 }
 
 .highlight-green {
-  background-color: rgba(187, 247, 208, 0.65);
-  border-bottom: 2px solid #22c55e;
+  background-color: rgba(243, 244, 246, 0.85);
+  border-bottom: 2px solid #525252;
   border-radius: 2px;
   padding: 1px 2px;
 }
 .dark .highlight-green {
-  background-color: rgba(34, 197, 94, 0.25);
-  border-bottom: 2px solid #4ade80;
-  color: #bbf7d0;
+  background-color: rgba(23, 23, 23, 0.85);
+  border-bottom: 2px solid #d4d4d4;
+  color: #fafafa;
 }
 
 .highlight-blue {
-  background-color: rgba(186, 230, 253, 0.65);
-  border-bottom: 2px solid #0ea5e9;
+  background-color: rgba(229, 231, 235, 0.85);
+  border-bottom: 2px solid #737373;
   border-radius: 2px;
   padding: 1px 2px;
 }
 .dark .highlight-blue {
-  background-color: rgba(14, 165, 233, 0.25);
-  border-bottom: 2px solid #38bdf8;
-  color: #bae6fd;
+  background-color: rgba(38, 38, 38, 0.85);
+  border-bottom: 2px solid #a3a3a3;
+  color: #fafafa;
 }
 
-.highlight-purple {
-  background-color: rgba(233, 213, 255, 0.65);
-  border-bottom: 2px solid #a855f7;
-  border-radius: 2px;
-  padding: 1px 2px;
-}
-.dark .highlight-purple {
-  background-color: rgba(168, 85, 247, 0.25);
-  border-bottom: 2px solid #c084fc;
-  color: #e9d5ff;
-}
-
-.highlight-pink {
-  background-color: rgba(251, 207, 232, 0.65);
-  border-bottom: 2px solid #ec4899;
-  border-radius: 2px;
-  padding: 1px 2px;
-}
-.dark .highlight-pink {
-  background-color: rgba(236, 72, 153, 0.25);
-  border-bottom: 2px solid #f472b6;
-  color: #fbcfe8;
-}
-
-/* Reader Sepia theme */
-.reader-theme-sepia {
-  background-color: #fbf0d9 !important;
-  color: #433422 !important;
-}
-.reader-theme-sepia .reader-card {
-  background-color: #f4e4c1 !important;
-  border-color: #e6d2a8 !important;
-  color: #3b2d1d !important;
-}
-
-/* Custom Minimal Scrollbar */
+/* Custom Minimalist Monochrome Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(160, 160, 160, 0.25);
+  background: rgba(160, 160, 160, 0.3);
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(160, 160, 160, 0.45);
+  background: rgba(160, 160, 160, 0.6);
 }
-

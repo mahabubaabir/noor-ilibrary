@@ -7,6 +7,9 @@ import {
   validatePassword,
 } from '@/lib/auth'
 import { prisma } from '@/lib/db'
+import { sendWelcomeEmail } from '@/lib/email'
+
+export const dynamic = 'force-dynamic'
 
 export async function POST(request: Request) {
   const body = (await request.json().catch(() => null)) as
@@ -37,6 +40,14 @@ export async function POST(request: Request) {
     },
     select: { id: true, email: true, name: true, role: true },
   })
+
+  // Dispatch Welcome Email to the user
+  try {
+    await sendWelcomeEmail({ to: user.email, name: user.name })
+  } catch (emailErr) {
+    console.error('[AUTH REGISTER] Welcome email dispatch failed:', emailErr)
+  }
+
   const session = await createSession(user.id)
   const cookie = sessionCookie(session.token, session.expiresAt)
   const response = NextResponse.json({ user })
