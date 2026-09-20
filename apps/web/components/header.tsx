@@ -22,6 +22,8 @@ import {
   BookMarked,
   FileText,
   GraduationCap,
+  Crown,
+  Landmark,
 } from "lucide-react"
 import { NoorLogo } from "./ui/noor-logo"
 import { HeaderSalahPill } from "./header-salah-pill"
@@ -69,6 +71,26 @@ const navGroups: NavDropdownGroup[] = [
         desc: "রাসূলুল্লাহ ﷺ ও চারপাশের সাহাবীদের আলোকিত জীবন",
         icon: ShieldCheck,
         badge: "জীবনী",
+      },
+      {
+        href: "/prophets",
+        title: "নবী ও রাসূলগণ (Prophets)",
+        desc: "আদম (আ.) থেকে মুহাম্মদ ﷺ — কুরআনের সূত্রসহ জীবনী",
+        icon: BookMarked,
+        badge: "নতুন",
+      },
+      {
+        href: "/khulafa",
+        title: "খুলাফায়ে রাশেদীন",
+        desc: "আবু বকর, উমর, উসমান ও আলী (রা.) — চার খলিফার জীবন",
+        icon: Crown,
+      },
+      {
+        href: "/history",
+        title: "ইসলামের ইতিহাস ও কিতাব",
+        desc: "সীরাত, কিসাসুল আম্বিয়া ও তাবারীর ইতিহাস — সূত্রসহ পাঠ",
+        icon: Landmark,
+        badge: "বই",
       },
       {
         href: "/names-of-allah",

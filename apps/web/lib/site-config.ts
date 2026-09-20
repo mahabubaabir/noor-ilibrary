@@ -10,7 +10,7 @@ export const SITE_CONFIG = {
   sanity: {
     projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID || "f7yazuq4",
     dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || "ace-noor",
-    apiVersion: "2024-02-28",
+    apiVersion: "2024-03-15",
     studioPath: "/studio",
   },
   neonDb: {

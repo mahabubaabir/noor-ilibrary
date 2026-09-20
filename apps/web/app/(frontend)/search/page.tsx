@@ -20,6 +20,14 @@ interface HadithMatch {
   translationBn?: string | null
 }
 
+interface LocalMatch {
+  type: 'prophet' | 'companion' | 'book' | 'study'
+  titleBn: string
+  titleEn: string
+  snippet: string
+  href: string
+}
+
 export default function SearchPage() {
   const [query, setQuery] = useState("")
   const [quranResults, setQuranResults] = useState<QuranMatch[]>([])
@@ -27,7 +35,8 @@ export default function SearchPage() {
   const [loading, setLoading] = useState(false)
   const [hasSearched, setHasSearched] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [activeTab, setActiveTab] = useState<"quran" | "hadith">("quran")
+  const [libraryResults, setLibraryResults] = useState<LocalMatch[]>([])
+  const [activeTab, setActiveTab] = useState<"quran" | "hadith" | "library">("quran")
 
   const handleSearch = async () => {
     const q = query.trim()
@@ -37,26 +46,30 @@ export default function SearchPage() {
     setHasSearched(true)
     try {
       // Quran search requires 3+ characters; hadith requires 2+.
-      const [qRes, hRes] = await Promise.all([
+      const [qRes, hRes, lRes] = await Promise.all([
         q.length >= 3 ? fetch(`/api/quran/search?q=${encodeURIComponent(q)}&lang=en`) : null,
         q.length >= 2 ? fetch(`/api/hadith/search?q=${encodeURIComponent(q)}`) : null,
+        q.length >= 2 ? fetch(`/api/search/local?q=${encodeURIComponent(q)}`) : null,
       ])
 
       const qData = qRes ? await qRes.json().catch(() => null) : null
       const hData = hRes ? await hRes.json().catch(() => null) : null
+      const lData = lRes ? await lRes.json().catch(() => null) : null
 
-      if (qRes && hRes && !qRes.ok && !hRes.ok) {
-        throw new Error(qData?.error || hData?.error || "Search failed")
+      if (qRes && hRes && lRes && !qRes.ok && !hRes.ok && !lRes.ok) {
+        throw new Error(qData?.error || hData?.error || lData?.error || "Search failed")
       }
 
       setQuranResults(Array.isArray(qData?.matches) ? qData.matches : [])
       setHadithResults(Array.isArray(hData?.result?.hadiths) ? hData.result.hadiths : [])
+      setLibraryResults(Array.isArray(lData?.results) ? lData.results : [])
 
       if (qRes && !qRes.ok) setError(qData?.error ?? "Quran search is unavailable")
       else if (hRes && !hRes.ok) setError(hData?.error ?? "Hadith search is unavailable")
     } catch (err) {
       setQuranResults([])
       setHadithResults([])
+      setLibraryResults([])
       setError(err instanceof Error ? err.message : "Search failed")
     }
     setLoading(false)
@@ -102,13 +115,16 @@ export default function SearchPage() {
         </p>
       )}
 
-      {(quranResults.length > 0 || hadithResults.length > 0) && (
+      {(quranResults.length > 0 || hadithResults.length > 0 || libraryResults.length > 0) && (
         <div className="mb-4 flex gap-1 rounded-xl bg-neutral-100 p-1 dark:bg-neutral-900">
           <button onClick={() => setActiveTab("quran")} className={`flex-1 rounded-lg py-2 text-sm font-medium transition-all ${activeTab === "quran" ? "bg-white text-neutral-900 shadow-sm dark:bg-neutral-700 dark:text-neutral-100" : "text-neutral-500 hover:text-neutral-700 dark:text-neutral-400"}`}>
             Quran ({quranResults.length})
           </button>
           <button onClick={() => setActiveTab("hadith")} className={`flex-1 rounded-lg py-2 text-sm font-medium transition-all ${activeTab === "hadith" ? "bg-white text-neutral-900 shadow-sm dark:bg-neutral-700 dark:text-neutral-100" : "text-neutral-500 hover:text-neutral-700 dark:text-neutral-400"}`}>
             Hadith ({hadithResults.length})
+          </button>
+          <button onClick={() => setActiveTab("library")} className={`flex-1 rounded-lg py-2 text-sm font-medium transition-all ${activeTab === "library" ? "bg-white text-neutral-900 shadow-sm dark:bg-neutral-700 dark:text-neutral-100" : "text-neutral-500 hover:text-neutral-700 dark:text-neutral-400"}`}>
+            Library ({libraryResults.length})
           </button>
         </div>
       )}
@@ -145,7 +161,23 @@ export default function SearchPage() {
         </div>
       )}
 
-      {!loading && hasSearched && quranResults.length === 0 && hadithResults.length === 0 && (
+      {!loading && activeTab === "library" && libraryResults.length > 0 && (
+        <div className="space-y-3">
+          {libraryResults.map((r, i) => (
+            <Link key={`${r.href}-${i}`} href={r.href}>
+              <div className="rounded-2xl border border-neutral-200 bg-white p-4 transition-all hover:border-neutral-900 hover:shadow-sm dark:border-neutral-800 dark:bg-neutral-950 dark:hover:border-white">
+                <p className="text-[10px] font-mono font-semibold uppercase tracking-wider text-neutral-400">{r.type}</p>
+                <p className="text-sm font-bold text-neutral-900 dark:text-white">
+                  {r.titleBn} <span className="font-normal text-neutral-400">· {r.titleEn}</span>
+                </p>
+                <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-neutral-600 dark:text-neutral-400">{r.snippet}</p>
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
+
+      {!loading && hasSearched && quranResults.length === 0 && hadithResults.length === 0 && libraryResults.length === 0 && (
         <div className="py-12 text-center">
           <p className="text-sm text-neutral-500 dark:text-neutral-400">No results found for &quot;{query}&quot;</p>
         </div>
