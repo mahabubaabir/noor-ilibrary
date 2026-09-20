@@ -49,6 +49,17 @@ interface AlquranEditionResult {
   ayahs: AlquranAyah[]
 }
 
+interface AlquranRandomAyah {
+  number: number
+  text: string
+  edition: AlquranEdition
+  surah: { number: number }
+  numberInSurah: number
+  juz: number
+  page: number
+  sajda?: boolean
+}
+
 interface AlquranSearchResult {
   count: number
   matches: {
@@ -162,11 +173,27 @@ export const alQuranCloudProvider: ContentProvider = {
 
   async getRandomAyah(): Promise<Ayah | null> {
     return withCache('provider:alquran:random-ayah', TTL_HOME, async () => {
-      const results = await fetchJson<AlquranEditionResult[]>(
+      // The random endpoint returns a flat list of ayah objects (one per edition),
+      // not the { edition, ayahs } shape used by chapter editions.
+      const results = await fetchJson<AlquranRandomAyah[]>(
         `/ayah/random/editions/${EDITION_AR},${EDITION_EN},${EDITION_BN}`,
       )
-      const ayahs = mergeEditions(results)
-      return ayahs[0] ?? null
+      const byEdition = new Map(results.map((item) => [item.edition.identifier, item]))
+      const arabic = byEdition.get(EDITION_AR)
+      if (!arabic) return null
+      const english = byEdition.get(EDITION_EN)
+      const bengali = byEdition.get(EDITION_BN)
+      return {
+        surahNumber: arabic.surah?.number ?? 0,
+        numberInSurah: arabic.numberInSurah,
+        globalNumber: arabic.number,
+        juz: arabic.juz,
+        page: arabic.page,
+        sajda: Boolean(arabic.sajda),
+        textArabic: arabic.text,
+        translationEn: english?.text ?? '',
+        translationBn: bengali?.text ?? '',
+      }
     })
   },
 

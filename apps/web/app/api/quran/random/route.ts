@@ -10,7 +10,8 @@ export async function GET() {
       return NextResponse.json({ error: 'Service temporarily unavailable' }, { status: 502 })
     }
     return NextResponse.json({ ayah })
-  } catch {
+  } catch (error) {
+    console.error('[quran/random]', error instanceof Error ? error.message : error)
     return NextResponse.json({ error: 'Service temporarily unavailable' }, { status: 502 })
   }
 }

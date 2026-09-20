@@ -38,6 +38,12 @@ export async function withCache<T>(
     throw error
   }
 
+  // Never persist null/undefined — a cached "empty" would look like a fresh
+  // result for the whole TTL and block recovery (e.g. a transient API miss).
+  if (value === null || value === undefined) {
+    return value
+  }
+
   try {
     await prisma.contentCache.upsert({
       where: { key },
