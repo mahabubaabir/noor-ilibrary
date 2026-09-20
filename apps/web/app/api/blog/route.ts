@@ -122,9 +122,8 @@ export async function GET(request: Request) {
     })
 
     return NextResponse.json({ posts })
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown error'
-    return NextResponse.json({ error: message }, { status: 500 })
+  } catch {
+    return NextResponse.json({ error: 'Service temporarily unavailable' }, { status: 500 })
   }
 }
 
@@ -186,8 +185,7 @@ export async function POST(request: Request) {
     })
 
     return NextResponse.json({ ok: true, post })
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown error'
-    return NextResponse.json({ error: message }, { status: 500 })
+  } catch {
+    return NextResponse.json({ error: 'Service temporarily unavailable' }, { status: 500 })
   }
 }

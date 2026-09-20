@@ -22,9 +22,8 @@ export async function GET(
     }
 
     return NextResponse.json({ post })
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown error'
-    return NextResponse.json({ error: message }, { status: 500 })
+  } catch {
+    return NextResponse.json({ error: 'Service temporarily unavailable' }, { status: 500 })
   }
 }
 
@@ -59,9 +58,8 @@ export async function PUT(
     })
 
     return NextResponse.json({ ok: true, post: updated })
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown error'
-    return NextResponse.json({ error: message }, { status: 500 })
+  } catch {
+    return NextResponse.json({ error: 'Service temporarily unavailable' }, { status: 500 })
   }
 }
 
@@ -78,8 +76,7 @@ export async function DELETE(
 
     await prisma.blogPost.delete({ where: { slug } })
     return NextResponse.json({ ok: true, message: 'Post deleted successfully' })
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown error'
-    return NextResponse.json({ error: message }, { status: 500 })
+  } catch {
+    return NextResponse.json({ error: 'Service temporarily unavailable' }, { status: 500 })
   }
 }

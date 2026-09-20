@@ -74,7 +74,8 @@ export function PdfEbookReader({ story }: ReaderProps) {
   // Highlights & Notes State
   const [highlights, setHighlights] = useState<HighlightItem[]>([])
   const [notes, setNotes] = useState<NoteItem[]>([])
-  const [syncStatus, setSyncStatus] = useState<"synced" | "saving" | "offline">("synced")
+  const [syncStatus, setSyncStatus] = useState<"synced" | "saving" | "offline" | "local">("synced")
+  const [canSync, setCanSync] = useState<boolean | null>(null)
 
   // Selection & Popover
   const [selectedText, setSelectedText] = useState("")
@@ -126,53 +127,67 @@ export function PdfEbookReader({ story }: ReaderProps) {
 
     // Fetch from Backend API if logged in
     fetch(`/api/library/highlights?targetId=${story.id}&targetType=story`)
-      .then((r) => r.json())
-      .then((d) => {
-        if (d.highlights && d.highlights.length > 0) {
-          const apiHighlights = d.highlights.map((h: any) => ({
-            id: h.id,
-            text: h.text,
-            color: h.color || "yellow",
-            note: h.note,
-            sectionIndex: 0,
-            createdAt: h.createdAt,
-          }))
-          setHighlights((prev) => {
-            const merged = [...prev]
-            apiHighlights.forEach((ah: HighlightItem) => {
-              if (!merged.some((m) => m.text === ah.text)) {
-                merged.push(ah)
-              }
-            })
-            return merged
-          })
+      .then((r) => {
+        if (r.status === 401) {
+          setCanSync(false)
+          return null
         }
+        if (!r.ok) return null
+        setCanSync(true)
+        return r.json()
+      })
+      .then((d) => {
+        if (!d || !d.highlights || d.highlights.length === 0) return
+        const apiHighlights = d.highlights.map((h: any) => ({
+          id: h.id,
+          text: h.text,
+          color: h.color || "yellow",
+          note: h.note,
+          sectionIndex: 0,
+          createdAt: h.createdAt,
+        }))
+        setHighlights((prev) => {
+          const merged = [...prev]
+          apiHighlights.forEach((ah: HighlightItem) => {
+            if (!merged.some((m) => m.text === ah.text)) {
+              merged.push(ah)
+            }
+          })
+          return merged
+        })
       })
       .catch(() => {})
 
     fetch(`/api/library/notes?targetId=${story.id}&targetType=story`)
-      .then((r) => r.json())
-      .then((d) => {
-        if (d.notes && d.notes.length > 0) {
-          const apiNotes = d.notes.map((n: any) => ({
-            id: n.id,
-            sectionIndex: 0,
-            sectionHeading: n.title || "Note",
-            title: n.title,
-            content: n.content,
-            color: n.color || "emerald",
-            createdAt: n.createdAt,
-          }))
-          setNotes((prev) => {
-            const merged = [...prev]
-            apiNotes.forEach((an: NoteItem) => {
-              if (!merged.some((m) => m.id === an.id || m.content === an.content)) {
-                merged.push(an)
-              }
-            })
-            return merged
-          })
+      .then((r) => {
+        if (r.status === 401) {
+          setCanSync(false)
+          return null
         }
+        if (!r.ok) return null
+        setCanSync(true)
+        return r.json()
+      })
+      .then((d) => {
+        if (!d || !d.notes || d.notes.length === 0) return
+        const apiNotes = d.notes.map((n: any) => ({
+          id: n.id,
+          sectionIndex: 0,
+          sectionHeading: n.title || "Note",
+          title: n.title,
+          content: n.content,
+          color: n.color || "emerald",
+          createdAt: n.createdAt,
+        }))
+        setNotes((prev) => {
+          const merged = [...prev]
+          apiNotes.forEach((an: NoteItem) => {
+            if (!merged.some((m) => m.id === an.id || m.content === an.content)) {
+              merged.push(an)
+            }
+          })
+          return merged
+        })
       })
       .catch(() => {})
   }, [story.id])
@@ -182,6 +197,13 @@ export function PdfEbookReader({ story }: ReaderProps) {
     (newHighlights: HighlightItem[], newNotes: NoteItem[]) => {
       localStorage.setItem(`highlights_${story.id}`, JSON.stringify(newHighlights))
       localStorage.setItem(`notes_${story.id}`, JSON.stringify(newNotes))
+
+      if (canSync === false) {
+        // Anonymous: keep local only and invite the user to sign in for sync.
+        setSyncStatus("local")
+        return
+      }
+
       setSyncStatus("saving")
 
       // Sync with API
@@ -205,10 +227,21 @@ export function PdfEbookReader({ story }: ReaderProps) {
           })),
         }),
       })
-        .then(() => setSyncStatus("synced"))
+        .then((r) => {
+          if (r.status === 401) {
+            setCanSync(false)
+            setSyncStatus("local")
+            return
+          }
+          if (!r.ok) {
+            setSyncStatus("offline")
+            return
+          }
+          setSyncStatus("synced")
+        })
         .catch(() => setSyncStatus("offline"))
     },
-    [story.id]
+    [story.id, canSync]
   )
 
   // Keyboard navigation for paginated mode
@@ -426,13 +459,34 @@ export function PdfEbookReader({ story }: ReaderProps) {
           )}
 
           {/* Sync Status Badge */}
-          <div
-            className="hidden sm:flex items-center gap-1 text-[11px] font-medium text-neutral-600 dark:text-neutral-400"
-            title="স্বয়ংক্রিয় ডেটা সিঙ্ক সক্রিয়"
-          >
-            <Sparkles className="h-3 w-3" />
-            <span>{syncStatus === "synced" ? "স্বয়ংক্রিয় সিঙ্ক" : "সংরক্ষিত"}</span>
-          </div>
+          {canSync === false ? (
+            <Link
+              href={`/login?redirect=${encodeURIComponent(`/stories/${story.id}`)}&intent=bookmark`}
+              className="hidden items-center gap-1 text-[11px] font-medium text-neutral-900 underline-offset-2 hover:underline dark:text-white sm:flex"
+              title="হাইলাইট ও নোট সিঙ্ক করতে সাইন ইন করুন"
+            >
+              <Sparkles className="h-3 w-3" />
+              <span>সিঙ্ক করতে সাইন ইন</span>
+            </Link>
+          ) : (
+            <div
+              className="hidden sm:flex items-center gap-1 text-[11px] font-medium text-neutral-600 dark:text-neutral-400"
+              title={
+                syncStatus === "synced"
+                  ? "স্বয়ংক্রিয় ডেটা সিঙ্ক সক্রিয়"
+                  : "ডিভাইসে সংরক্ষিত"
+              }
+            >
+              <Sparkles className="h-3 w-3" />
+              <span>
+                {syncStatus === "saving"
+                  ? "সংরক্ষণ হচ্ছে..."
+                  : syncStatus === "synced"
+                    ? "স্বয়ংক্রিয় সিঙ্ক"
+                    : "শুধু ডিভাইসে"}
+              </span>
+            </div>
+          )}
 
           <div className="h-4 w-px bg-neutral-200 dark:bg-neutral-800" />
 

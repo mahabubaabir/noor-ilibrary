@@ -30,8 +30,7 @@ export async function POST(request: Request) {
       ok: true,
       message: 'Password has been reset successfully. You can now log in with your new password.',
     })
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown error'
-    return NextResponse.json({ error: message }, { status: 500 })
+  } catch {
+    return NextResponse.json({ error: 'Service temporarily unavailable' }, { status: 500 })
   }
 }

@@ -23,8 +23,7 @@ export async function GET(
 
     const hadith = await getHadith(collection, hadithNumber)
     return NextResponse.json({ collection: match, hadith })
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown error'
-    return NextResponse.json({ error: message }, { status: 502 })
+  } catch {
+    return NextResponse.json({ error: 'Service temporarily unavailable' }, { status: 502 })
   }
 }

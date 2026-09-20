@@ -5,10 +5,11 @@ import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import { Eye, EyeOff, Loader2, Bookmark, Heart, BookOpen, ShieldCheck } from "lucide-react"
 import { NoorLogo } from "@/components/ui/noor-logo"
+import { safeInternalPath } from "@/lib/url"
 
 function LoginForm() {
   const searchParams = useSearchParams()
-  const redirect = searchParams.get("redirect") || "/library"
+  const redirect = safeInternalPath(searchParams.get("redirect"), "/library")
   const intent = searchParams.get("intent") // "bookmark" | "progress" | "hadith"
 
   const [email, setEmail] = useState("")

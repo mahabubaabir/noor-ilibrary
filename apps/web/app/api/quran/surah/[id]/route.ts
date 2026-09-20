@@ -14,9 +14,11 @@ export async function GET(
   }
   try {
     const surah = await content.surah(number)
+    if (!surah) {
+      return NextResponse.json({ error: 'Surah not found' }, { status: 404 })
+    }
     return NextResponse.json({ surah })
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown error'
-    return NextResponse.json({ error: message }, { status: 502 })
+  } catch {
+    return NextResponse.json({ error: 'Service temporarily unavailable' }, { status: 502 })
   }
 }

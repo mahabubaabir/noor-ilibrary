@@ -16,8 +16,7 @@ export async function GET(request: Request) {
   try {
     const matches = await content.search(q, lang as TranslationLanguage)
     return NextResponse.json({ query: q, language: lang, matches })
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown error'
-    return NextResponse.json({ error: message }, { status: 502 })
+  } catch {
+    return NextResponse.json({ error: 'Service temporarily unavailable' }, { status: 502 })
   }
 }

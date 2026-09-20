@@ -52,8 +52,7 @@ export async function GET(
       limit,
       total,
     })
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown error'
-    return NextResponse.json({ error: message }, { status: 502 })
+  } catch {
+    return NextResponse.json({ error: 'Service temporarily unavailable' }, { status: 502 })
   }
 }

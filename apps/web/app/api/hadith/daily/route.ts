@@ -26,8 +26,7 @@ export async function GET(request: Request) {
       currentIndex: index ?? 0,
       totalCount: CURATED_DAILY_HADITHS.length,
     })
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown error'
-    return NextResponse.json({ error: message }, { status: 500 })
+  } catch {
+    return NextResponse.json({ error: 'Service temporarily unavailable' }, { status: 500 })
   }
 }

@@ -20,11 +20,13 @@ import {
   X,
 } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import type { SurahDetail, Ayah } from "@noor/types"
 import {
   RECITERS_LIST,
   audioManager,
 } from "@/lib/audio/audio-player-engine"
+import { htmlToText } from "@/lib/tafsir-text"
 
 const RECITERS = RECITERS_LIST.map((r) => ({ name: `${r.nameBn} (${r.nameEn})`, id: r.id }))
 
@@ -36,6 +38,7 @@ export default function SurahDetailPage({
   params: Promise<{ surah: string }>
 }) {
   const { surah } = use(params)
+  const router = useRouter()
   const num = parseInt(surah, 10)
 
   const [surahData, setSurahData] = useState<SurahDetail | null>(null)
@@ -47,6 +50,7 @@ export default function SurahDetailPage({
   const [reciter, setReciter] = useState(RECITERS[0]?.id ?? "ar.alafasy")
   const [showTafsir, setShowTafsir] = useState(false)
   const [tafsirText, setTafsirText] = useState<string>("")
+  const [tafsirSource, setTafsirSource] = useState<string>("Tafsir Ibn Kathir")
 
   // Audio player state
   const [isPlaying, setIsPlaying] = useState(false)
@@ -80,14 +84,28 @@ export default function SurahDetailPage({
         setLoading(false)
       })
 
-    // Fetch Tafsir
-    fetch(`https://quran.com/api/qtls/v4/tafsirs/1?surah=${num}`, {
-      headers: { "User-Agent": "Mozilla/5.0" },
-    })
-      .then((r) => r.json())
+    // Fetch Tafsir from the internal cached API (never call upstream from the browser)
+    fetch(`/api/tafsir/${num}?lang=en`)
+      .then(async (r) => {
+        if (!r.ok) throw new Error("Tafsir request failed")
+        return r.json()
+      })
       .then((d) => {
-        const t = d?.tafsirs?.[0]?.text
-        if (typeof t === "string") setTafsirText(t)
+        const entries = d?.tafsir?.entries as Record<string, string> | undefined
+        if (!entries) return
+        const formatted = Object.keys(entries)
+          .map(Number)
+          .filter((n) => Number.isInteger(n))
+          .sort((a, b) => a - b)
+          .map((n) => `[${n}] ${htmlToText(entries[String(n)] ?? "")}`)
+          .filter((line) => line.replace(/^\[\d+\]\s*/, "").trim().length > 0)
+          .join("\n\n")
+        if (formatted) {
+          setTafsirText(formatted)
+          if (typeof d?.tafsir?.source === "string" && d.tafsir.source) {
+            setTafsirSource(d.tafsir.source)
+          }
+        }
       })
       .catch(() => undefined)
   }, [num])
@@ -202,24 +220,67 @@ export default function SurahDetailPage({
     }
   }
 
-  // Auth Guard for Bookmark Ayah
+  // Hydrate previously saved bookmarks for this surah (so hearts persist after reload)
+  useEffect(() => {
+    let cancelled = false
+    fetch('/api/library/bookmarks')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (cancelled || !Array.isArray(d?.bookmarks)) return
+        const saved = new Set<number>()
+        for (const b of d.bookmarks as { surahNumber?: number; ayahNumber?: number }[]) {
+          if (b?.surahNumber === num && Number.isInteger(b?.ayahNumber)) {
+            saved.add(b.ayahNumber as number)
+          }
+        }
+        if (saved.size > 0) setBookmarkedAyahs(saved)
+      })
+      .catch(() => undefined)
+    return () => {
+      cancelled = true
+    }
+  }, [num])
+
+  // Auth Guard for Bookmark Ayah (toggle: bookmark / remove)
   const handleBookmark = async (ayah: Ayah) => {
+    const loginRedirect = encodeURIComponent(`${window.location.pathname}#ayah-${ayah.numberInSurah}`)
+    const isBookmarked = bookmarkedAyahs.has(ayah.numberInSurah)
+
     try {
+      if (isBookmarked) {
+        const res = await fetch(
+          `/api/library/bookmarks?surah=${num}&ayah=${ayah.numberInSurah}`,
+          { method: 'DELETE' },
+        )
+        if (res.status === 401) {
+          router.push(`/login?redirect=${loginRedirect}&intent=bookmark`)
+          return
+        }
+        if (res.ok) {
+          setBookmarkedAyahs((prev) => {
+            const next = new Set(prev)
+            next.delete(ayah.numberInSurah)
+            return next
+          })
+        }
+        return
+      }
+
       const res = await fetch("/api/library/bookmarks", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           surahNumber: num,
           ayahNumber: ayah.numberInSurah,
-          arabicText: ayah.textArabic,
+          surahName: surahData?.meta.nameEnglish || surahData?.meta.nameTranslation || `Surah ${num}`,
+          textArabic: ayah.textArabic,
+          translationEn: ayah.translationEn,
           translationBn: ayah.translationBn,
-          surahNameBn: surahData?.meta.nameTranslation,
         }),
       })
 
       if (res.status === 401) {
-        const redirect = encodeURIComponent(window.location.pathname)
-        window.location.href = `/login?redirect=${redirect}&intent=bookmark`
+        router.push(`/login?redirect=${loginRedirect}&intent=bookmark`)
         return
       }
 
@@ -239,14 +300,15 @@ export default function SurahDetailPage({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           surahNumber: num,
-          lastAyah: ayah.numberInSurah,
+          ayahNumber: ayah.numberInSurah,
+          surahName: surahData?.meta.nameEnglish || surahData?.meta.nameTranslation || `Surah ${num}`,
           totalAyahs: surahData?.meta.ayahCount ?? 0,
         }),
       })
 
       if (res.status === 401) {
-        const redirect = encodeURIComponent(window.location.pathname)
-        window.location.href = `/login?redirect=${redirect}&intent=progress`
+        const redirect = encodeURIComponent(`${window.location.pathname}#ayah-${ayah.numberInSurah}`)
+        router.push(`/login?redirect=${redirect}&intent=progress`)
         return
       }
 
@@ -367,25 +429,20 @@ export default function SurahDetailPage({
         </div>
       </div>
 
-      {/* Tafsir Accordion View */}
+      {/* Tafsir View (plain text; provider HTML is stripped) */}
       {showTafsir && tafsirText && (
         <div className="mb-8 rounded-2xl border border-neutral-200 bg-neutral-50 p-6 shadow-sm dark:border-neutral-800 dark:bg-neutral-900/60 sm:p-8">
           <div className="mb-4 flex items-center justify-between border-b border-neutral-200 pb-3 dark:border-neutral-800">
             <h3 className="font-bold text-neutral-900 dark:text-white text-sm">
-              তাফসীর ইবনে কাসীর — সূরা {meta.nameTranslation}
+              তাফসীর — সূরা {meta.nameTranslation}
             </h3>
             <span className="rounded border border-neutral-300 px-2 py-0.5 text-[10px] font-mono text-neutral-600 dark:border-neutral-700 dark:text-neutral-300">
-              আল-কুরআন একাডেমি
+              {tafsirSource}
             </span>
           </div>
-          <div
-            className="prose prose-neutral dark:prose-invert max-w-none text-xs sm:text-sm leading-relaxed"
-            dangerouslySetInnerHTML={{
-              __html: tafsirText
-                .replace(/\n/g, "<br/>")
-                .replace(/\(.*?\)/g, '<span class="font-semibold">$&</span>'),
-            }}
-          />
+          <div className="max-w-none whitespace-pre-wrap text-xs leading-relaxed text-neutral-700 dark:text-neutral-300 sm:text-sm">
+            {tafsirText}
+          </div>
         </div>
       )}
 

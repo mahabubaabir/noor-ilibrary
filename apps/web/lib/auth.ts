@@ -6,7 +6,10 @@ import { prisma } from '@/lib/db'
 const scrypt = promisify(scryptCallback)
 const SESSION_COOKIE = 'noor_session'
 const SESSION_DAYS = 30
-const SECURE_COOKIE = process.env.AUTH_COOKIE_SECURE === 'true'
+const SECURE_COOKIE =
+  process.env.NODE_ENV === 'production'
+    ? process.env.AUTH_COOKIE_SECURE !== 'false'
+    : process.env.AUTH_COOKIE_SECURE === 'true'
 
 export interface SafeUser {
   id: string
@@ -53,11 +56,11 @@ export async function verifyPassword(password: string, storedHash: string): Prom
 }
 
 export function validateEmail(email: string): boolean {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+  return email.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
 }
 
 export function validatePassword(password: string): boolean {
-  return password.length >= 6
+  return password.length >= 8 && password.length <= 128
 }
 
 export async function createSession(userId: string): Promise<{ token: string; expiresAt: Date }> {
@@ -84,7 +87,7 @@ export async function createPasswordResetToken(userId: string): Promise<{ token:
 
 export async function resetPasswordWithToken(token: string, newPassword: string): Promise<{ success: boolean; error?: string }> {
   if (!validatePassword(newPassword)) {
-    return { success: false, error: 'Password must be at least 6 characters' }
+    return { success: false, error: 'Password must be between 8 and 128 characters' }
   }
 
   const record = await prisma.passwordResetToken.findUnique({

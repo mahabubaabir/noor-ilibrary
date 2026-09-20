@@ -20,8 +20,7 @@ export async function GET(
   try {
     const tafsir = await content.tafsir(number, lang as TranslationLanguage)
     return NextResponse.json({ tafsir })
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown error'
-    return NextResponse.json({ error: message }, { status: 502 })
+  } catch {
+    return NextResponse.json({ error: 'Service temporarily unavailable' }, { status: 502 })
   }
 }

@@ -7,8 +7,7 @@ export async function GET() {
   try {
     const collections = await getHadithCollections()
     return NextResponse.json({ collections })
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown error'
-    return NextResponse.json({ error: message }, { status: 502 })
+  } catch {
+    return NextResponse.json({ error: 'Service temporarily unavailable' }, { status: 502 })
   }
 }

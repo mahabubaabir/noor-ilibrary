@@ -32,8 +32,7 @@ export async function POST(request: Request) {
       ok: true,
       message: 'যদি এই ইমেইলে কোনো অ্যাকাউন্ট নিবন্ধিত থাকে, তবে একটি পাসওয়ার্ড রিসেট লিংক পাঠানো হয়েছে। অনুগ্রহ করে আপনার ইনবক্স এবং স্প্যাম ফোল্ডার চেক করুন।',
     })
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Unknown error'
-    return NextResponse.json({ error: message }, { status: 500 })
+  } catch {
+    return NextResponse.json({ error: 'Service temporarily unavailable' }, { status: 500 })
   }
 }

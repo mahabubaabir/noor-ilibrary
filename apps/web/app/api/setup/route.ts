@@ -1,8 +1,41 @@
 import { NextResponse } from 'next/server'
+import { timingSafeEqual } from 'crypto'
 import { prisma } from '@/lib/db'
-import { hashPassword } from '@/lib/auth'
+import { hashPassword, validatePassword, verifyPassword } from '@/lib/auth'
 
-export async function POST() {
+const LEGACY_ADMIN_EMAIL = 'admin@noor.app'
+const LEGACY_ADMIN_PASSWORD = 'Admin123456!'
+const GENERATED_PASSWORD_LENGTH = 24
+
+function secretMatches(provided: string | null, required: string): boolean {
+  if (!provided) return false
+  const a = Buffer.from(provided)
+  const b = Buffer.from(required)
+  return a.length === b.length && timingSafeEqual(a, b)
+}
+
+function generatePassword(): string {
+  const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%^&*'
+  const bytes = new Uint8Array(GENERATED_PASSWORD_LENGTH)
+  crypto.getRandomValues(bytes)
+  return Array.from(bytes, (b) => alphabet[b % alphabet.length]).join('')
+}
+
+export async function POST(request: Request) {
+  // Fail closed in production: setup is destructive and creates/rotates admins.
+  const required = process.env.SETUP_SECRET
+  if (!required) {
+    if (process.env.NODE_ENV === 'production') {
+      return NextResponse.json({ ok: false, error: 'Setup is disabled' }, { status: 403 })
+    }
+  } else {
+    const url = new URL(request.url)
+    const provided = url.searchParams.get('secret') ?? request.headers.get('x-setup-secret')
+    if (!secretMatches(provided, required)) {
+      return NextResponse.json({ ok: false, error: 'Forbidden' }, { status: 403 })
+    }
+  }
+
   try {
     // 1. ContentCache
     await prisma.$executeRawUnsafe(`
@@ -206,30 +239,58 @@ export async function POST() {
     await prisma.$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS "UserNote_userId_targetType_targetId_idx" ON "UserNote"("userId", "targetType", "targetId")`)
     await prisma.$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS "UserNote_userId_createdAt_idx" ON "UserNote"("userId", "createdAt")`)
 
-    // Ensure default admin exists or can be upgraded
-    const adminEmail = process.env.ADMIN_EMAIL || 'admin@noor.app'
-    const existingAdmin = await prisma.user.findUnique({ where: { email: adminEmail } })
-    if (!existingAdmin) {
-      const defaultHash = await hashPassword('Admin123456!')
-      await prisma.user.create({
-        data: {
-          email: adminEmail,
-          name: 'Noor Admin',
-          passwordHash: defaultHash,
-          role: 'admin',
-        },
-      })
-    } else if (existingAdmin.role !== 'admin') {
-      await prisma.user.update({
-        where: { id: existingAdmin.id },
-        data: { role: 'admin' },
-      })
+    // Ensure an admin exists using env credentials only. Never create or keep
+    // known default credentials.
+    const adminEmail = (process.env.ADMIN_EMAIL || LEGACY_ADMIN_EMAIL).trim().toLowerCase()
+    const adminPassword = process.env.ADMIN_PASSWORD
+    let legacyAdminPassword: string | null = null
+
+    if (adminPassword && !validatePassword(adminPassword)) {
+      return NextResponse.json(
+        { ok: false, error: 'ADMIN_PASSWORD must be between 8 and 128 characters' },
+        { status: 400 },
+      )
     }
 
-    return NextResponse.json({ ok: true, message: 'All tables and schema initialized successfully' })
-  } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : 'Unknown error'
-    return NextResponse.json({ ok: false, error: message }, { status: 500 })
+    if (adminPassword) {
+      const existing = await prisma.user.findUnique({ where: { email: adminEmail } })
+      const passwordHash = await hashPassword(adminPassword)
+      if (!existing) {
+        await prisma.user.create({
+          data: { email: adminEmail, name: 'Noor Admin', passwordHash, role: 'admin' },
+        })
+      } else {
+        await prisma.user.update({
+          where: { id: existing.id },
+          data: { passwordHash, role: 'admin' },
+        })
+      }
+    }
+
+    // Neutralize the legacy hardcoded default admin if it still uses the known password.
+    const legacyAdmin = await prisma.user.findUnique({ where: { email: LEGACY_ADMIN_EMAIL } })
+    if (legacyAdmin) {
+      const stillDefault = await verifyPassword(LEGACY_ADMIN_PASSWORD, legacyAdmin.passwordHash)
+      if (stillDefault && legacyAdmin.email !== adminEmail) {
+        legacyAdminPassword = generatePassword()
+        await prisma.user.update({
+          where: { id: legacyAdmin.id },
+          data: { passwordHash: await hashPassword(legacyAdminPassword), role: 'user' },
+        })
+      }
+    }
+
+    return NextResponse.json({
+      ok: true,
+      message: 'All tables and schema initialized successfully',
+      admin: adminPassword
+        ? { email: adminEmail, source: 'env' }
+        : { email: null, source: 'none' },
+      legacyDefaultAdminRotated: legacyAdminPassword !== null,
+      legacyAdminPassword: legacyAdminPassword ?? undefined,
+    })
+  } catch {
+    return NextResponse.json({ ok: false, error: 'Setup failed' }, { status: 500 })
   }
 }
 

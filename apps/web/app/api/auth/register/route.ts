@@ -17,40 +17,62 @@ export async function POST(request: Request) {
     | null
   const email = body?.email?.trim().toLowerCase() ?? ''
   const password = body?.password ?? ''
-  const name = body?.name?.trim() || null
+  const name = body?.name?.trim().slice(0, 100) || null
 
   if (!validateEmail(email)) {
     return NextResponse.json({ error: 'Valid email is required' }, { status: 400 })
   }
   if (!validatePassword(password)) {
-    return NextResponse.json({ error: 'Password must be at least 6 characters' }, { status: 400 })
+    return NextResponse.json(
+      { error: 'Password must be between 8 and 128 characters' },
+      { status: 400 },
+    )
   }
 
-  const existing = await prisma.user.findUnique({ where: { email } })
-  if (existing) {
-    return NextResponse.json({ error: 'An account already exists for this email' }, { status: 409 })
-  }
-
-  const user = await prisma.user.create({
-    data: {
-      email,
-      name,
-      passwordHash: await hashPassword(password),
-      preference: { create: {} },
-    },
-    select: { id: true, email: true, name: true, role: true },
-  })
-
-  // Dispatch Welcome Email to the user
   try {
-    await sendWelcomeEmail({ to: user.email, name: user.name })
-  } catch (emailErr) {
-    console.error('[AUTH REGISTER] Welcome email dispatch failed:', emailErr)
-  }
+    const existing = await prisma.user.findUnique({ where: { email } })
+    if (existing) {
+      return NextResponse.json(
+        { error: 'An account already exists for this email' },
+        { status: 409 },
+      )
+    }
 
-  const session = await createSession(user.id)
-  const cookie = sessionCookie(session.token, session.expiresAt)
-  const response = NextResponse.json({ user })
-  response.cookies.set(cookie.name, cookie.value, cookie.options)
-  return response
+    const user = await prisma.user.create({
+      data: {
+        email,
+        name,
+        passwordHash: await hashPassword(password),
+        preference: { create: {} },
+      },
+      select: { id: true, email: true, name: true, role: true },
+    })
+
+    // Dispatch Welcome Email to the user (never blocks account creation)
+    try {
+      await sendWelcomeEmail({ to: user.email, name: user.name })
+    } catch (emailErr) {
+      console.error('[AUTH REGISTER] Welcome email dispatch failed:', emailErr)
+    }
+
+    const session = await createSession(user.id)
+    const cookie = sessionCookie(session.token, session.expiresAt)
+    const response = NextResponse.json({ user })
+    response.cookies.set(cookie.name, cookie.value, cookie.options)
+    return response
+  } catch (error: unknown) {
+    // Concurrent double-submit can hit the unique constraint after the check above.
+    if (
+      typeof error === 'object' &&
+      error !== null &&
+      'code' in error &&
+      (error as { code?: string }).code === 'P2002'
+    ) {
+      return NextResponse.json(
+        { error: 'An account already exists for this email' },
+        { status: 409 },
+      )
+    }
+    return NextResponse.json({ error: 'Service temporarily unavailable' }, { status: 503 })
+  }
 }

@@ -89,7 +89,8 @@ export default function HadithPage() {
     if (!search.trim()) return
     setSearching(true)
     try {
-      const r = await fetch(`/api/hadith/search?q=${encodeURIComponent(search)}&collection=bukhari,muslim`)
+      // UmmahAPI only accepts a single collection key (CSV lists return 0 results)
+      const r = await fetch(`/api/hadith/search?q=${encodeURIComponent(search)}`)
       const d = await r.json()
       setSearchResults(d.hadiths || d.result?.hadiths || [])
     } catch {
