@@ -6,20 +6,18 @@ import {
   Sparkles,
   Search,
   BookOpen,
-  Volume2,
   CheckCircle2,
   Bookmark,
   Share2,
   Check,
   X,
-  Heart,
   Info,
   ArrowRight,
 } from "lucide-react"
 import { ALLAH_99_NAMES, AllahName } from "@/lib/allah-names-data"
 import { Button } from "@/components/ui/button"
+import { LikeButton } from "@/components/ui/like-button"
 
-import { playSafeSpeech } from "@/lib/audio/audio-player-engine"
 
 export default function NamesOfAllahPage() {
   const [searchQuery, setSearchQuery] = useState("")
@@ -28,17 +26,30 @@ export default function NamesOfAllahPage() {
   const [memorizedNames, setMemorizedNames] = useState<number[]>([])
   const [favoriteNames, setFavoriteNames] = useState<number[]>([])
   const [copied, setCopied] = useState(false)
-  const [speakingNumber, setSpeakingNumber] = useState<number | null>(null)
 
-  // Load memorized and favorites from localStorage
+  // Memorized is device-local; favorites are account-synced.
   useEffect(() => {
     try {
       const savedMemorized = localStorage.getItem("noor_memorized_allah_names")
       if (savedMemorized) setMemorizedNames(JSON.parse(savedMemorized))
-
-      const savedFavorites = localStorage.getItem("noor_favorite_allah_names")
-      if (savedFavorites) setFavoriteNames(JSON.parse(savedFavorites))
     } catch {}
+
+    let cancelled = false
+    fetch("/api/library/likes")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (cancelled || !Array.isArray(d?.likes)) return
+        setFavoriteNames(
+          d.likes
+            .filter((l: { targetType?: string }) => l?.targetType === "name")
+            .map((l: { targetId?: string }) => Number(l.targetId))
+            .filter((n: number) => Number.isInteger(n)),
+        )
+      })
+      .catch(() => undefined)
+    return () => {
+      cancelled = true
+    }
   }, [])
 
   const toggleMemorized = (number: number, e?: React.MouseEvent) => {
@@ -52,33 +63,10 @@ export default function NamesOfAllahPage() {
     } catch {}
   }
 
-  const toggleFavorite = (number: number, e?: React.MouseEvent) => {
-    e?.stopPropagation()
-    const updated = favoriteNames.includes(number)
-      ? favoriteNames.filter((n) => n !== number)
-      : [...favoriteNames, number]
-    setFavoriteNames(updated)
-    try {
-      localStorage.setItem("noor_favorite_allah_names", JSON.stringify(updated))
-    } catch {}
-  }
-
-  const handleSpeak = (name: AllahName) => {
-    if (speakingNumber === name.number) {
-      if (typeof window !== "undefined" && "speechSynthesis" in window) {
-        window.speechSynthesis.cancel()
-      }
-      setSpeakingNumber(null)
-      return
-    }
-
-    setSpeakingNumber(name.number)
-    playSafeSpeech({
-      text: `${name.arabic}. ${name.transliterationBn}.`,
-      lang: "ar-SA",
-      onEnd: () => setSpeakingNumber(null),
-      onError: () => setSpeakingNumber(null),
-    })
+  const handleFavoriteChange = (number: number, liked: boolean) => {
+    setFavoriteNames((prev) =>
+      liked ? (prev.includes(number) ? prev : [...prev, number]) : prev.filter((n) => n !== number),
+    )
   }
 
   const handleShare = (name: AllahName) => {
@@ -257,32 +245,18 @@ export default function NamesOfAllahPage() {
                   </span>
 
                   <div className="flex items-center gap-1.5">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleSpeak(item)
-                      }}
-                      title="আরবী উচ্চারণ শুনুন"
-                      className={`rounded-lg p-1.5 transition-all ${
-                        speakingNumber === item.number
-                          ? "bg-neutral-900 text-white animate-pulse dark:bg-white dark:text-neutral-900"
-                          : "text-neutral-400 hover:bg-neutral-100 hover:text-neutral-900 dark:hover:bg-neutral-800 dark:hover:text-white"
-                      }`}
-                    >
-                      <Volume2 className="h-4 w-4" />
-                    </button>
-
-                    <button
-                      onClick={(e) => toggleFavorite(item.number, e)}
-                      title="প্রিয় তালিকা"
+                    <LikeButton
+                      targetType="name"
+                      targetId={String(item.number)}
+                      liked={isFavorite}
+                      onChange={(liked) => handleFavoriteChange(item.number, liked)}
                       className={`rounded-lg p-1.5 transition-colors ${
                         isFavorite
-                          ? "text-red-500 hover:text-red-600"
-                          : "text-neutral-400 hover:bg-neutral-100 hover:text-red-500 dark:hover:bg-neutral-800"
+                          ? "text-neutral-900 dark:text-white"
+                          : "text-neutral-400 hover:bg-neutral-100 hover:text-neutral-900 dark:hover:bg-neutral-800 dark:hover:text-white"
                       }`}
-                    >
-                      <Heart className={`h-4 w-4 ${isFavorite ? "fill-current" : ""}`} />
-                    </button>
+                      iconClassName="h-4 w-4"
+                    />
 
                     <button
                       onClick={(e) => toggleMemorized(item.number, e)}
@@ -386,16 +360,6 @@ export default function NamesOfAllahPage() {
 
             {/* Modal Actions */}
             <div className="mt-6 flex items-center justify-between border-t border-neutral-200 pt-4 dark:border-neutral-800">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => handleSpeak(selectedName)}
-                className="gap-2 text-xs rounded-xl transition-all"
-              >
-                <Volume2 className="h-4 w-4 text-neutral-900 dark:text-white" />
-                {speakingNumber === selectedName.number ? "উচ্চারণ হচ্ছে..." : "উচ্চারণ শুনুন"}
-              </Button>
-
               <div className="flex items-center gap-2">
                 <Button
                   variant="outline"

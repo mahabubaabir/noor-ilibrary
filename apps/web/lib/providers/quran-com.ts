@@ -21,6 +21,7 @@ async function fetchJson<T>(path: string): Promise<T> {
   const res = await fetch(`${QURANCOM_BASE}${path}`, {
     cache: 'no-store',
     headers: { 'User-Agent': BROWSER_UA },
+    signal: AbortSignal.timeout(15000),
   })
   if (!res.ok) throw new Error(`quran.com ${path} -> ${res.status}`)
   return (await res.json()) as T

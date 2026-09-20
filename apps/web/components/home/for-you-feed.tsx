@@ -19,6 +19,7 @@ import {
   trackUserInteraction,
 } from "@/lib/recommendation/engine"
 import { SpotlightTiltCard } from "../ui/spotlight-tilt-card"
+import { LikeButton } from "../ui/like-button"
 
 const iconMap = {
   book: BookOpen,
@@ -153,9 +154,12 @@ export function ForYouFeed() {
                       <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-neutral-200 bg-neutral-50 text-neutral-800 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-200 transition-colors group-hover:bg-black group-hover:text-white dark:group-hover:bg-white dark:group-hover:text-black">
                         <Icon className="h-5 w-5" />
                       </div>
-                      <span className="rounded border border-neutral-200 px-2 py-0.5 text-[10px] font-mono font-semibold text-neutral-600 dark:border-neutral-800 dark:text-neutral-400">
-                        {item.badgeBn}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="rounded border border-neutral-200 px-2 py-0.5 text-[10px] font-mono font-semibold text-neutral-600 dark:border-neutral-800 dark:text-neutral-400">
+                          {item.badgeBn}
+                        </span>
+                        <LikeButton targetType="content" targetId={item.id} />
+                      </div>
                     </div>
 
                     <span className="text-[10px] font-mono font-semibold uppercase tracking-wider text-neutral-500">

@@ -6,8 +6,6 @@ import {
   Sparkles,
   Search,
   BookOpen,
-  Volume2,
-  Bookmark,
   Share2,
   Check,
   Heart,
@@ -18,6 +16,7 @@ import {
 } from "lucide-react"
 import { AUTHENTIC_DUAS_COLLECTION, DUA_CATEGORIES, DuaItem } from "@/lib/duas-data"
 import { Button } from "@/components/ui/button"
+import { LikeButton } from "@/components/ui/like-button"
 
 export default function DuasCenterPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all")
@@ -26,20 +25,28 @@ export default function DuasCenterPage() {
   const [copiedId, setCopiedId] = useState<string | null>(null)
 
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem("noor_bookmarked_duas")
-      if (saved) setBookmarkedDuas(JSON.parse(saved))
-    } catch {}
+    let cancelled = false
+    fetch("/api/library/likes")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (cancelled || !Array.isArray(d?.likes)) return
+        setBookmarkedDuas(
+          d.likes
+            .filter((l: { targetType?: string }) => l?.targetType === "dua")
+            .map((l: { targetId?: string }) => l.targetId)
+            .filter(Boolean),
+        )
+      })
+      .catch(() => undefined)
+    return () => {
+      cancelled = true
+    }
   }, [])
 
-  const toggleBookmark = (id: string) => {
-    const updated = bookmarkedDuas.includes(id)
-      ? bookmarkedDuas.filter((d) => d !== id)
-      : [...bookmarkedDuas, id]
-    setBookmarkedDuas(updated)
-    try {
-      localStorage.setItem("noor_bookmarked_duas", JSON.stringify(updated))
-    } catch {}
+  const handleDuaLikeChange = (id: string, liked: boolean) => {
+    setBookmarkedDuas((prev) =>
+      liked ? (prev.includes(id) ? prev : [...prev, id]) : prev.filter((d) => d !== id),
+    )
   }
 
   const handleCopy = (dua: DuaItem) => {
@@ -49,14 +56,6 @@ export default function DuasCenterPage() {
         setCopiedId(dua.id)
         setTimeout(() => setCopiedId(null), 2000)
       })
-    }
-  }
-
-  const handleSpeak = (text: string) => {
-    if ("speechSynthesis" in window) {
-      const utterance = new SpeechSynthesisUtterance(text)
-      utterance.lang = "ar-SA"
-      window.speechSynthesis.speak(utterance)
     }
   }
 
@@ -181,14 +180,6 @@ export default function DuasCenterPage() {
 
                 <div className="flex items-center gap-1.5">
                   <button
-                    onClick={() => handleSpeak(dua.arabic)}
-                    title="আরবী উচ্চারণ শুনুন"
-                    className="rounded-xl p-2 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-900 dark:hover:bg-neutral-800 dark:hover:text-white"
-                  >
-                    <Volume2 className="h-4 w-4" />
-                  </button>
-
-                  <button
                     onClick={() => handleCopy(dua)}
                     title="দু'আ কপি করুন"
                     className="rounded-xl p-2 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-900 dark:hover:bg-neutral-800 dark:hover:text-white"
@@ -196,17 +187,18 @@ export default function DuasCenterPage() {
                     {isCopied ? <Check className="h-4 w-4 text-neutral-900 dark:text-white" /> : <Copy className="h-4 w-4" />}
                   </button>
 
-                  <button
-                    onClick={() => toggleBookmark(dua.id)}
-                    title="বুকমার্ক করুন"
+                  <LikeButton
+                    targetType="dua"
+                    targetId={dua.id}
+                    liked={isSaved}
+                    onChange={(liked) => handleDuaLikeChange(dua.id, liked)}
                     className={`rounded-xl p-2 transition-colors ${
                       isSaved
                         ? "text-neutral-900 dark:text-white"
                         : "text-neutral-400 hover:bg-neutral-100 hover:text-neutral-900 dark:hover:bg-neutral-800 dark:hover:text-white"
                     }`}
-                  >
-                    <Bookmark className={`h-4 w-4 ${isSaved ? "fill-current" : ""}`} />
-                  </button>
+                    iconClassName="h-4 w-4"
+                  />
                 </div>
               </div>
 

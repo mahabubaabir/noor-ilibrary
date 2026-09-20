@@ -33,6 +33,7 @@ model User {
   posts               BlogPost[]
   highlights          UserHighlight[]
   notes               UserNote[]
+  likes               Like[]
 }
 
 model PasswordResetToken {
@@ -183,3 +184,16 @@ model UserNote {
   @@index([userId, createdAt])
 }
 
+
+model Like {
+  id         String   @id @default(cuid())
+  userId     String
+  targetId   String
+  targetType String   @default("content") // "content" | "dua" | "name" | "companion" | "hadith" | "bookmark"
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, targetType, targetId])
+  @@index([userId, createdAt])
+  @@index([targetType, targetId])
+}

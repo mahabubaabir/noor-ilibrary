@@ -408,16 +408,16 @@ export function PdfEbookReader({ story }: ReaderProps) {
   return (
     <div className="mx-auto max-w-4xl px-2 sm:px-4 py-4" onMouseUp={handleMouseUp}>
       {/* Top Floating Reader Toolbar */}
-      <div className="sticky top-18 z-40 mb-6 flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-stone-200/80 bg-white/90 p-2.5 shadow-lg backdrop-blur-xl dark:border-stone-800 dark:bg-stone-900/90">
+      <div className="sticky top-18 z-40 mb-6 flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-neutral-200/80 bg-white/90 p-2.5 shadow-lg backdrop-blur-xl dark:border-neutral-800 dark:bg-neutral-900/90">
         <div className="flex items-center gap-2">
           <Link
             href="/stories"
-            className="flex items-center gap-1 rounded-xl px-2.5 py-1.5 text-xs font-semibold text-stone-600 hover:bg-stone-100 dark:text-stone-300 dark:hover:bg-stone-800"
+            className="flex items-center gap-1 rounded-xl px-2.5 py-1.5 text-xs font-semibold text-neutral-600 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-800"
           >
             <ChevronLeft className="h-4 w-4" /> সূচিপত্র
           </Link>
 
-          <div className="h-4 w-px bg-stone-200 dark:bg-stone-800" />
+          <div className="h-4 w-px bg-neutral-200 dark:bg-neutral-800" />
 
           {/* Language Toggle */}
           <button
@@ -646,36 +646,36 @@ export function PdfEbookReader({ story }: ReaderProps) {
             left: `${Math.max(10, Math.min(popoverPos.x - 140, window.innerWidth - 300))}px`,
             top: `${popoverPos.y - 50}px`,
           }}
-          className="z-50 flex items-center gap-1.5 rounded-2xl border border-stone-800/30 bg-stone-900/95 p-1.5 shadow-2xl backdrop-blur-xl animate-in fade-in zoom-in-95 duration-150"
+          className="z-50 flex items-center gap-1.5 rounded-2xl border border-neutral-800/30 bg-neutral-900/95 p-1.5 shadow-2xl backdrop-blur-xl animate-in fade-in zoom-in-95 duration-150"
         >
           {/* Color Palettes */}
           <button
             onClick={() => addHighlight("yellow")}
             title="হলুদ হাইলাইট"
-            className="h-6 w-6 rounded-full bg-yellow-300 ring-1 ring-white/20 transition-transform hover:scale-115 active:scale-95"
+            className="h-6 w-6 rounded-full bg-neutral-300 ring-1 ring-white/20 transition-transform hover:scale-115 active:scale-95"
           />
           <button
             onClick={() => addHighlight("green")}
             title="সবুজ হাইলাইট"
-            className="h-6 w-6 rounded-full bg-emerald-300 ring-1 ring-white/20 transition-transform hover:scale-115 active:scale-95"
+            className="h-6 w-6 rounded-full bg-neutral-300 ring-1 ring-white/20 transition-transform hover:scale-115 active:scale-95"
           />
           <button
             onClick={() => addHighlight("blue")}
             title="নীল হাইলাইট"
-            className="h-6 w-6 rounded-full bg-sky-300 ring-1 ring-white/20 transition-transform hover:scale-115 active:scale-95"
+            className="h-6 w-6 rounded-full bg-neutral-300 ring-1 ring-white/20 transition-transform hover:scale-115 active:scale-95"
           />
           <button
             onClick={() => addHighlight("purple")}
             title="বেগুনি হাইলাইট"
-            className="h-6 w-6 rounded-full bg-purple-300 ring-1 ring-white/20 transition-transform hover:scale-115 active:scale-95"
+            className="h-6 w-6 rounded-full bg-neutral-300 ring-1 ring-white/20 transition-transform hover:scale-115 active:scale-95"
           />
           <button
             onClick={() => addHighlight("pink")}
             title="গোলাপি হাইলাইট"
-            className="h-6 w-6 rounded-full bg-pink-300 ring-1 ring-white/20 transition-transform hover:scale-115 active:scale-95"
+            className="h-6 w-6 rounded-full bg-neutral-300 ring-1 ring-white/20 transition-transform hover:scale-115 active:scale-95"
           />
 
-          <div className="h-4 w-px bg-stone-700 mx-1" />
+          <div className="h-4 w-px bg-neutral-700 mx-1" />
 
           {/* Add Note Button */}
           <button

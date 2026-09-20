@@ -237,7 +237,7 @@ export function CinematicHero() {
   }
 
   return (
-    <div className="relative flex min-h-[92vh] w-full flex-col justify-between overflow-hidden border-b border-neutral-200 bg-neutral-950 text-white select-none dark:border-neutral-800">
+    <div className="relative flex min-h-[92vh] w-full flex-col justify-between overflow-hidden border-b border-neutral-200 bg-white text-neutral-900 select-none dark:border-neutral-800 dark:bg-neutral-950 dark:text-white">
       {/* Background Subtle Monochrome Dust Canvas */}
       <canvas
         ref={canvasRef}
@@ -245,19 +245,19 @@ export function CinematicHero() {
       />
 
       {/* Subtle Radial Vignette */}
-      <div className="pointer-events-none absolute inset-0 z-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(120,119,198,0.15),rgba(255,255,255,0))]" />
+      <div className="pointer-events-none absolute inset-0 z-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(128,128,128,0.12),rgba(255,255,255,0))]" />
 
       {/* Top Header Tag */}
       <div className="relative z-10 mx-auto flex w-full max-w-6xl items-center justify-between px-6 pt-8 sm:px-8">
-        <div className="inline-flex items-center gap-2 rounded-full border border-neutral-700 bg-neutral-900/80 px-3.5 py-1 text-[11px] font-mono font-semibold text-neutral-300 backdrop-blur-xl">
-          <Sparkles className="h-3.5 w-3.5 text-white animate-pulse" />
+        <div className="inline-flex items-center gap-2 rounded-full border border-neutral-300 bg-neutral-100/80 px-3.5 py-1 text-[11px] font-mono font-semibold text-neutral-700 backdrop-blur-xl dark:border-neutral-700 dark:bg-neutral-900/80 dark:text-neutral-300">
+          <Sparkles className="h-3.5 w-3.5 text-neutral-900 animate-pulse dark:text-white" />
           <span>নূর ইসলামিক লাইব্রেরি • MINIMALIST EDITION</span>
         </div>
 
         <button
           onClick={handleNextAyah}
           title="পরবর্তী নির্বাচিত আয়াত"
-          className="inline-flex items-center gap-1.5 rounded-full border border-neutral-700 bg-neutral-900/80 px-3 py-1 text-xs font-semibold text-neutral-300 transition-all hover:border-neutral-500 hover:text-white active:scale-95"
+          className="inline-flex items-center gap-1.5 rounded-full border border-neutral-300 bg-neutral-100/80 px-3 py-1 text-xs font-semibold text-neutral-700 transition-all hover:border-neutral-400 hover:text-neutral-900 active:scale-95 dark:border-neutral-700 dark:bg-neutral-900/80 dark:text-neutral-300 dark:hover:border-neutral-500 dark:hover:text-white"
         >
           <RefreshCw className="h-3 w-3" />
           <span>পরবর্তী আয়াত ({currentIndex + 1}/{FEATURED_AYAHS.length})</span>
@@ -267,35 +267,35 @@ export function CinematicHero() {
       {/* Center Stage: Hero Featured Ayah (Editorial Swiss Style) */}
       <div className="relative z-10 mx-auto flex w-full max-w-4xl flex-col items-center px-6 py-12 text-center sm:px-8 sm:py-16">
         {/* Theme Tag */}
-        <span className="mb-4 inline-block text-[11px] font-bold uppercase tracking-widest text-neutral-400">
+        <span className="mb-4 inline-block text-[11px] font-bold uppercase tracking-widest text-neutral-500 dark:text-neutral-400">
           {currentAyah.theme}
         </span>
 
         {/* Grand Arabic Calligraphy with High Contrast */}
         <h1
           dir="rtl"
-          className="arabic text-3xl font-medium leading-[2.4] tracking-wide sm:text-5xl lg:text-6xl text-white drop-shadow-sm max-w-3xl"
+          className="arabic text-3xl font-medium leading-[2.4] tracking-wide sm:text-5xl lg:text-6xl text-neutral-900 drop-shadow-sm dark:text-white max-w-3xl"
         >
           {currentAyah.arabic}
         </h1>
 
         {/* Bengali Translation */}
-        <p className="bengali mt-6 max-w-2xl text-base sm:text-xl font-medium leading-relaxed text-neutral-200">
+        <p className="bengali mt-6 max-w-2xl text-base sm:text-xl font-medium leading-relaxed text-neutral-700 dark:text-neutral-200">
           &ldquo;{currentAyah.bangla}&rdquo;
         </p>
 
         {/* English Translation */}
-        <p className="mt-2 max-w-xl text-xs sm:text-sm italic leading-relaxed text-neutral-400">
+        <p className="mt-2 max-w-xl text-xs sm:text-sm italic leading-relaxed text-neutral-500 dark:text-neutral-400">
           {currentAyah.english}
         </p>
 
         {/* Surah Citation */}
-        <div className="mt-3 flex items-center gap-2 text-xs font-semibold text-neutral-400">
-          <span className="text-white font-bold font-mono">
+        <div className="mt-3 flex items-center gap-2 text-xs font-semibold text-neutral-500 dark:text-neutral-400">
+          <span className="text-neutral-900 font-bold font-mono dark:text-white">
             সূরা {currentAyah.surahNameBn} [{currentAyah.surahNumber}:{currentAyah.ayahNumber}]
           </span>
           <span>•</span>
-          <span className="text-neutral-500">{currentAyah.surahNameEn}</span>
+          <span className="text-neutral-400 dark:text-neutral-500">{currentAyah.surahNameEn}</span>
         </div>
 
         {/* Audio Recitation & Action Controls */}
@@ -304,14 +304,14 @@ export function CinematicHero() {
           <button
             onClick={handleToggleAudio}
             disabled={isLoadingAudio}
-            className="inline-flex items-center gap-2 rounded-xl bg-white px-5 py-2.5 text-xs font-bold text-black shadow-lg transition-all hover:bg-neutral-200 active:scale-95 disabled:opacity-60"
+            className="inline-flex items-center gap-2 rounded-xl bg-black px-5 py-2.5 text-xs font-bold text-white shadow-lg transition-all hover:bg-neutral-800 active:scale-95 disabled:opacity-60 dark:bg-white dark:text-black dark:hover:bg-neutral-200"
           >
             {isLoadingAudio ? (
-              <Loader2 className="h-4 w-4 animate-spin text-black" />
+              <Loader2 className="h-4 w-4 animate-spin text-white dark:text-black" />
             ) : isPlayingAudio ? (
-              <Pause className="h-4 w-4 fill-current text-black" />
+              <Pause className="h-4 w-4 fill-current text-white dark:text-black" />
             ) : (
-              <Volume2 className="h-4 w-4 text-black" />
+              <Volume2 className="h-4 w-4 text-white dark:text-black" />
             )}
             <span>{isPlayingAudio ? "তিলাওয়াত থামান" : "তিলাওয়াত শুনুন (Listen)"}</span>
           </button>
@@ -320,16 +320,16 @@ export function CinematicHero() {
           <button
             onClick={handleCopy}
             title="আয়াত কপি করুন"
-            className="inline-flex items-center gap-1.5 rounded-xl border border-neutral-700 bg-neutral-900/90 px-4 py-2.5 text-xs font-semibold text-neutral-300 transition-all hover:border-neutral-500 hover:text-white"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-neutral-300 bg-neutral-50 px-4 py-2.5 text-xs font-semibold text-neutral-700 transition-all hover:border-neutral-400 hover:text-neutral-900 dark:border-neutral-700 dark:bg-neutral-900/90 dark:text-neutral-300 dark:hover:border-neutral-500 dark:hover:text-white"
           >
-            {copied ? <Check className="h-4 w-4 text-white" /> : <Copy className="h-4 w-4" />}
+            {copied ? <Check className="h-4 w-4 text-neutral-900 dark:text-white" /> : <Copy className="h-4 w-4" />}
             <span>{copied ? "কপি হয়েছে" : "কপি"}</span>
           </button>
 
           {/* Read Surah Link */}
           <Link
             href={`/quran/${currentAyah.surahNumber}`}
-            className="inline-flex items-center gap-1.5 rounded-xl border border-neutral-700 bg-neutral-900/90 px-4 py-2.5 text-xs font-semibold text-neutral-300 transition-all hover:border-neutral-500 hover:text-white"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-neutral-300 bg-neutral-50 px-4 py-2.5 text-xs font-semibold text-neutral-700 transition-all hover:border-neutral-400 hover:text-neutral-900 dark:border-neutral-700 dark:bg-neutral-900/90 dark:text-neutral-300 dark:hover:border-neutral-500 dark:hover:text-white"
           >
             <BookOpen className="h-4 w-4" />
             <span>সম্পূর্ণ সূরা পড়ুন</span>
@@ -353,32 +353,32 @@ export function CinematicHero() {
               placeholder="কুরআনের আয়াত, সূরা, হাদিস বা সাহাবীদের জীবনী খুঁজুন..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-2xl border border-neutral-800 bg-neutral-900/90 py-3 pl-11 pr-24 text-xs text-white placeholder:text-neutral-500 backdrop-blur-xl focus:border-neutral-500 focus:outline-none"
+              className="w-full rounded-2xl border border-neutral-300 bg-white py-3 pl-11 pr-24 text-xs text-neutral-900 placeholder:text-neutral-400 backdrop-blur-xl focus:border-neutral-500 focus:outline-none dark:border-neutral-800 dark:bg-neutral-900/90 dark:text-white dark:placeholder:text-neutral-500"
             />
             <button
               type="submit"
-              className="absolute right-2 rounded-xl bg-white px-3.5 py-1.5 text-xs font-bold text-black hover:bg-neutral-200 transition-all"
+              className="absolute right-2 rounded-xl bg-black px-3.5 py-1.5 text-xs font-bold text-white transition-all hover:bg-neutral-800 dark:bg-white dark:text-black dark:hover:bg-neutral-200"
             >
               অনুসন্ধান
             </button>
           </form>
 
           {/* Quick Filter Tags */}
-          <div className="mt-3 flex flex-wrap items-center justify-center gap-2 text-[11px] text-neutral-400">
-            <span className="text-neutral-600">জনপ্রিয়:</span>
-            <Link href="/quran/67" className="hover:text-white underline-offset-2 hover:underline">
+          <div className="mt-3 flex flex-wrap items-center justify-center gap-2 text-[11px] text-neutral-500 dark:text-neutral-400">
+            <span className="text-neutral-400 dark:text-neutral-600">জনপ্রিয়:</span>
+            <Link href="/quran/67" className="hover:text-neutral-900 underline-offset-2 hover:underline dark:hover:text-white">
               সূরা মুলক
             </Link>
             <span>•</span>
-            <Link href="/quran/36" className="hover:text-white underline-offset-2 hover:underline">
+            <Link href="/quran/36" className="hover:text-neutral-900 underline-offset-2 hover:underline dark:hover:text-white">
               সূরা ইয়াসীন
             </Link>
             <span>•</span>
-            <Link href="/quran/18" className="hover:text-white underline-offset-2 hover:underline">
+            <Link href="/quran/18" className="hover:text-neutral-900 underline-offset-2 hover:underline dark:hover:text-white">
               সূরা কাহাফ
             </Link>
             <span>•</span>
-            <Link href="/hadith/bukhari" className="hover:text-white underline-offset-2 hover:underline">
+            <Link href="/hadith/bukhari" className="hover:text-neutral-900 underline-offset-2 hover:underline dark:hover:text-white">
               সহীহ বুখারী
             </Link>
           </div>
@@ -389,7 +389,7 @@ export function CinematicHero() {
       <div className="relative z-10 flex w-full justify-center pb-6">
         <button
           onClick={scrollToContent}
-          className="inline-flex items-center gap-1.5 text-xs font-semibold text-neutral-500 transition-colors hover:text-white"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-neutral-500 transition-colors hover:text-neutral-900 dark:hover:text-white"
         >
           <span>নিচে আরও অন্বেষণ করুন</span>
           <ChevronDown className="h-3.5 w-3.5 animate-bounce" />

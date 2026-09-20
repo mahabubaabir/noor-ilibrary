@@ -21,6 +21,7 @@ import { CinematicHero } from "@/components/home/cinematic-hero"
 import { SalahTimeWidget } from "@/components/home/salah-time-widget"
 import { SpotlightTiltCard } from "@/components/ui/spotlight-tilt-card"
 import { ForYouFeed } from "@/components/home/for-you-feed"
+import { AyahOfTheDay } from "@/components/quran/ayah-of-the-day"
 import { trackUserInteraction } from "@/lib/recommendation/engine"
 
 export default function HomePage() {
@@ -336,6 +337,11 @@ export default function HomePage() {
             </div>
           ) : null}
         </SpotlightTiltCard>
+
+        {/* Ayah of the Day (live from the internal cached provider) */}
+        <div className="mb-12">
+          <AyahOfTheDay />
+        </div>
 
         {/* CORE RESOURCE TILES WITH MONOCHROME MINIMALIST DESIGN */}
         <div className="my-16">

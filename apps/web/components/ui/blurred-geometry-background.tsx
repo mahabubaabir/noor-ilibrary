@@ -9,12 +9,12 @@ export function BlurredGeometryBackground() {
       className="pointer-events-none fixed inset-0 z-0 overflow-hidden select-none"
     >
       {/* Subtle Monochrome Ambient Depth */}
-      <div className="absolute -top-40 left-1/4 h-[500px] w-[500px] rounded-full bg-neutral-200/20 blur-3xl dark:bg-neutral-800/10" />
-      <div className="absolute top-1/2 -right-40 h-[600px] w-[600px] rounded-full bg-neutral-200/15 blur-3xl dark:bg-neutral-800/10" />
+      <div className="absolute -top-40 left-1/4 h-[500px] w-[500px] rounded-full bg-neutral-200/30 blur-3xl dark:bg-neutral-800/15" />
+      <div className="absolute top-1/2 -right-40 h-[600px] w-[600px] rounded-full bg-neutral-200/25 blur-3xl dark:bg-neutral-800/15" />
 
       {/* Modern Sacred Geometric Pattern SVG Overlay */}
       <svg
-        className="absolute inset-0 h-full w-full opacity-[0.02] dark:opacity-[0.035] stroke-black dark:stroke-white"
+        className="absolute inset-0 h-full w-full blur-[0.4px] opacity-[0.045] dark:opacity-[0.07] stroke-black dark:stroke-white"
         xmlns="http://www.w3.org/2000/svg"
         width="100%"
         height="100%"

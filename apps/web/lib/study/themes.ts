@@ -511,6 +511,207 @@ export const studyThemes: StudyTheme[] = [
       },
     ],
   },
+  {
+    id: 'prophets',
+    title: 'Stories of the Prophets',
+    arabicTitle: 'قَصَصُ الْأَنْبِيَاء',
+    tagline: 'Nobider Jiboni — walk with Adam, Nuh, Ibrahim, Musa, Isa and Muhammad ﷺ.',
+    description:
+      'The Quran tells the lives of the prophets so we can follow their footsteps: the first man, the patient warner, the friend of Allah, the one who spoke with Allah, the Messiah, and the final Messenger. Six lives, one message — worship Allah alone.',
+    difficulty: 'Beginner',
+    duration: '~25 min',
+    icon: 'star',
+    objectives: [
+      'Meet six great prophets through the verses revealed about them',
+      'See how every prophet carried the same message of tawhid',
+      'Take one practical lesson from each prophetic life',
+    ],
+    lessons: [
+      {
+        id: 'adam-first-man',
+        title: 'Adam — the first man',
+        arabicTitle: 'آدَمُ عَلَيْهِ السَّلَامُ',
+        overview:
+          'Before any nation or scripture, there was Adam: taught the names of all things, honoured above the angels, and tested in Paradise. His story teaches that mistakes can be forgiven — and that repentance is the way back.',
+        ayahs: [
+          {
+            surah: 2,
+            from: 30,
+            to: 39,
+            note: 'Allah announces a vicegerent on earth, teaches Adam the names, and forgives him after his slip.',
+          },
+          {
+            surah: 7,
+            from: 11,
+            to: 27,
+            note: 'The command to bow, the deception of Satan, and the warning to the children of Adam.',
+          },
+        ],
+        hadiths: [
+          {
+            collection: 'bukhari',
+            number: 3326,
+            note: 'Allah created Adam sixty cubits tall — and every believer who enters Paradise will be in the image of Adam.',
+          },
+        ],
+        takeaway:
+          'You will slip like Adam slipped — so return like Adam returned: admit it, ask forgiveness, and start again.',
+      },
+      {
+        id: 'nuh-patient-warner',
+        title: 'Nuh — the patient warner',
+        arabicTitle: 'نُوحٌ عَلَيْهِ السَّلَامُ',
+        overview:
+          'For nine hundred and fifty years Nuh called his people — in public and in secret, by night and by day. Almost no one listened, yet he never stopped. His life is the definition of patience in dawah.',
+        ayahs: [
+          {
+            surah: 71,
+            from: 1,
+            to: 28,
+            note: 'The whole chapter of Nuh: his call, his methods, his dua, and the flood.',
+          },
+          {
+            surah: 11,
+            from: 25,
+            to: 49,
+            note: 'The building of the ark, the mockery of his people, and the salvation of the believers.',
+          },
+        ],
+        hadiths: [
+          {
+            collection: 'bukhari',
+            number: 3337,
+            note: 'There was no prophet but warned his nation against the Dajjal — and Nuh warned his nation against him.',
+          },
+        ],
+        takeaway:
+          'Results are with Allah; your job is the effort. Call to good for years if needed — and never give up.',
+      },
+      {
+        id: 'ibrahim-friend-of-allah',
+        title: 'Ibrahim — the friend of Allah',
+        arabicTitle: 'إِبْرَاهِيمُ عَلَيْهِ السَّلَامُ',
+        overview:
+          'He broke the idols of his people, was thrown into fire that Allah made cool and safe, and was ready to sacrifice his own son. For that loyalty Allah took him as a close friend — Khalilullah.',
+        ayahs: [
+          {
+            surah: 2,
+            from: 124,
+            to: 141,
+            note: 'Allah tests Ibrahim with words, makes him a leader, and he raises the foundations of the Kaaba with Ismail.',
+          },
+          {
+            surah: 37,
+            from: 99,
+            to: 113,
+            note: 'The dream, the willingness to sacrifice, and the great ransom — the origin of Eid al-Adha.',
+          },
+        ],
+        hadiths: [
+          {
+            collection: 'bukhari',
+            number: 3353,
+            note: 'The most honorable in lineage: Yusuf, son of Yaqub, son of Ishaq, son of Ibrahim — the Khalil of Allah.',
+          },
+        ],
+        takeaway:
+          'Put Allah before everything — even what you love most — and He will make a way out you never imagined.',
+      },
+      {
+        id: 'musa-spoke-with-allah',
+        title: 'Musa — the one who spoke with Allah',
+        arabicTitle: 'مُوسَى عَلَيْهِ السَّلَامُ',
+        overview:
+          'From a basket on the Nile to the burning valley of Tuwa, Musa faced the greatest tyrant of his age with nothing but trust in Allah. His journey with Al-Khadir teaches that Allah’s wisdom is deeper than what our eyes see.',
+        ayahs: [
+          {
+            surah: 20,
+            from: 9,
+            to: 48,
+            note: 'The burning bush, the staff and the glowing hand, and the mission to Pharaoh.',
+          },
+          {
+            surah: 18,
+            from: 60,
+            to: 82,
+            note: 'The journey with Al-Khadir: the ship, the boy, and the wall — patience with what you do not yet understand.',
+          },
+        ],
+        hadiths: [
+          {
+            collection: 'bukhari',
+            number: 74,
+            note: 'Musa asked to meet the most learned servant — and learned from Al-Khadir that knowledge requires humility.',
+          },
+        ],
+        takeaway:
+          'No tyrant is greater than Allah. Stand for truth, and when His decree puzzles you, trust His wisdom.',
+      },
+      {
+        id: 'isa-the-messiah',
+        title: 'Isa — the Messiah',
+        arabicTitle: 'عِيسَى عَلَيْهِ السَّلَامُ',
+        overview:
+          'Born of Maryam without a father, speaking from the cradle, healing the blind and raising the dead by Allah’s permission — Isa called his people back to Allah. Muslims love him, honour him, and await his return.',
+        ayahs: [
+          {
+            surah: 19,
+            from: 16,
+            to: 36,
+            note: 'The birth under the palm tree, the infant speaking in defence of his mother, and his message.',
+          },
+          {
+            surah: 3,
+            from: 45,
+            to: 55,
+            note: 'Glad tidings of a word from Allah — his miracles, his disciples, and Allah raising him up.',
+          },
+        ],
+        hadiths: [
+          {
+            collection: 'bukhari',
+            number: 2222,
+            note: 'The son of Mary will descend as a just ruler, break the cross, and fill the earth with justice.',
+          },
+        ],
+        takeaway:
+          'Love Isa as the Quran teaches: a mighty messenger and servant of Allah — honoured in this world and the next.',
+      },
+      {
+        id: 'muhammad-final-messenger',
+        title: 'Muhammad ﷺ — the final Messenger',
+        arabicTitle: 'مُحَمَّدٌ صَلَّى اللّٰهُ عَلَيْهِ وَسَلَّمَ',
+        overview:
+          'The orphan who became the mercy to the worlds. Every prophet before him pointed to his coming, and with him the religion was completed. His life — in Mecca and Medina — is the living Quran.',
+        ayahs: [
+          {
+            surah: 33,
+            from: 40,
+            note: 'Muhammad is not the father of any of your men — he is the Messenger of Allah and the seal of the prophets.',
+          },
+          {
+            surah: 21,
+            from: 107,
+            note: 'We sent you only as a mercy to the worlds — the summary of his entire mission.',
+          },
+          {
+            surah: 48,
+            from: 29,
+            note: 'Muhammad is the Messenger of Allah — and the portrait of his companions around him.',
+          },
+        ],
+        hadiths: [
+          {
+            collection: 'bukhari',
+            number: 3535,
+            note: 'I am the final brick in the beautiful house of prophethood — and I am the last of the Prophets.',
+          },
+        ],
+        takeaway:
+          'Know him, love him, and follow him: the shortest path to Allah is the Sunnah of His final Messenger ﷺ.',
+      },
+    ],
+  },
 ]
 
 export function getStudyTheme(id: string): StudyTheme | undefined {

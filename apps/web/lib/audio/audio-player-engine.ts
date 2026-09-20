@@ -4,6 +4,8 @@ export interface ReciterInfo {
   nameBn: string
   style?: string
   everyAyahFolder: string
+  /** Use the EveryAyah mirror first (for editions whose CDN files return 403). */
+  everyAyahFirst?: boolean
 }
 
 export const RECITERS_LIST: ReciterInfo[] = [
@@ -20,6 +22,7 @@ export const RECITERS_LIST: ReciterInfo[] = [
     nameBn: "আব্দুর রহমান আস-সুদাইস (ইমামে কাবা)",
     style: "Murattal",
     everyAyahFolder: "Abdurrahmaan_As-Sudais_192kbps",
+    everyAyahFirst: true,
   },
   {
     id: "ar.abubakrasshatri",
@@ -27,6 +30,28 @@ export const RECITERS_LIST: ReciterInfo[] = [
     nameBn: "আবু বকর আশ-শাতরি",
     style: "Murattal",
     everyAyahFolder: "Abu_Bakr_Ash-Shaatree_128kbps",
+    everyAyahFirst: true,
+  },
+  {
+    id: "ar.ahmedajamy",
+    nameEn: "Ahmed ibn Ali al-Ajamy",
+    nameBn: "আহমেদ ইবনে আলী আল-আজামি",
+    style: "Murattal",
+    everyAyahFolder: "ahmed_ibn_ali_al_ajamy_128kbps",
+  },
+  {
+    id: "ar.husary",
+    nameEn: "Mahmoud Khalil Al-Husary",
+    nameBn: "মাহমুদ খলিল আল-হুসারি",
+    style: "Tajweed Master",
+    everyAyahFolder: "Husary_128kbps",
+  },
+  {
+    id: "ar.mahermuaiqly",
+    nameEn: "Maher Al Muaiqly",
+    nameBn: "মাহের আল-মুআইকিলি",
+    style: "Murattal",
+    everyAyahFolder: "MaherAlMuaiqly128kbps",
   },
   {
     id: "ar.minshawi",
@@ -36,18 +61,25 @@ export const RECITERS_LIST: ReciterInfo[] = [
     everyAyahFolder: "Minshawy_Murattal_128kbps",
   },
   {
+    id: "ar.muhammadayyoub",
+    nameEn: "Muhammad Ayyoub",
+    nameBn: "মুহাম্মাদ আইয়ুব",
+    style: "Murattal",
+    everyAyahFolder: "Muhammad_Ayyoub_128kbps",
+  },
+  {
+    id: "ar.muhammadjibreel",
+    nameEn: "Muhammad Jibreel",
+    nameBn: "মুহাম্মাদ জিব্রীল",
+    style: "Murattal",
+    everyAyahFolder: "Muhammad_Jibreel_128kbps",
+  },
+  {
     id: "ar.hudhaify",
     nameEn: "Ali Al-Hudhaify",
     nameBn: "আলী আল-হুযাইফী",
     style: "Murattal",
     everyAyahFolder: "Hudhaify_128kbps",
-  },
-  {
-    id: "ar.husary",
-    nameEn: "Mahmoud Khalil Al-Husary",
-    nameBn: "মাহমুদ খলিল আল-হুসারি",
-    style: "Tajweed Master",
-    everyAyahFolder: "Husary_128kbps",
   },
 ]
 
@@ -93,9 +125,14 @@ export function getAyahAudioSources(
   const s = String(surahNumber).padStart(3, "0")
   const a = String(ayahNumber).padStart(3, "0")
 
+  // cdn.islamic.network wants the GLOBAL ayah number with no zero-padding.
+  const cdn = `https://cdn.islamic.network/quran/audio/128/${reciter.id}/${globalNumber}.mp3`
+  const everyAyah = `https://everyayah.com/data/${reciter.everyAyahFolder}/${s}${a}.mp3`
+  const [first, second] = reciter.everyAyahFirst ? [everyAyah, cdn] : [cdn, everyAyah]
+
   return {
-    primary: `https://cdn.islamic.network/quran/audio/128/${reciter.id}/${globalNumber}.mp3`,
-    fallback: `https://everyayah.com/data/${reciter.everyAyahFolder}/${s}${a}.mp3`,
+    primary: first,
+    fallback: second,
     tertiary: `https://verses.quran.com/Alafasy/mp3/${s}${a}.mp3`,
     altFallback: `https://everyayah.com/data/Alafasy_128kbps/${s}${a}.mp3`,
   }
@@ -280,70 +317,3 @@ class UniversalAudioManager {
 
 // Global Singleton Instance
 export const audioManager = new UniversalAudioManager()
-
-/**
- * Universal Human-Voice Speech Narration Engine
- * High-fidelity sentence narrator with reliable Web Speech synthesis fallback.
- */
-export function playSafeSpeech({
-  text,
-  lang = "bn-BD",
-  rate = 0.9,
-  onStart,
-  onEnd,
-  onError,
-}: {
-  text: string
-  lang?: string
-  rate?: number
-  onStart?: () => void
-  onEnd?: () => void
-  onError?: (err?: unknown) => void
-}): { cancel: () => void } {
-  let isCancelled = false
-
-  const cleanText = text.replace(/[\n\r\t]+/g, " ").trim()
-  if (!cleanText) {
-    onEnd?.()
-    return { cancel: () => {} }
-  }
-
-  // Use browser native SpeechSynthesis for highest reliability and zero CORS errors
-  if (typeof window !== "undefined" && "speechSynthesis" in window) {
-    try {
-      window.speechSynthesis.cancel()
-      const utterance = new SpeechSynthesisUtterance(cleanText)
-      utterance.lang = lang
-      utterance.rate = rate
-
-      utterance.onstart = () => {
-        if (!isCancelled) onStart?.()
-      }
-      utterance.onend = () => {
-        if (!isCancelled) onEnd?.()
-      }
-      utterance.onerror = (e) => {
-        if (!isCancelled) onError?.(e)
-      }
-
-      window.speechSynthesis.speak(utterance)
-
-      return {
-        cancel: () => {
-          isCancelled = true
-          window.speechSynthesis.cancel()
-          onEnd?.()
-        },
-      }
-    } catch (e) {
-      onError?.(e)
-    }
-  }
-
-  return {
-    cancel: () => {
-      isCancelled = true
-      onEnd?.()
-    },
-  }
-}

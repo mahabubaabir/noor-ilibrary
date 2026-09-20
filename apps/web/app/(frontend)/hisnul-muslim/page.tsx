@@ -6,7 +6,6 @@ import {
   ShieldCheck,
   Search,
   BookOpen,
-  Volume2,
   Copy,
   Check,
   Sparkles,
@@ -32,14 +31,6 @@ export default function HisnulMuslimPage() {
         setCopiedId(id)
         setTimeout(() => setCopiedId(null), 2000)
       })
-    }
-  }
-
-  const handleSpeak = (text: string) => {
-    if ("speechSynthesis" in window) {
-      const utterance = new SpeechSynthesisUtterance(text)
-      utterance.lang = "ar-SA"
-      window.speechSynthesis.speak(utterance)
     }
   }
 
@@ -173,14 +164,6 @@ export default function HisnulMuslimPage() {
                     </h3>
 
                     <div className="flex items-center gap-1.5">
-                      <button
-                        onClick={() => handleSpeak(dua.arabic)}
-                        title="আরবী শুনুন"
-                        className="rounded-xl p-1.5 text-neutral-400 hover:bg-neutral-100 hover:text-neutral-900 dark:hover:bg-neutral-800 dark:hover:text-white"
-                      >
-                        <Volume2 className="h-4 w-4" />
-                      </button>
-
                       <button
                         onClick={() => handleCopy(dua.id, copyText)}
                         title="কপি করুন"

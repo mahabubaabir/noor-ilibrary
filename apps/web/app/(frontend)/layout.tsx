@@ -42,6 +42,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       suppressHydrationWarning
       className={`${inter.variable} ${notoArabic.variable} ${notoBengali.variable}`}
     >
+      <head>
+        {/* Apply the saved theme before first paint so dark users never see a white flash. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{var t=localStorage.getItem('theme');var d=t?t==='dark':true;document.documentElement.classList.toggle('dark',d);document.documentElement.classList.remove('light')}catch(e){document.documentElement.classList.add('dark')}",
+          }}
+        />
+      </head>
       <body className="relative min-h-screen bg-white font-sans text-neutral-900 antialiased dark:bg-black dark:text-neutral-100">
         <MotionCursor />
         <BlurredGeometryBackground />

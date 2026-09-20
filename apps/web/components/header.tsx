@@ -21,6 +21,7 @@ import {
   ChevronDown,
   BookMarked,
   FileText,
+  GraduationCap,
 } from "lucide-react"
 import { NoorLogo } from "./ui/noor-logo"
 import { HeaderSalahPill } from "./header-salah-pill"
@@ -82,6 +83,12 @@ const navGroups: NavDropdownGroup[] = [
         icon: BookMarked,
       },
       {
+        href: "/study",
+        title: "অধ্যয়ন থিম (Study)",
+        desc: "নবী-জীবনীসহ ধারাবাহিক পাঠ — Nobider Jiboni",
+        icon: GraduationCap,
+      },
+      {
         href: "/duas",
         title: "মাসনূন দু'আ ও যিকির",
         desc: "কুরআনী রাব্বানা ও প্রাত্যহিক জীবনের দু'আ",
@@ -139,11 +146,17 @@ export function Header() {
 
   useEffect(() => {
     setMounted(true)
-    const saved = localStorage.getItem("theme")
-    const isDark = saved ? saved === "dark" : true
+    // The pre-paint script in the root layout already applied the theme class;
+    // only sync local state here (and repair the class if needed).
+    let isDark = document.documentElement.classList.contains("dark")
+    try {
+      const saved = localStorage.getItem("theme")
+      if (saved) isDark = saved === "dark"
+    } catch {
+      // localStorage unavailable — keep the class-based value
+    }
     setDarkMode(isDark)
     document.documentElement.classList.toggle("dark", isDark)
-    document.documentElement.classList.toggle("light", !isDark)
   }, [])
 
   useEffect(() => {
@@ -163,8 +176,11 @@ export function Header() {
     const next = !darkMode
     setDarkMode(next)
     document.documentElement.classList.toggle("dark", next)
-    document.documentElement.classList.toggle("light", !next)
-    localStorage.setItem("theme", next ? "dark" : "light")
+    try {
+      localStorage.setItem("theme", next ? "dark" : "light")
+    } catch {
+      // Ignore storage failures (private mode); the class still applies.
+    }
   }
 
   const logout = async () => {

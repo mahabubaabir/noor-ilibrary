@@ -735,7 +735,7 @@ export default function LibraryProfilePage() {
       {/* Edit Profile Modal */}
       {isEditingProfile && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-lg rounded-3xl border border-stone-200 bg-white p-6 shadow-2xl dark:border-stone-800 dark:bg-stone-900">
+          <div className="w-full max-w-lg rounded-3xl border border-neutral-200 bg-white p-6 shadow-2xl dark:border-neutral-800 dark:bg-neutral-900">
             <div className="mb-4 flex items-center justify-between">
               <h3 className="font-bold text-neutral-900 dark:text-neutral-100 flex items-center gap-2">
                 <User className="h-5 w-5 text-neutral-900 dark:text-neutral-100" />

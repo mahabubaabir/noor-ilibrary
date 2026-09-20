@@ -239,6 +239,20 @@ export async function POST(request: Request) {
     await prisma.$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS "UserNote_userId_targetType_targetId_idx" ON "UserNote"("userId", "targetType", "targetId")`)
     await prisma.$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS "UserNote_userId_createdAt_idx" ON "UserNote"("userId", "createdAt")`)
 
+    // 13. Like
+    await prisma.$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS "Like" (
+        "id" TEXT NOT NULL PRIMARY KEY,
+        "userId" TEXT NOT NULL,
+        "targetId" TEXT NOT NULL,
+        "targetType" TEXT NOT NULL DEFAULT 'content',
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+      )
+    `)
+    await prisma.$executeRawUnsafe(`CREATE UNIQUE INDEX IF NOT EXISTS "Like_userId_targetType_targetId_key" ON "Like"("userId", "targetType", "targetId")`)
+    await prisma.$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS "Like_userId_createdAt_idx" ON "Like"("userId", "createdAt")`)
+    await prisma.$executeRawUnsafe(`CREATE INDEX IF NOT EXISTS "Like_targetType_targetId_idx" ON "Like"("targetType", "targetId")`)
+
     // Ensure an admin exists using env credentials only. Never create or keep
     // known default credentials.
     const adminEmail = (process.env.ADMIN_EMAIL || LEGACY_ADMIN_EMAIL).trim().toLowerCase()

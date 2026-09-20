@@ -109,28 +109,28 @@ export default function HadithPage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
       {/* Hero Header */}
-      <div className="relative mb-8 overflow-hidden rounded-3xl border border-amber-500/20 bg-gradient-to-br from-amber-500/10 via-amber-600/5 to-emerald-500/5 p-6 sm:p-8 dark:border-amber-500/30 dark:from-amber-950/40 dark:via-stone-900/40">
+      <div className="relative mb-8 overflow-hidden rounded-3xl border border-neutral-500/20 bg-gradient-to-br from-neutral-500/10 via-neutral-600/5 to-neutral-500/5 p-6 sm:p-8 dark:border-neutral-500/30 dark:from-neutral-950/40 dark:via-neutral-900/40">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-amber-100/80 px-3 py-1 text-xs font-semibold text-amber-900 dark:bg-amber-900/40 dark:text-amber-300">
-              <Sparkles className="h-3.5 w-3.5 text-amber-600 dark:text-amber-400" />
+            <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-neutral-100/80 px-3 py-1 text-xs font-semibold text-neutral-900 dark:bg-neutral-900/40 dark:text-neutral-300">
+              <Sparkles className="h-3.5 w-3.5 text-neutral-600 dark:text-neutral-400" />
               বিশুদ্ধ হাদিস সংকলন (Hadith Library)
             </div>
-            <h1 className="text-3xl font-bold tracking-tight text-stone-900 dark:text-stone-100 sm:text-4xl">
+            <h1 className="text-3xl font-bold tracking-tight text-neutral-900 dark:text-neutral-100 sm:text-4xl">
               Hadith Collections
             </h1>
-            <p className="mt-1 max-w-xl text-sm text-stone-600 dark:text-stone-400">
+            <p className="mt-1 max-w-xl text-sm text-neutral-600 dark:text-neutral-400">
               Explore authentic narrations from the Prophet Muhammad (ﷺ) with Arabic text, Bangla & English translations, and narration chains.
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <div className="rounded-2xl border border-amber-500/20 bg-white/80 p-4 text-center backdrop-blur dark:border-amber-500/30 dark:bg-stone-900/80">
-              <span className="block text-2xl font-bold text-amber-700 dark:text-amber-400">7</span>
-              <span className="text-xs text-stone-500 dark:text-stone-400">কিতাব / Books</span>
+            <div className="rounded-2xl border border-neutral-500/20 bg-white/80 p-4 text-center backdrop-blur dark:border-neutral-500/30 dark:bg-neutral-900/80">
+              <span className="block text-2xl font-bold text-neutral-700 dark:text-neutral-400">7</span>
+              <span className="text-xs text-neutral-500 dark:text-neutral-400">কিতাব / Books</span>
             </div>
-            <div className="rounded-2xl border border-emerald-500/20 bg-white/80 p-4 text-center backdrop-blur dark:border-emerald-500/30 dark:bg-stone-900/80">
-              <span className="block text-2xl font-bold text-emerald-700 dark:text-emerald-400">34,000+</span>
-              <span className="text-xs text-stone-500 dark:text-stone-400">হাদিস / Hadiths</span>
+            <div className="rounded-2xl border border-neutral-500/20 bg-white/80 p-4 text-center backdrop-blur dark:border-neutral-500/30 dark:bg-neutral-900/80">
+              <span className="block text-2xl font-bold text-neutral-700 dark:text-neutral-400">34,000+</span>
+              <span className="text-xs text-neutral-500 dark:text-neutral-400">হাদিস / Hadiths</span>
             </div>
           </div>
         </div>
@@ -139,19 +139,19 @@ export default function HadithPage() {
       {/* Search Bar */}
       <div className="mb-8">
         <div className="relative max-w-xl">
-          <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-stone-400" />
+          <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
           <input
             type="text"
             placeholder="Search hadith topics, keywords (e.g., prayer, intention, দান)..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-            className="w-full rounded-2xl border border-stone-200 bg-white py-3 pl-10 pr-24 text-sm text-stone-900 placeholder:text-stone-400 focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 dark:border-stone-800 dark:bg-stone-900 dark:text-stone-100"
+            className="w-full rounded-2xl border border-neutral-200 bg-white py-3 pl-10 pr-24 text-sm text-neutral-900 placeholder:text-neutral-400 focus:border-neutral-500 focus:outline-none focus:ring-2 focus:ring-neutral-500/20 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-100"
           />
           <button
             onClick={handleSearch}
             disabled={searching}
-            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-xl bg-amber-600 px-4 py-1.5 text-xs font-semibold text-white hover:bg-amber-700 disabled:opacity-50"
+            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-xl bg-neutral-600 px-4 py-1.5 text-xs font-semibold text-white hover:bg-neutral-700 disabled:opacity-50"
           >
             {searching ? "খোঁজা হচ্ছে..." : "Search"}
           </button>
@@ -160,19 +160,19 @@ export default function HadithPage() {
 
       {/* Search Results if any */}
       {searchResults.length > 0 && (
-        <div className="mb-10 rounded-3xl border border-stone-200 bg-white/60 p-6 backdrop-blur dark:border-stone-800 dark:bg-stone-900/60">
-          <h2 className="mb-4 text-sm font-bold text-stone-700 dark:text-stone-300">
+        <div className="mb-10 rounded-3xl border border-neutral-200 bg-white/60 p-6 backdrop-blur dark:border-neutral-800 dark:bg-neutral-900/60">
+          <h2 className="mb-4 text-sm font-bold text-neutral-700 dark:text-neutral-300">
             অনুসন্ধানের ফলাফল ({searchResults.length})
           </h2>
           <div className="space-y-3">
             {searchResults.map((h: any, i: number) => (
               <Link key={i} href={`/hadith/${h.collection}?n=${h.hadithNumber}`}>
-                <div className="rounded-2xl border border-stone-200 bg-white p-4 transition-all hover:border-amber-400 hover:shadow-md dark:border-stone-800 dark:bg-stone-900">
-                  <div className="mb-1 flex items-center justify-between text-xs text-amber-700 dark:text-amber-400">
+                <div className="rounded-2xl border border-neutral-200 bg-white p-4 transition-all hover:border-neutral-400 hover:shadow-md dark:border-neutral-800 dark:bg-neutral-900">
+                  <div className="mb-1 flex items-center justify-between text-xs text-neutral-700 dark:text-neutral-400">
                     <span className="font-semibold uppercase">{h.collection} #{h.hadithNumber}</span>
                     <span>{h.grade || "Sahih"}</span>
                   </div>
-                  <p className="line-clamp-2 text-sm text-stone-800 dark:text-stone-200">{h.translationBn || h.english || h.text}</p>
+                  <p className="line-clamp-2 text-sm text-neutral-800 dark:text-neutral-200">{h.translationBn || h.english || h.text}</p>
                 </div>
               </Link>
             ))}
@@ -184,33 +184,33 @@ export default function HadithPage() {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {filteredCollections.map((col) => (
           <Link key={col.id} href={`/hadith/${col.id}`}>
-            <div className="group relative flex h-full flex-col justify-between rounded-3xl border border-stone-200/80 bg-white p-6 transition-all duration-200 hover:-translate-y-1 hover:border-amber-400/80 hover:shadow-xl dark:border-stone-800/80 dark:bg-stone-900/90 dark:hover:border-amber-500/50">
+            <div className="group relative flex h-full flex-col justify-between rounded-3xl border border-neutral-200/80 bg-white p-6 transition-all duration-200 hover:-translate-y-1 hover:border-neutral-400/80 hover:shadow-xl dark:border-neutral-800/80 dark:bg-neutral-900/90 dark:hover:border-neutral-500/50">
               <div>
                 <div className="mb-3 flex items-center justify-between">
-                  <div className="rounded-2xl bg-amber-50 p-3 text-amber-700 dark:bg-amber-950/50 dark:text-amber-400">
+                  <div className="rounded-2xl bg-neutral-50 p-3 text-neutral-700 dark:bg-neutral-950/50 dark:text-neutral-400">
                     <BookOpen className="h-6 w-6" />
                   </div>
-                  <span className="font-arabic text-xl text-stone-400 group-hover:text-amber-600 dark:text-stone-500 dark:group-hover:text-amber-400">
+                  <span className="font-arabic text-xl text-neutral-400 group-hover:text-neutral-600 dark:text-neutral-500 dark:group-hover:text-neutral-400">
                     {col.arabicName}
                   </span>
                 </div>
 
-                <h3 className="text-lg font-bold text-stone-900 dark:text-stone-100">
+                <h3 className="text-lg font-bold text-neutral-900 dark:text-neutral-100">
                   {col.name}
                 </h3>
-                <p className="text-xs font-medium text-amber-700 dark:text-amber-400">
+                <p className="text-xs font-medium text-neutral-700 dark:text-neutral-400">
                   {col.bnName}
                 </p>
-                <p className="mt-2 text-xs leading-relaxed text-stone-500 dark:text-stone-400">
+                <p className="mt-2 text-xs leading-relaxed text-neutral-500 dark:text-neutral-400">
                   {col.full}
                 </p>
               </div>
 
-              <div className="mt-6 flex items-center justify-between border-t border-stone-100 pt-4 dark:border-stone-800">
-                <span className="text-xs font-semibold text-stone-600 dark:text-stone-400">
+              <div className="mt-6 flex items-center justify-between border-t border-neutral-100 pt-4 dark:border-neutral-800">
+                <span className="text-xs font-semibold text-neutral-600 dark:text-neutral-400">
                   {col.hadithCount.toLocaleString()} হাদিস
                 </span>
-                <span className="inline-flex items-center gap-1 text-xs font-semibold text-amber-700 transition-transform group-hover:translate-x-1 dark:text-amber-400">
+                <span className="inline-flex items-center gap-1 text-xs font-semibold text-neutral-700 transition-transform group-hover:translate-x-1 dark:text-neutral-400">
                   অধ্যায় পড়ুন <ArrowRight className="h-3.5 w-3.5" />
                 </span>
               </div>

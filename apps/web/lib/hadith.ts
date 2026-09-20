@@ -41,10 +41,20 @@ interface UmmahSearchData {
   hadiths: UmmahHadith[]
 }
 
+/** Small non-crypto hash for bounding cache-key length. */
+function simpleHash(text: string): string {
+  let hash = 0
+  for (let i = 0; i < text.length; i++) {
+    hash = (hash * 31 + text.charCodeAt(i)) >>> 0
+  }
+  return hash.toString(36)
+}
+
 async function fetchJson<T>(path: string): Promise<T> {
   const res = await fetch(`${UMMAH_BASE}${path}`, {
     cache: 'no-store',
     headers: { 'User-Agent': BROWSER_UA },
+    signal: AbortSignal.timeout(15000),
   })
   if (!res.ok) throw new Error(`UmmahAPI ${path} -> ${res.status}`)
   const body = (await res.json()) as UmmahResponse<T>
@@ -150,8 +160,9 @@ export async function getHadithCollections(): Promise<HadithCollection[]> {
 }
 
 export async function getHadith(collection: string, number: number): Promise<HadithRecord> {
+  const safeCollection = encodeURIComponent(collection)
   return withCache(`hadith:${collection}:${number}`, TTL_HADITH, async () => {
-    const data = await fetchJson<UmmahHadith>(`/${collection}/${number}`)
+    const data = await fetchJson<UmmahHadith>(`/${safeCollection}/${number}`)
     return mapHadith(data)
   })
 }
@@ -195,9 +206,14 @@ export async function searchHadith(
   collection?: string,
   limit = 10,
 ): Promise<HadithSearchResult> {
-  const safeQuery = query.trim()
+  const safeQuery = query.trim().slice(0, 200)
+  // Bound cache-key cardinality: long/unique queries share a hashed key.
+  const keyQuery =
+    safeQuery.length > 100
+      ? `hash:${simpleHash(safeQuery.toLowerCase())}`
+      : safeQuery.toLowerCase()
   return withCache(
-    `hadith:search:${collection ?? 'all'}:${limit}:${safeQuery.toLowerCase()}`,
+    `hadith:search:${collection ?? 'all'}:${limit}:${keyQuery}`,
     TTL_SEARCH,
     async () => {
       const params = new URLSearchParams({ q: safeQuery, limit: String(limit) })

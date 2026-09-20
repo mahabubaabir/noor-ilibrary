@@ -1,17 +1,13 @@
 "use client"
 
-import React, { useState, useRef } from "react"
+import React, { useState } from "react"
 import Link from "next/link"
 import {
   X,
-  Play,
-  Pause,
   ArrowRight,
   Sparkles,
-  Loader2,
 } from "lucide-react"
 import { COMPANIONS_COLLECTION, CompanionItem } from "@/lib/companions-data"
-import { playSafeSpeech } from "@/lib/audio/audio-player-engine"
 
 interface Props {
   initialCompanions?: CompanionItem[]
@@ -22,53 +18,8 @@ export function CompanionsGeometricGrid({ initialCompanions = [] }: Props) {
 
   const [selectedCompanion, setSelectedCompanion] = useState<CompanionItem | null>(null)
   const [language, setLanguage] = useState<"bn" | "en">("bn")
-  const [isPlayingAudio, setIsPlayingAudio] = useState(false)
-  const [isLoadingAudio, setIsLoadingAudio] = useState(false)
-  const audioCancelRef = useRef<(() => void) | null>(null)
-
-  // Audio speech narration
-  const handleToggleNarration = () => {
-    if (!selectedCompanion) return
-
-    if (isPlayingAudio || isLoadingAudio) {
-      audioCancelRef.current?.()
-      setIsPlayingAudio(false)
-      setIsLoadingAudio(false)
-    } else {
-      audioCancelRef.current?.()
-      setIsLoadingAudio(true)
-      const text =
-        language === "bn"
-          ? `${selectedCompanion.nameBn}। ${selectedCompanion.titleBn || ""}। ${selectedCompanion.shortBioBn}`
-          : `${selectedCompanion.nameEn}. ${selectedCompanion.titleEn || ""}. ${selectedCompanion.shortBioEn}`
-
-      const { cancel } = playSafeSpeech({
-        text,
-        lang: language === "bn" ? "bn-BD" : "en-US",
-        onStart: () => {
-          setIsLoadingAudio(false)
-          setIsPlayingAudio(true)
-        },
-        onEnd: () => {
-          setIsLoadingAudio(false)
-          setIsPlayingAudio(false)
-        },
-        onError: () => {
-          setIsLoadingAudio(false)
-          setIsPlayingAudio(false)
-        },
-      })
-      audioCancelRef.current = cancel
-    }
-  }
-
   const handleCloseModal = () => {
     setSelectedCompanion(null)
-    if (isPlayingAudio || isLoadingAudio) {
-      audioCancelRef.current?.()
-      setIsPlayingAudio(false)
-      setIsLoadingAudio(false)
-    }
   }
 
   return (
@@ -245,33 +196,6 @@ export function CompanionsGeometricGrid({ initialCompanions = [] }: Props) {
                 <span>{language === "bn" ? "সম্পূর্ণ জীবনী পড়ুন" : "Read Full Story"}</span>
                 <ArrowRight className="h-4 w-4" />
               </Link>
-
-              <button
-                onClick={handleToggleNarration}
-                disabled={isLoadingAudio}
-                className={`inline-flex w-full items-center justify-center gap-2 rounded-2xl border px-6 py-3 text-sm font-bold shadow-sm transition-all active:scale-95 sm:w-72 ${
-                  isPlayingAudio
-                    ? "border-neutral-900 bg-neutral-900 text-white dark:border-white dark:bg-white dark:text-black"
-                    : "border-neutral-300 bg-white text-neutral-800 hover:bg-neutral-50 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200 dark:hover:bg-neutral-800"
-                }`}
-              >
-                {isLoadingAudio ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin text-neutral-900 dark:text-white" />
-                    <span>{language === "bn" ? "অডিও লোড হচ্ছে..." : "Loading Audio..."}</span>
-                  </>
-                ) : isPlayingAudio ? (
-                  <>
-                    <Pause className="h-4 w-4 fill-current text-white dark:text-black" />
-                    <span>{language === "bn" ? "অডিও বিরতি দিন" : "Pause Narration"}</span>
-                  </>
-                ) : (
-                  <>
-                    <Play className="h-4 w-4 fill-current text-neutral-900 dark:text-white" />
-                    <span>{language === "bn" ? "অডিও বিবরণ শুনুন" : "Listen to Audio"}</span>
-                  </>
-                )}
-              </button>
             </div>
           </div>
         </div>

@@ -77,13 +77,13 @@ export function ZakatCalculatorWidget() {
   return (
     <div className="space-y-8">
       {/* Nisab Basis Standard Card */}
-      <div className="rounded-3xl border border-stone-200/80 bg-white/90 p-6 shadow-sm backdrop-blur dark:border-stone-800 dark:bg-stone-900/90 sm:p-8">
+      <div className="rounded-3xl border border-neutral-200/80 bg-white/90 p-6 shadow-sm backdrop-blur dark:border-neutral-800 dark:bg-neutral-900/90 sm:p-8">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h3 className="text-base font-bold text-stone-900 dark:text-stone-100">
+            <h3 className="text-base font-bold text-neutral-900 dark:text-neutral-100">
               নিসাব নির্ধারণ পদ্ধতি (Nisab Standard)
             </h3>
-            <p className="text-xs text-stone-500">
+            <p className="text-xs text-neutral-500">
               বেশিরভাগ উলামায়ে কেরামের মতে গরিবদের কল্যাণে রূপার নিসাবকে ভিত্তি ধরা উত্তম।
             </p>
           </div>

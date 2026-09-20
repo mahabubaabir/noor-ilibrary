@@ -66,7 +66,10 @@ interface AlquranResponse<T> {
 }
 
 async function fetchJson<T>(path: string): Promise<T> {
-  const res = await fetch(`${ALQURAN_BASE}${path}`, { cache: 'no-store' })
+  const res = await fetch(`${ALQURAN_BASE}${path}`, {
+    cache: 'no-store',
+    signal: AbortSignal.timeout(15000),
+  })
   if (!res.ok) throw new Error(`alquran.cloud ${path} -> ${res.status}`)
   const body = (await res.json()) as AlquranResponse<T>
   if (body.code !== 200) throw new Error(`alquran.cloud ${path} -> code ${body.code}`)

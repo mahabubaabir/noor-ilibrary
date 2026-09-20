@@ -41,7 +41,7 @@ export function AuthForm({ mode }: { mode: 'login' | 'register' }) {
     <Card className="mx-auto max-w-md">
       <CardBody>
         <h1 className="text-2xl font-semibold">{mode === 'login' ? 'Login' : 'Create account'}</h1>
-        <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
+        <p className="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
           Save bookmarks and reading progress across your devices.
         </p>
 
