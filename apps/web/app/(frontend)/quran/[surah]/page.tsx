@@ -1,6 +1,6 @@
 "use client"
 
-import { use, useEffect, useState, useCallback } from "react"
+import { use, useEffect, useRef, useState, useCallback } from "react"
 import {
   Play,
   Pause,
@@ -60,13 +60,31 @@ export default function SurahDetailPage({
   const [copiedAyah, setCopiedAyah] = useState<number | null>(null)
   const [bookmarkedAyahs, setBookmarkedAyahs] = useState<Set<number>>(new Set())
   const [savedProgressAyah, setSavedProgressAyah] = useState<number | null>(null)
+  const [retryKey, setRetryKey] = useState(0)
+  const [prevNum, setPrevNum] = useState(num)
+  const [prevRetryKey, setPrevRetryKey] = useState(retryKey)
 
-  useEffect(() => {
+  // Reset per-surah state when the route or a retry changes (render-phase
+  // adjustment, so no cascading setState calls inside the effect).
+  if (prevNum !== num || prevRetryKey !== retryKey) {
+    setPrevNum(num)
+    setPrevRetryKey(retryKey)
+    setSurahData(null)
+    setTafsirText("")
     setLoading(true)
     setError(null)
+  }
 
-    // Fetch cached surah detail from internal API
-    fetch(`/api/quran/surah/${num}`)
+  // Older browsers without AbortSignal.timeout just fetch normally.
+  const fetchSignal = () =>
+    typeof AbortSignal !== "undefined" && "timeout" in AbortSignal
+      ? AbortSignal.timeout(20000)
+      : undefined
+
+  useEffect(() => {
+    // Fetch cached surah detail from internal API (with timeout so a hung
+    // request can never leave the page stuck on "সূরা লোড হচ্ছে...")
+    fetch(`/api/quran/surah/${num}`, { signal: fetchSignal() })
       .then((r) => {
         if (!r.ok) throw new Error("Failed to load surah")
         return r.json()
@@ -80,12 +98,19 @@ export default function SurahDetailPage({
         setLoading(false)
       })
       .catch((err) => {
-        setError(err.message || "Failed to load surah")
+        const timedOut =
+          err instanceof DOMException &&
+          (err.name === "TimeoutError" || err.name === "AbortError")
+        setError(
+          timedOut
+            ? "সময় শেষ — ইন্টারনেট সংযোগ পরীক্ষা করে আবার চেষ্টা করুন (Request timed out)"
+            : err.message || "Failed to load surah",
+        )
         setLoading(false)
       })
 
     // Fetch Tafsir from the internal cached API (never call upstream from the browser)
-    fetch(`/api/tafsir/${num}?lang=en`)
+    fetch(`/api/tafsir/${num}?lang=en`, { signal: fetchSignal() })
       .then(async (r) => {
         if (!r.ok) throw new Error("Tafsir request failed")
         return r.json()
@@ -108,7 +133,7 @@ export default function SurahDetailPage({
         }
       })
       .catch(() => undefined)
-  }, [num])
+  }, [num, retryKey])
 
   // Stop audio on unmount or surah change
   useEffect(() => {
@@ -118,6 +143,10 @@ export default function SurahDetailPage({
       setCurrentAyahIndex(null)
     }
   }, [num])
+
+  // Indirection so the audio "ended" listener can advance to the next ayah
+  // without referencing the in-progress `playAyah` declaration.
+  const playAyahRef = useRef<(index: number, targetReciter?: string) => void>(() => {})
 
   const playAyah = useCallback(
     (index: number, targetReciter = reciter) => {
@@ -144,7 +173,7 @@ export default function SurahDetailPage({
         },
         ended: () => {
           if (index + 1 < surahData.ayahs.length) {
-            playAyah(index + 1, targetReciter)
+            playAyahRef.current(index + 1, targetReciter)
           } else {
             setIsPlaying(false)
             setCurrentAyahIndex(null)
@@ -159,6 +188,10 @@ export default function SurahDetailPage({
     },
     [surahData, reciter, num]
   )
+
+  useEffect(() => {
+    playAyahRef.current = playAyah
+  }, [playAyah])
 
   const handleReciterChange = (newReciterId: string) => {
     setReciter(newReciterId)
@@ -335,12 +368,21 @@ export default function SurahDetailPage({
       <div className="mx-auto max-w-xl px-4 py-16 text-center">
         <h2 className="text-lg font-bold text-neutral-900 dark:text-neutral-100">সূরা খুঁজে পাওয়া যায়নি</h2>
         <p className="mt-1 text-xs text-neutral-500">{error || "অনুরোধটি সম্পন্ন করা সম্ভব হয়নি।"}</p>
-        <Link
-          href="/quran"
-          className="mt-6 inline-flex items-center gap-2 rounded-xl bg-black px-5 py-2.5 text-xs font-semibold text-white hover:bg-neutral-800 dark:bg-white dark:text-black dark:hover:bg-neutral-200"
-        >
-          <ArrowLeft className="h-4 w-4" /> সূরার তালিকায় ফিরে যান
-        </Link>
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+          <button
+            type="button"
+            onClick={() => setRetryKey((k) => k + 1)}
+            className="inline-flex items-center gap-2 rounded-xl bg-black px-5 py-2.5 text-xs font-semibold text-white hover:bg-neutral-800 dark:bg-white dark:text-black dark:hover:bg-neutral-200"
+          >
+            আবার চেষ্টা করুন (Try again)
+          </button>
+          <Link
+            href="/quran"
+            className="inline-flex items-center gap-2 rounded-xl border border-neutral-300 px-5 py-2.5 text-xs font-semibold text-neutral-700 hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-900"
+          >
+            <ArrowLeft className="h-4 w-4" /> সূরার তালিকায় ফিরে যান
+          </Link>
+        </div>
       </div>
     )
   }

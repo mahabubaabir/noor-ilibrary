@@ -17,7 +17,6 @@ import type { ContentProvider } from './types'
 
 const TTL_QURAN = 60 * 60 * 24 * 30
 const TTL_SEARCH = 60 * 60 * 24 * 7
-const TTL_HOME = 60 * 60 * 12
 
 interface AlquranAyah {
   number: number
@@ -90,9 +89,16 @@ async function fetchJson<T>(path: string): Promise<T> {
 function mergeEditions(results: AlquranEditionResult[]): Ayah[] {
   const byId = new Map(results.map((r) => [r.edition.identifier, r.ayahs]))
   const arabic = byId.get(EDITION_AR) ?? []
-  const english = byId.get(EDITION_EN) ?? []
-  const bengali = byId.get(EDITION_BN) ?? []
-  return arabic.map((a, i) => ({
+  // Align translations by ayah number, not array position: if an edition
+  // returns a different count/order, index-based merging would silently
+  // attach the wrong translation to an ayah.
+  const englishByAyah = new Map(
+    (byId.get(EDITION_EN) ?? []).map((a) => [a.numberInSurah, a.text]),
+  )
+  const bengaliByAyah = new Map(
+    (byId.get(EDITION_BN) ?? []).map((a) => [a.numberInSurah, a.text]),
+  )
+  return arabic.map((a) => ({
     surahNumber: 0,
     numberInSurah: a.numberInSurah,
     globalNumber: a.number,
@@ -100,8 +106,8 @@ function mergeEditions(results: AlquranEditionResult[]): Ayah[] {
     page: a.page,
     sajda: Boolean(a.sajda),
     textArabic: a.text,
-    translationEn: english[i]?.text ?? '',
-    translationBn: bengali[i]?.text ?? '',
+    translationEn: englishByAyah.get(a.numberInSurah) ?? '',
+    translationBn: bengaliByAyah.get(a.numberInSurah) ?? '',
   }))
 }
 
@@ -172,29 +178,29 @@ export const alQuranCloudProvider: ContentProvider = {
   },
 
   async getRandomAyah(): Promise<Ayah | null> {
-    return withCache('provider:alquran:random-ayah', TTL_HOME, async () => {
-      // The random endpoint returns a flat list of ayah objects (one per edition),
-      // not the { edition, ayahs } shape used by chapter editions.
-      const results = await fetchJson<AlquranRandomAyah[]>(
-        `/ayah/random/editions/${EDITION_AR},${EDITION_EN},${EDITION_BN}`,
-      )
-      const byEdition = new Map(results.map((item) => [item.edition.identifier, item]))
-      const arabic = byEdition.get(EDITION_AR)
-      if (!arabic) return null
-      const english = byEdition.get(EDITION_EN)
-      const bengali = byEdition.get(EDITION_BN)
-      return {
-        surahNumber: arabic.surah?.number ?? 0,
-        numberInSurah: arabic.numberInSurah,
-        globalNumber: arabic.number,
-        juz: arabic.juz,
-        page: arabic.page,
-        sajda: Boolean(arabic.sajda),
-        textArabic: arabic.text,
-        translationEn: english?.text ?? '',
-        translationBn: bengali?.text ?? '',
-      }
-    })
+    // Deliberately NOT cached: a fixed cache key would serve the same
+    // "random" ayah to every visitor for the whole TTL (12h).
+    // The random endpoint returns a flat list of ayah objects (one per edition),
+    // not the { edition, ayahs } shape used by chapter editions.
+    const results = await fetchJson<AlquranRandomAyah[]>(
+      `/ayah/random/editions/${EDITION_AR},${EDITION_EN},${EDITION_BN}`,
+    )
+    const byEdition = new Map(results.map((item) => [item.edition.identifier, item]))
+    const arabic = byEdition.get(EDITION_AR)
+    if (!arabic) return null
+    const english = byEdition.get(EDITION_EN)
+    const bengali = byEdition.get(EDITION_BN)
+    return {
+      surahNumber: arabic.surah?.number ?? 0,
+      numberInSurah: arabic.numberInSurah,
+      globalNumber: arabic.number,
+      juz: arabic.juz,
+      page: arabic.page,
+      sajda: Boolean(arabic.sajda),
+      textArabic: arabic.text,
+      translationEn: english?.text ?? '',
+      translationBn: bengali?.text ?? '',
+    }
   },
 
   getTafsirChapter: async () => null,
