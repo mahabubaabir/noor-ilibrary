@@ -13,15 +13,30 @@ import {
   Sparkles,
   Award,
   RotateCcw,
+  Ban,
 } from "lucide-react"
 import {
   type PrayerTimesData,
+  type ProhibitedWindow,
   PRAYER_NAMES,
   formatTo12Hour,
   calculateNextPrayer,
   toBengaliNumerals,
   getOfflinePrayerFallback,
+  getProhibitedWindows,
+  getActiveProhibitedWindow,
 } from "@/lib/prayer-times"
+
+const SALAH_LOCATION_KEY = "noor_salah_location_v1"
+
+interface SavedLocation {
+  mode: "gps" | "city"
+  lat?: number
+  lng?: number
+  city?: string
+  country?: string
+  label?: string
+}
 
 const PRESET_CITIES = [
   { city: "Dhaka", country: "Bangladesh", labelBn: "ঢাকা (বিভাগীয় সদর)" },
@@ -52,6 +67,7 @@ export function SalahTimeWidget() {
   const [selectedCountry, setSelectedCountry] = useState("Bangladesh")
   const [dropdownOpen, setDropdownOpen] = useState(false)
   const [countdown, setCountdown] = useState<string>("")
+  const [activeProhibitedKey, setActiveProhibitedKey] = useState<string | null>(null)
   const [tracker, setTracker] = useState<Record<string, boolean>>({
     Fajr: false,
     Dhuhr: false,
@@ -61,6 +77,7 @@ export function SalahTimeWidget() {
   })
 
   const dropdownRef = useRef<HTMLDivElement>(null)
+  const initialLoadDoneRef = useRef(false)
 
   // Load tracker state from localStorage for today
   useEffect(() => {
@@ -153,12 +170,41 @@ export function SalahTimeWidget() {
     [selectedCity, selectedCountry]
   )
 
-  // Initial load
+  // Universal automatic location: on first load use the saved location (GPS or
+  // city). If nothing is saved, call the API with no params — the server
+  // resolves the visitor's location from edge geo headers, so correct prayer
+  // times appear automatically with no permission prompt.
   useEffect(() => {
-    // Deferred so fetchPrayerTimes' synchronous loading setState does not
-    // trigger a cascading render from within the effect body.
-    queueMicrotask(() => fetchPrayerTimes({ city: selectedCity, country: selectedCountry }))
-  }, [fetchPrayerTimes, selectedCity, selectedCountry])
+    if (initialLoadDoneRef.current) return
+    initialLoadDoneRef.current = true
+    queueMicrotask(() => {
+      let params: { lat?: number; lng?: number; city?: string; country?: string; locName?: string } = {}
+      try {
+        const raw = localStorage.getItem(SALAH_LOCATION_KEY)
+        if (raw) {
+          const saved = JSON.parse(raw) as SavedLocation
+          if (saved.mode === "gps" && typeof saved.lat === "number" && typeof saved.lng === "number") {
+            params = { lat: saved.lat, lng: saved.lng, locName: saved.label }
+          } else if (saved.mode === "city" && saved.city) {
+            setSelectedCity(saved.city)
+            setSelectedCountry(saved.country || "Bangladesh")
+            params = { city: saved.city, country: saved.country || "Bangladesh", locName: saved.label }
+          }
+        }
+      } catch {
+        // ignore storage access errors
+      }
+      fetchPrayerTimes(params)
+    })
+  }, [fetchPrayerTimes])
+
+  const persistLocation = (saved: SavedLocation) => {
+    try {
+      localStorage.setItem(SALAH_LOCATION_KEY, JSON.stringify(saved))
+    } catch {
+      // ignore storage access errors
+    }
+  }
 
   // Click outside to close dropdown
   useEffect(() => {
@@ -187,6 +233,7 @@ export function SalahTimeWidget() {
             lat: latitude,
             lng: longitude,
           })
+          persistLocation({ mode: "gps", lat: latitude, lng: longitude })
         } finally {
           setDetectingLocation(false)
         }
@@ -210,6 +257,10 @@ export function SalahTimeWidget() {
       const secs = nextPrayer.remainingSeconds % 60
       const formatted = `${hrs > 0 ? `${hrs} ঘণ্টা ` : ""}${mins} মিনিট ${secs} সেকেন্ড`
       setCountdown(toBengaliNumerals(formatted))
+
+      // Live prohibited-time state (জাওয়াল / সূর্যোদয় / সূর্যাস্ত)
+      const active = getActiveProhibitedWindow(data.timings, new Date(), data.meta?.timezone)
+      setActiveProhibitedKey(active?.key ?? null)
     }
 
     tick()
@@ -228,6 +279,13 @@ export function SalahTimeWidget() {
 
   const currentPrayerKey = data?.currentPrayer?.nameEn || "Fajr"
   const nextPrayerKey = data?.nextPrayer?.nameEn || "Dhuhr"
+
+  // Prohibited prayer moments (সূর্যোদয় / জাওয়াল / সূর্যাস্ত)
+  const prohibitedWindows: ProhibitedWindow[] = data?.timings
+    ? getProhibitedWindows(data.timings)
+    : []
+  const activeProhibited =
+    prohibitedWindows.find((w) => w.key === activeProhibitedKey) || null
 
   const fardKeys = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"]
   const completedCount = fardKeys.filter((k) => !!tracker[k]).length
@@ -307,6 +365,12 @@ export function SalahTimeWidget() {
                             setSelectedCountry(c.country)
                             setLocationName(c.labelBn)
                             setDropdownOpen(false)
+                            persistLocation({
+                              mode: "city",
+                              city: c.city,
+                              country: c.country,
+                              label: c.labelBn,
+                            })
                             fetchPrayerTimes({ city: c.city, country: c.country, locName: c.labelBn })
                           }}
                           className={`flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-medium transition-colors ${
@@ -529,6 +593,80 @@ export function SalahTimeWidget() {
             )
           })}
         </div>
+
+        {/* Prohibited Prayer Moments (নিষিদ্ধ সময়) */}
+        {prohibitedWindows.length > 0 && (
+          <div
+            className={`mt-6 rounded-2xl border p-5 transition-colors ${
+              activeProhibited
+                ? "border-neutral-900 bg-neutral-900 text-white dark:border-white dark:bg-white dark:text-black"
+                : "border-neutral-200 bg-neutral-50 dark:border-neutral-800 dark:bg-neutral-900/60"
+            }`}
+          >
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-2.5">
+                <span
+                  className={`inline-flex h-8 w-8 items-center justify-center rounded-xl ${
+                    activeProhibited
+                      ? "bg-white text-black dark:bg-black dark:text-white"
+                      : "bg-black text-white dark:bg-white dark:text-black"
+                  }`}
+                >
+                  <Ban className="h-4 w-4" />
+                </span>
+                <div>
+                  <h3 className="text-sm font-bold">নিষিদ্ধ সময় — সালাত আদায় করা যায় না</h3>
+                  <p
+                    className={`text-[11px] ${
+                      activeProhibited ? "opacity-80" : "text-neutral-500 dark:text-neutral-400"
+                    }`}
+                  >
+                    {activeProhibited
+                      ? `এখন ${activeProhibited.nameBn} সময় চলছে — ফরজ/নফল সালাত থেকে বিরত থাকুন`
+                      : "দৈনিক তিনটি সময়ে (সূর্যোদয়, জাওয়াল ও সূর্যাস্ত) সালাত আদায় নিষিদ্ধ"}
+                  </p>
+                </div>
+              </div>
+              {activeProhibited && (
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-current px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider">
+                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-current" />
+                  চলমান
+                </span>
+              )}
+            </div>
+
+            <div className="mt-4 grid gap-3 sm:grid-cols-3">
+              {prohibitedWindows.map((w) => {
+                const isActive = w.key === activeProhibitedKey
+                return (
+                  <div
+                    key={w.key}
+                    className={`rounded-xl border p-3 transition-colors ${
+                      isActive
+                        ? "border-current bg-black/5 dark:bg-white/10"
+                        : "border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-950"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold">{w.nameBn}</span>
+                      <span className="font-serif text-xs opacity-70">{w.nameAr}</span>
+                    </div>
+                    <div className="mt-2 font-mono text-sm font-black">
+                      {formatTo12Hour(w.start)} – {formatTo12Hour(w.end)}
+                    </div>
+                    <p
+                      className={`mt-1.5 text-[10px] leading-relaxed ${
+                        isActive ? "opacity-80" : "text-neutral-500 dark:text-neutral-400"
+                      }`}
+                    >
+                      {w.noteBn}
+                    </p>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
       </div>
     </section>
   )

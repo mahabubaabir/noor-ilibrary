@@ -19,6 +19,8 @@ export interface PrayerTimesData {
     Isha: string
     Imsak: string
     Midnight: string
+    Sunset: string
+    Zawal: string
   }
   nextPrayer: {
     nameEn: string
@@ -41,13 +43,104 @@ export interface PrayerTimesData {
 
 export const PRAYER_NAMES: Record<string, { bn: string; ar: string }> = {
   Fajr: { bn: "ফজর", ar: "الفجر" },
-  Sunrise: { bn: "সূর্যোদয়", ar: "الشروق" },
+  Sunrise: { bn: "সূর্যোদয়", ar: "الشروق" },
   Dhuhr: { bn: "যোহর", ar: "الظهر" },
   Asr: { bn: "আসর", ar: "العصر" },
   Maghrib: { bn: "মাগরিব", ar: "المغرب" },
   Isha: { bn: "ইশা", ar: "العشاء" },
   Imsak: { bn: "ইমসাক", ar: "الإمساك" },
   Midnight: { bn: "মধ্যরাত", ar: "منتصف الليل" },
+  Sunset: { bn: "সূর্যাস্ত", ar: "الغروب" },
+  Zawal: { bn: "জাওয়াল", ar: "الاستواء" },
+}
+
+export interface ProhibitedWindow {
+  key: "sunrise" | "zawal" | "sunset"
+  nameBn: string
+  nameAr: string
+  start: string
+  end: string
+  noteBn: string
+}
+
+// "HH:MM" + delta minutes (handles wrapping past midnight)
+export function addMinutesToTime(time24: string, deltaMinutes: number): string {
+  const clean = cleanTimeStr(time24)
+  const [h, m] = clean.split(":").map(Number)
+  let total = (h ?? 0) * 60 + (m ?? 0) + deltaMinutes
+  total = ((total % 1440) + 1440) % 1440
+  const hh = String(Math.floor(total / 60)).padStart(2, "0")
+  const mm = String(total % 60).padStart(2, "0")
+  return `${hh}:${mm}`
+}
+
+/**
+ * The three daily moments when prayer is prohibited (নিষিদ্ধ সময়):
+ * 1. সূর্যোদয় — while the sun is rising (~15 min after sunrise)
+ * 2. জাওয়াল / ইস্তিওয়া — sun at its zenith (~10 min before Dhuhr)
+ * 3. সূর্যাস্ত — while the sun is setting (~15 min before Maghrib)
+ */
+export function getProhibitedWindows(timings: Record<string, string>): ProhibitedWindow[] {
+  const windows: ProhibitedWindow[] = []
+
+  if (timings.Sunrise) {
+    windows.push({
+      key: "sunrise",
+      nameBn: "সূর্যোদয়",
+      nameAr: "الشروق",
+      start: cleanTimeStr(timings.Sunrise),
+      end: addMinutesToTime(timings.Sunrise, 15),
+      noteBn: "সূর্য সম্পূর্ণ উদয় হওয়া পর্যন্ত (প্রায় ১৫ মিনিট) সালাত নিষিদ্ধ",
+    })
+  }
+
+  if (timings.Dhuhr) {
+    const zawalStart = timings.Zawal
+      ? cleanTimeStr(timings.Zawal)
+      : addMinutesToTime(timings.Dhuhr, -10)
+    windows.push({
+      key: "zawal",
+      nameBn: "জাওয়াল / ইস্তিওয়া",
+      nameAr: "الاستواء",
+      start: zawalStart,
+      end: cleanTimeStr(timings.Dhuhr),
+      noteBn: "সূর্য মধ্যাকাশে থাকা অবস্থায় (যোহরের পূর্বে প্রায় ১০ মিনিট) সালাত নিষিদ্ধ",
+    })
+  }
+
+  if (timings.Maghrib) {
+    windows.push({
+      key: "sunset",
+      nameBn: "সূর্যাস্ত",
+      nameAr: "الغروب",
+      start: addMinutesToTime(timings.Maghrib, -15),
+      end: cleanTimeStr(timings.Maghrib),
+      noteBn: "সূর্য অস্ত যাওয়া পর্যন্ত (মাগরিবের পূর্বে প্রায় ১৫ মিনিট) সালাত নিষিদ্ধ",
+    })
+  }
+
+  return windows
+}
+
+export function getActiveProhibitedWindow(
+  timings: Record<string, string>,
+  now: Date = new Date(),
+  targetTimezone?: string,
+): ProhibitedWindow | null {
+  const targetNow = targetTimezone
+    ? new Date(now.toLocaleString("en-US", { timeZone: targetTimezone }))
+    : now
+  const minutesNow =
+    targetNow.getHours() * 60 + targetNow.getMinutes() + targetNow.getSeconds() / 60
+
+  for (const window of getProhibitedWindows(timings)) {
+    const [sh, sm] = window.start.split(":").map(Number)
+    const [eh, em] = window.end.split(":").map(Number)
+    const start = (sh ?? 0) * 60 + (sm ?? 0)
+    const end = (eh ?? 0) * 60 + (em ?? 0)
+    if (minutesNow >= start && minutesNow < end) return window
+  }
+  return null
 }
 
 // Clean time string "05:12 (BST)" -> "05:12"
@@ -187,6 +280,8 @@ export function getOfflinePrayerFallback(city = "Dhaka", country = "Bangladesh")
     Isha: "19:24",
     Imsak: "04:35",
     Midnight: "00:06",
+    Sunset: "18:07",
+    Zawal: "11:56",
   }
 
   const { currentPrayer, nextPrayer } = calculateNextPrayer(timings, now, "Asia/Dhaka")

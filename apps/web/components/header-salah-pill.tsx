@@ -8,7 +8,9 @@ export function HeaderSalahPill() {
   const [data, setData] = useState<PrayerTimesData | null>(null)
 
   useEffect(() => {
-    fetch("/api/prayer-times?city=Dhaka&country=Bangladesh")
+    // No city param: the API resolves the visitor's location from edge geo
+    // headers, so the pill matches the visitor's actual prayer times.
+    fetch("/api/prayer-times")
       .then((r) => r.json())
       .then((d) => {
         if (d?.timings) setData(d)
