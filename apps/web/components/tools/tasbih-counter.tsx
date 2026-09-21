@@ -23,10 +23,14 @@ export function TasbihCounter() {
 
   // Load lifetime count from localStorage
   useEffect(() => {
-    try {
-      const savedTotal = localStorage.getItem("noor_tasbih_lifetime_count")
-      if (savedTotal) setTotalLifetimeCount(parseInt(savedTotal, 10) || 0)
-    } catch {}
+    // Deferred so the synchronous setState does not trigger a cascading render
+    // from within the effect body.
+    queueMicrotask(() => {
+      try {
+        const savedTotal = localStorage.getItem("noor_tasbih_lifetime_count")
+        if (savedTotal) setTotalLifetimeCount(parseInt(savedTotal, 10) || 0)
+      } catch {}
+    })
   }, [])
 
   // Play click audio

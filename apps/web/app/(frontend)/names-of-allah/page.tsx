@@ -29,10 +29,14 @@ export default function NamesOfAllahPage() {
 
   // Memorized is device-local; favorites are account-synced.
   useEffect(() => {
-    try {
-      const savedMemorized = localStorage.getItem("noor_memorized_allah_names")
-      if (savedMemorized) setMemorizedNames(JSON.parse(savedMemorized))
-    } catch {}
+    // Deferred so the synchronous setState from localStorage does not trigger
+    // a cascading render from within the effect body.
+    queueMicrotask(() => {
+      try {
+        const savedMemorized = localStorage.getItem("noor_memorized_allah_names")
+        if (savedMemorized) setMemorizedNames(JSON.parse(savedMemorized))
+      } catch {}
+    })
 
     let cancelled = false
     fetch("/api/library/likes")

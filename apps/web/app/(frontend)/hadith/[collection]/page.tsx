@@ -2,6 +2,7 @@
 
 import { use, useEffect, useState } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import {
   ArrowLeft,
   ArrowRight,
@@ -24,6 +25,7 @@ export default function CollectionDetailPage({
 }) {
   const { collection } = use(params)
   const { n } = use(searchParams)
+  const router = useRouter()
 
   const [hadiths, setHadiths] = useState<HadithRecord[]>([])
   const [collectionMeta, setCollectionMeta] = useState<HadithCollection | null>(null)
@@ -45,9 +47,17 @@ export default function CollectionDetailPage({
   const pageSize = 10
   const rangeEnd = rangeStart + pageSize - 1
 
-  useEffect(() => {
+  // Reset loading/error when the collection or page range changes
+  // (render-phase adjustment, so no cascading setState inside the effect).
+  const [prevQuery, setPrevQuery] = useState(`${collection}|${rangeStart}`)
+  const queryKey = `${collection}|${rangeStart}`
+  if (prevQuery !== queryKey) {
+    setPrevQuery(queryKey)
     setLoading(true)
     setError(null)
+  }
+
+  useEffect(() => {
     fetch(`/api/hadith/${collection}?start=${rangeStart}&limit=${pageSize}`)
       .then((r) => {
         if (!r.ok) throw new Error("হাদিস লোড করতে সমস্যা হয়েছে")
@@ -120,7 +130,7 @@ export default function CollectionDetailPage({
 
       if (r.status === 401) {
         const redirect = encodeURIComponent(window.location.pathname + window.location.search)
-        window.location.href = `/login?redirect=${redirect}&intent=hadith`
+        router.push(`/login?redirect=${redirect}&intent=hadith`)
         return
       }
 

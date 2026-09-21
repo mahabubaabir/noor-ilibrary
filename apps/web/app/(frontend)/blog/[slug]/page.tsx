@@ -18,13 +18,24 @@ function renderMarkdown(content: string) {
     .replace(/\n/gim, '<br/>')
 }
 
+interface BlogPost {
+  slug: string
+  title: string
+  titleBn?: string | null
+  excerpt?: string | null
+  content: string
+  category?: string | null
+  createdAt: string
+  author?: { name?: string | null } | null
+}
+
 export default function BlogPostReaderPage({
   params,
 }: {
   params: Promise<{ slug: string }>
 }) {
   const { slug } = use(params)
-  const [post, setPost] = useState<any | null>(null)
+  const [post, setPost] = useState<BlogPost | null>(null)
   const [loading, setLoading] = useState(true)
   const [copied, setCopied] = useState(false)
 
@@ -42,7 +53,7 @@ export default function BlogPostReaderPage({
     if (navigator.share && post) {
       navigator.share({
         title: post.titleBn || post.title,
-        text: post.excerpt,
+        text: post.excerpt || undefined,
         url: window.location.href,
       }).catch(() => undefined)
     } else {

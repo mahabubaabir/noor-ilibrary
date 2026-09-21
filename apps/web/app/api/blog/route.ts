@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { Prisma } from '@prisma/client'
 import { prisma } from '@/lib/db'
 import { getCurrentUser } from '@/lib/auth'
 
@@ -101,7 +102,7 @@ export async function GET(request: Request) {
       }
     }
 
-    const where: Record<string, any> = { published: true }
+    const where: Prisma.BlogPostWhereInput = { published: true }
     if (category && category !== 'All') {
       where.category = category
     }

@@ -151,7 +151,9 @@ export default function LibraryProfilePage() {
   }
 
   useEffect(() => {
-    fetchData()
+    // Deferred so fetchData's synchronous loading setState does not trigger
+    // a cascading render from within the effect body.
+    queueMicrotask(fetchData)
   }, [])
 
   // Manual Trigger Full Auto-Sync

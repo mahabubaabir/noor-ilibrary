@@ -56,7 +56,10 @@ export function ForYouFeed() {
   }
 
   useEffect(() => {
-    loadFeed(activeFilter)
+    // Deferred so loadFeed's synchronous setState does not trigger a cascading
+    // render from within the effect body (and stays post-hydration, avoiding
+    // a localStorage-driven hydration mismatch).
+    queueMicrotask(() => loadFeed(activeFilter))
   }, [activeFilter])
 
   const handleTabClick = (tabId: ContentCategory | "all") => {

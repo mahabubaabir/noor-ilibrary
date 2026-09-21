@@ -111,6 +111,15 @@ export function CinematicHero() {
 
   const currentAyah = FEATURED_AYAHS[currentIndex]!
 
+  // Reset playback state when the featured ayah changes (render-phase
+  // adjustment, so no cascading setState inside an effect).
+  const [prevIndex, setPrevIndex] = useState(currentIndex)
+  if (prevIndex !== currentIndex) {
+    setPrevIndex(currentIndex)
+    setIsPlayingAudio(false)
+    setIsLoadingAudio(false)
+  }
+
   // Dynamic Ambient Monochrome Particle Canvas
   useEffect(() => {
     const canvas = canvasRef.current
@@ -167,11 +176,9 @@ export function CinematicHero() {
     }
   }, [])
 
-  // Audio cleanup on index change
+  // Stop any audio when the featured ayah changes (side-effect only)
   useEffect(() => {
     audioManager.stop()
-    setIsPlayingAudio(false)
-    setIsLoadingAudio(false)
   }, [currentIndex])
 
   const handleToggleAudio = () => {

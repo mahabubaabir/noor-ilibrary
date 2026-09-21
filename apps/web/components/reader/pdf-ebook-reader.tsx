@@ -30,6 +30,22 @@ import {
 import { StoryItem, StorySection } from "@/lib/stories-data"
 import { Button } from "@/components/ui/button"
 
+interface ApiHighlight {
+  id: string
+  text: string
+  color?: string | null
+  note?: string | null
+  createdAt?: string
+}
+
+interface ApiNote {
+  id: string
+  title?: string | null
+  content: string
+  color?: string | null
+  createdAt?: string
+}
+
 interface HighlightItem {
   id: string
   text: string
@@ -100,30 +116,34 @@ export function PdfEbookReader({ story }: ReaderProps) {
 
   // Load Saved Highlights, Notes, Settings from LocalStorage & Sync
   useEffect(() => {
-    const savedTheme = localStorage.getItem(`reader_theme`) as ReaderTheme
-    if (savedTheme) setTheme(savedTheme)
+    // Deferred so the synchronous setState from localStorage does not trigger
+    // a cascading render from within the effect body.
+    queueMicrotask(() => {
+      const savedTheme = localStorage.getItem(`reader_theme`) as ReaderTheme
+      if (savedTheme) setTheme(savedTheme)
 
-    const savedView = localStorage.getItem(`reader_viewMode`) as ViewMode
-    if (savedView) setViewMode(savedView)
+      const savedView = localStorage.getItem(`reader_viewMode`) as ViewMode
+      if (savedView) setViewMode(savedView)
 
-    const savedFontSize = localStorage.getItem(`reader_fontSize`) as FontSize
-    if (savedFontSize) setFontSize(savedFontSize)
+      const savedFontSize = localStorage.getItem(`reader_fontSize`) as FontSize
+      if (savedFontSize) setFontSize(savedFontSize)
 
-    // Load Local Highlights
-    const localH = localStorage.getItem(`highlights_${story.id}`)
-    if (localH) {
-      try {
-        setHighlights(JSON.parse(localH))
-      } catch {}
-    }
+      // Load Local Highlights
+      const localH = localStorage.getItem(`highlights_${story.id}`)
+      if (localH) {
+        try {
+          setHighlights(JSON.parse(localH))
+        } catch {}
+      }
 
-    // Load Local Notes
-    const localN = localStorage.getItem(`notes_${story.id}`)
-    if (localN) {
-      try {
-        setNotes(JSON.parse(localN))
-      } catch {}
-    }
+      // Load Local Notes
+      const localN = localStorage.getItem(`notes_${story.id}`)
+      if (localN) {
+        try {
+          setNotes(JSON.parse(localN))
+        } catch {}
+      }
+    })
 
     // Fetch from Backend API if logged in
     fetch(`/api/library/highlights?targetId=${story.id}&targetType=story`)
@@ -138,7 +158,7 @@ export function PdfEbookReader({ story }: ReaderProps) {
       })
       .then((d) => {
         if (!d || !d.highlights || d.highlights.length === 0) return
-        const apiHighlights = d.highlights.map((h: any) => ({
+        const apiHighlights = d.highlights.map((h: ApiHighlight) => ({
           id: h.id,
           text: h.text,
           color: h.color || "yellow",
@@ -170,7 +190,7 @@ export function PdfEbookReader({ story }: ReaderProps) {
       })
       .then((d) => {
         if (!d || !d.notes || d.notes.length === 0) return
-        const apiNotes = d.notes.map((n: any) => ({
+        const apiNotes = d.notes.map((n: ApiNote) => ({
           id: n.id,
           sectionIndex: 0,
           sectionHeading: n.title || "Note",

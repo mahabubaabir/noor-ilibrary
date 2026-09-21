@@ -52,10 +52,14 @@ export default function CompanionDetailPage({ params }: PageProps) {
   const [isAddingNote, setIsAddingNote] = useState(false)
 
   useEffect(() => {
-    try {
-      const savedHighlights = localStorage.getItem(`noor_companion_highlights_${companion.id}`)
-      if (savedHighlights) setHighlights(JSON.parse(savedHighlights))
-    } catch {}
+    // Deferred so the synchronous setState from localStorage does not trigger
+    // a cascading render from within the effect body.
+    queueMicrotask(() => {
+      try {
+        const savedHighlights = localStorage.getItem(`noor_companion_highlights_${companion.id}`)
+        if (savedHighlights) setHighlights(JSON.parse(savedHighlights))
+      } catch {}
+    })
   }, [companion.id])
 
   const handleShare = () => {

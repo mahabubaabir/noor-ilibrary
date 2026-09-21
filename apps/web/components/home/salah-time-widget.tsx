@@ -64,18 +64,22 @@ export function SalahTimeWidget() {
 
   // Load tracker state from localStorage for today
   useEffect(() => {
-    try {
-      const todayKey = new Date().toISOString().slice(0, 10)
-      const saved = localStorage.getItem(`noor_salah_tracker_${todayKey}`)
-      if (saved) {
-        const parsed = JSON.parse(saved)
-        if (parsed && typeof parsed === "object") {
-          setTracker((prev) => ({ ...prev, ...parsed }))
+    // Deferred so the synchronous setState does not trigger a cascading render
+    // from within the effect body.
+    queueMicrotask(() => {
+      try {
+        const todayKey = new Date().toISOString().slice(0, 10)
+        const saved = localStorage.getItem(`noor_salah_tracker_${todayKey}`)
+        if (saved) {
+          const parsed = JSON.parse(saved)
+          if (parsed && typeof parsed === "object") {
+            setTracker((prev) => ({ ...prev, ...parsed }))
+          }
         }
+      } catch {
+        // ignore storage access errors
       }
-    } catch {
-      // ignore storage access errors
-    }
+    })
   }, [])
 
   // Toggle individual prayer completion status
@@ -151,7 +155,9 @@ export function SalahTimeWidget() {
 
   // Initial load
   useEffect(() => {
-    fetchPrayerTimes({ city: selectedCity, country: selectedCountry })
+    // Deferred so fetchPrayerTimes' synchronous loading setState does not
+    // trigger a cascading render from within the effect body.
+    queueMicrotask(() => fetchPrayerTimes({ city: selectedCity, country: selectedCountry }))
   }, [fetchPrayerTimes, selectedCity, selectedCountry])
 
   // Click outside to close dropdown

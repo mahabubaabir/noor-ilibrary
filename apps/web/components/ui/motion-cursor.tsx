@@ -14,18 +14,25 @@ export function MotionCursor() {
   const mousePos = useRef({ x: -100, y: -100 })
   const ringPos = useRef({ x: -100, y: -100 })
   const rafId = useRef<number | null>(null)
+  const visibleRef = useRef(false)
+  const hoveredRef = useRef(false)
 
   useEffect(() => {
     // Check if device supports fine pointer (mouse/trackpad)
     if (typeof window !== "undefined") {
       const finePointer = window.matchMedia("(pointer: fine)").matches
-      setIsTouchDevice(!finePointer)
+      // Deferred so the synchronous setState does not trigger a cascading
+      // render from within the effect body.
+      queueMicrotask(() => setIsTouchDevice(!finePointer))
       if (!finePointer) return
     }
 
     const onMouseMove = (e: MouseEvent) => {
       mousePos.current = { x: e.clientX, y: e.clientY }
-      if (!visible) setVisible(true)
+      if (!visibleRef.current) {
+        visibleRef.current = true
+        setVisible(true)
+      }
 
       // Direct position for the inner dot
       if (cursorDotRef.current) {
@@ -36,8 +43,14 @@ export function MotionCursor() {
     const onMouseDown = () => setClicked(true)
     const onMouseUp = () => setClicked(false)
 
-    const onMouseEnter = () => setVisible(true)
-    const onMouseLeave = () => setVisible(false)
+    const onMouseEnter = () => {
+      visibleRef.current = true
+      setVisible(true)
+    }
+    const onMouseLeave = () => {
+      visibleRef.current = false
+      setVisible(false)
+    }
 
     // Check if hovered element is clickable/interactive
     const onMouseOver = (e: MouseEvent) => {
@@ -47,7 +60,11 @@ export function MotionCursor() {
       const isInteractive = target.closest(
         'a, button, input, select, textarea, [role="button"], [data-cursor-interactive="true"], .interactive-hover'
       )
-      setHovered(!!isInteractive)
+      const nextHovered = !!isInteractive
+      if (hoveredRef.current !== nextHovered) {
+        hoveredRef.current = nextHovered
+        setHovered(nextHovered)
+      }
     }
 
     window.addEventListener("mousemove", onMouseMove, { passive: true })
@@ -81,7 +98,7 @@ export function MotionCursor() {
       document.removeEventListener("mouseleave", onMouseLeave)
       if (rafId.current) cancelAnimationFrame(rafId.current)
     }
-  }, [visible])
+  }, [])
 
   if (isTouchDevice) return null
 

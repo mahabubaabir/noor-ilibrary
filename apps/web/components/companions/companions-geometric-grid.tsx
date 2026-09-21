@@ -77,7 +77,7 @@ export function CompanionsGeometricGrid({ initialCompanions = [] }: Props) {
                   "Muhammad ﷺ is the final Prophet and Messenger of Islam. He was sent as a mercy to all mankind. Through him, Allah revealed the complete religion of Islam and the final revelation, the Quran.",
                 keyAttributesBn: ["সর্বশ্রেষ্ঠ মানব", "খাতামুন নাবিয়্যীন"],
                 keyAttributesEn: ["Greatest of Mankind", "Seal of the Prophets"],
-                category: "prominent" as any,
+                category: "prominent" as CompanionItem["category"],
                 categoryLabelBn: "নবী",
                 categoryLabelEn: "Prophet",
                 era: "570 CE - 632 CE",

@@ -167,18 +167,22 @@ export function Header() {
   const dropdownTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
-    setMounted(true)
-    // The pre-paint script in the root layout already applied the theme class;
-    // only sync local state here (and repair the class if needed).
-    let isDark = document.documentElement.classList.contains("dark")
-    try {
-      const saved = localStorage.getItem("theme")
-      if (saved) isDark = saved === "dark"
-    } catch {
-      // localStorage unavailable — keep the class-based value
-    }
-    setDarkMode(isDark)
-    document.documentElement.classList.toggle("dark", isDark)
+    // Deferred so the synchronous setState does not trigger a cascading render
+    // from within the effect body.
+    queueMicrotask(() => {
+      setMounted(true)
+      // The pre-paint script in the root layout already applied the theme class;
+      // only sync local state here (and repair the class if needed).
+      let isDark = document.documentElement.classList.contains("dark")
+      try {
+        const saved = localStorage.getItem("theme")
+        if (saved) isDark = saved === "dark"
+      } catch {
+        // localStorage unavailable — keep the class-based value
+      }
+      setDarkMode(isDark)
+      document.documentElement.classList.toggle("dark", isDark)
+    })
   }, [])
 
   useEffect(() => {
@@ -188,11 +192,14 @@ export function Header() {
       .catch(() => {})
   }, [pathname])
 
-  // Close menus on page change
-  useEffect(() => {
+  // Close menus on page change (render-phase adjustment keyed on pathname,
+  // so no cascading setState inside an effect).
+  const [prevPathname, setPrevPathname] = useState(pathname)
+  if (prevPathname !== pathname) {
+    setPrevPathname(pathname)
     setActiveDropdown(null)
     setMobileMenuOpen(false)
-  }, [pathname])
+  }
 
   const toggleTheme = () => {
     const next = !darkMode

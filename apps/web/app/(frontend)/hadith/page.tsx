@@ -80,9 +80,18 @@ const COLLECTIONS: CollectionInfo[] = [
   },
 ]
 
+interface HadithSearchHit {
+  collection: string
+  hadithNumber: number
+  grade?: string | null
+  translationBn?: string | null
+  english?: string | null
+  text?: string | null
+}
+
 export default function HadithPage() {
   const [search, setSearch] = useState("")
-  const [searchResults, setSearchResults] = useState<any[]>([])
+  const [searchResults, setSearchResults] = useState<HadithSearchHit[]>([])
   const [searching, setSearching] = useState(false)
 
   const handleSearch = async () => {
@@ -165,7 +174,7 @@ export default function HadithPage() {
             অনুসন্ধানের ফলাফল ({searchResults.length})
           </h2>
           <div className="space-y-3">
-            {searchResults.map((h: any, i: number) => (
+            {searchResults.map((h, i: number) => (
               <Link key={i} href={`/hadith/${h.collection}?n=${h.hadithNumber}`}>
                 <div className="rounded-2xl border border-neutral-200 bg-white p-4 transition-all hover:border-neutral-400 hover:shadow-md dark:border-neutral-800 dark:bg-neutral-900">
                   <div className="mb-1 flex items-center justify-between text-xs text-neutral-700 dark:text-neutral-400">

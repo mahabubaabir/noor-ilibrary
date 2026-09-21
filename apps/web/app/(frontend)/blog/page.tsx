@@ -6,14 +6,32 @@ import { Newspaper, Search, Sparkles, ArrowRight, Calendar, User, BookOpen } fro
 
 const CATEGORIES = ["All", "Quran Reflection", "Hadith Studies", "Spiritual Reminders", "General"]
 
+interface BlogPostSummary {
+  slug: string
+  title: string
+  titleBn?: string | null
+  excerpt?: string | null
+  category?: string | null
+  createdAt: string
+  author?: { name?: string | null } | null
+}
+
 export default function BlogListingPage() {
-  const [posts, setPosts] = useState<any[]>([])
+  const [posts, setPosts] = useState<BlogPostSummary[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedCategory, setSelectedCategory] = useState("All")
   const [search, setSearch] = useState("")
 
-  useEffect(() => {
+  // Reset the loading state when filters change (render-phase adjustment,
+  // so no cascading setState inside the fetch effect).
+  const [prevFilters, setPrevFilters] = useState(`${selectedCategory}|${search}`)
+  const filterKey = `${selectedCategory}|${search}`
+  if (prevFilters !== filterKey) {
+    setPrevFilters(filterKey)
     setLoading(true)
+  }
+
+  useEffect(() => {
     let url = "/api/blog"
     const params = new URLSearchParams()
     if (selectedCategory !== "All") params.set("category", selectedCategory)

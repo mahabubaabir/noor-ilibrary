@@ -86,7 +86,7 @@ export default function DuasCenterPage() {
           <div>
             <div className="inline-flex items-center gap-2 rounded-xl border border-neutral-300 bg-white px-3 py-1 text-xs font-bold text-neutral-900 dark:border-neutral-700 dark:bg-neutral-950 dark:text-white">
               <Sparkles className="h-3.5 w-3.5 text-neutral-900 dark:text-white" />
-              কুরআন ও সুন্নাহর দু'আ ভাণ্ডার (Dua & Azkar Center)
+              কুরআন ও সুন্নাহর দু&apos;আ ভাণ্ডার (Dua &amp; Azkar Center)
             </div>
             <h1 className="mt-3 text-2xl font-bold tracking-tight text-neutral-900 sm:text-4xl dark:text-white">
               মাসনূন দু&apos;আ ও আযকার সংকলন

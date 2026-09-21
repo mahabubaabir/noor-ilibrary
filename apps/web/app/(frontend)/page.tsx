@@ -24,6 +24,15 @@ import { ForYouFeed } from "@/components/home/for-you-feed"
 import { AyahOfTheDay } from "@/components/quran/ayah-of-the-day"
 import { trackUserInteraction } from "@/lib/recommendation/engine"
 
+interface BlogPostSummary {
+  slug: string
+  title: string
+  titleBn?: string | null
+  excerpt?: string | null
+  category?: string | null
+  createdAt: string
+}
+
 export default function HomePage() {
   const [dailyHadith, setDailyHadith] = useState<DailyHadithItem | null>(null)
   const [hadithIndex, setHadithIndex] = useState(0)
@@ -33,7 +42,7 @@ export default function HomePage() {
   const [copied, setCopied] = useState(false)
   const [bookmarked, setBookmarked] = useState(false)
   const [languageMode, setLanguageMode] = useState<"bn" | "ar+bn" | "all">("bn")
-  const [latestPosts, setLatestPosts] = useState<any[]>([])
+  const [latestPosts, setLatestPosts] = useState<BlogPostSummary[]>([])
 
   const fetchHadith = async (index?: number, action?: string) => {
     setLoadingHadith(true)
@@ -58,7 +67,9 @@ export default function HomePage() {
   }
 
   useEffect(() => {
-    fetchHadith()
+    // Deferred so fetchHadith's synchronous loading setState does not trigger
+    // a cascading render from within the effect body.
+    queueMicrotask(() => fetchHadith())
 
     fetch("/api/blog")
       .then((r) => r.json())

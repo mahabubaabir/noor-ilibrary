@@ -18,10 +18,33 @@ import {
   Sparkles,
 } from "lucide-react"
 
+interface AdminStats {
+  totalUsers?: number
+  totalBookmarks?: number
+  totalHadithBookmarks?: number
+  totalPosts?: number
+  activeReaders?: number
+}
+
+interface AdminUser {
+  id: string
+  name?: string | null
+  email: string
+  role?: string
+}
+
+interface AdminPost {
+  id: string
+  slug: string
+  title: string
+  category?: string
+  createdAt: string
+}
+
 export default function AdminDashboardPage() {
-  const [stats, setStats] = useState<any | null>(null)
-  const [recentUsers, setRecentUsers] = useState<any[]>([])
-  const [recentPosts, setRecentPosts] = useState<any[]>([])
+  const [stats, setStats] = useState<AdminStats | null>(null)
+  const [recentUsers, setRecentUsers] = useState<AdminUser[]>([])
+  const [recentPosts, setRecentPosts] = useState<AdminPost[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -48,7 +71,9 @@ export default function AdminDashboardPage() {
   }
 
   useEffect(() => {
-    loadStats()
+    // Deferred so the synchronous setState inside loadStats does not trigger
+    // a cascading render from within the effect body.
+    queueMicrotask(loadStats)
   }, [])
 
   const deletePost = async (slug: string) => {
