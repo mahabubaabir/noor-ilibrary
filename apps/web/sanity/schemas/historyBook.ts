@@ -1,8 +1,10 @@
 import { defineType, defineField } from "sanity"
 
-const reference = {
+// NOTE: the object type must NOT be named "reference" — that clashes with
+// Sanity's built-in reference type and fails schema validation on deploy.
+const bookReference = {
   type: "object" as const,
-  name: "reference",
+  name: "bookReference",
   fields: [
     { name: "label", title: "Label", type: "string" },
     { name: "href", title: "Internal link (e.g. /quran/12#ayah-111)", type: "string" },
@@ -52,7 +54,7 @@ export const historyBookSchema = defineType({
               name: "references",
               title: "References",
               type: "array",
-              of: [reference],
+              of: [bookReference],
             },
           ],
           preview: { select: { title: "titleEn", subtitle: "titleBn" } },

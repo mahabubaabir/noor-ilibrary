@@ -8,4 +8,8 @@ export default defineCliConfig({
     projectId,
     dataset,
   },
+  studioHost: "noor-ilibrary",
+  deployment: {
+    appId: "qba7dguzu22kb00e2gooe5ie",
+  },
 })
