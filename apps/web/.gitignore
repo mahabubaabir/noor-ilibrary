@@ -1,2 +1,5 @@
 .vercel
 .env*
+
+# Sanity deploy artifacts
+.sanity/
