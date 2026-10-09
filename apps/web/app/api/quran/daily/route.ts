@@ -5,9 +5,13 @@ import { prisma } from '@/lib/db'
 
 export const dynamic = 'force-dynamic'
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const ayah = await getDailyAyah()
+    // Optional ?date=YYYY-MM-DD previews any day's ayah (the app itself never
+    // sends it; the daily rotation is otherwise fully automatic).
+    const { searchParams } = new URL(request.url)
+    const dateParam = searchParams.get('date') || undefined
+    const ayah = await getDailyAyah(dateParam)
 
     // Include the signed-in visitor's bookmark state so the client can render
     // the correct toggle immediately (guests simply get false).

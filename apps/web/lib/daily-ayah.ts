@@ -84,12 +84,40 @@ function toItem(row: {
 }
 
 /**
+ * The canonical timezone whose midnight advances the daily ayah. The audience
+ * is primarily Bangladesh, and the UTC date would otherwise flip the ayah at
+ * 6 AM Dhaka time, which feels broken. With this, the ayah changes at local
+ * midnight in Bangladesh.
+ */
+const DAILY_TIMEZONE = 'Asia/Dhaka'
+
+/** "YYYY-MM-DD" for `now` in the given timezone (en-CA gives ISO order). */
+export function dateStringInTimezone(now: Date = new Date(), timeZone = DAILY_TIMEZONE): string {
+  try {
+    return new Intl.DateTimeFormat('en-CA', {
+      timeZone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).format(now)
+  } catch {
+    return now.toISOString().slice(0, 10)
+  }
+}
+
+/**
  * Today's ayah. Once persisted for a date it never changes for that date,
- * so reloads and revisits always show the same ayah. The next day the
- * modular walk advances to the next unique ayah.
+ * so reloads and revisits always show the same ayah. At midnight (Asia/Dhaka)
+ * the modular walk advances to the next unique ayah.
+ *
+ * `dateStr` (YYYY-MM-DD) lets callers preview any day's ayah - useful for
+ * testing the rotation; the main app always calls it with no arguments.
  */
 export async function getDailyAyah(dateStr?: string): Promise<DailyAyahItem> {
-  const date = dateStr || (new Date().toISOString().split('T')[0] ?? '2026-01-01')
+  const date =
+    dateStr && /^\d{4}-\d{2}-\d{2}$/.test(dateStr)
+      ? dateStr
+      : dateStringInTimezone(new Date())
 
   // 1. Database first: the day's selection is immutable once stored.
   try {
