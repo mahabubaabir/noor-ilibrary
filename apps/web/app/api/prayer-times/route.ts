@@ -78,11 +78,12 @@ export async function GET(request: Request) {
   const paramLng = searchParams.get('lng')
   const paramCity = searchParams.get('city')?.trim()
   const paramCountry = searchParams.get('country')?.trim()
+  const paramQ = searchParams.get('q')?.trim()
   let locationName = searchParams.get('locationName')?.trim() || ''
 
   // Universal automatic geolocation: Vercel injects the visitor's coarse
   // location into these headers, so every visitor gets correct prayer times
-  // without any browser permission prompt. Explicit ?lat/lng or ?city wins.
+  // without any browser permission prompt. Explicit ?lat/lng, ?city or ?q wins.
   const headers = request.headers
   const geoLat = headers.get('x-vercel-ip-latitude')
   const geoLng = headers.get('x-vercel-ip-longitude')
@@ -90,19 +91,28 @@ export async function GET(request: Request) {
   const geoCountry = headers.get('x-vercel-ip-country') || ''
   const geoCity = geoCityRaw ? decodeURIComponent(geoCityRaw) : ''
 
-  const useGeo = !paramLat && !paramLng && !paramCity
+  const useGeo = !paramLat && !paramLng && !paramCity && !paramQ
   const lat = paramLat || (useGeo ? geoLat : null)
   const lng = paramLng || (useGeo ? geoLng : null)
   const city = paramCity || geoCity || 'Dhaka'
   const country = paramCountry || geoCountry || 'Bangladesh'
 
-  if (!locationName && geoCity) {
+  // The coarse IP city must never be used as a label for an explicitly
+  // requested location (e.g. precise browser GPS): otherwise someone in
+  // Chuadanga would see "Dhaka" while the times are actually Chuangdanga's.
+  if (!locationName && useGeo && geoCity) {
     locationName = geoCity
   }
 
   try {
     let aladhanUrl: string
-    if (lat && lng) {
+    if (paramQ) {
+      // Free-typed location search ("Chuadanga", "Sylhet, Bangladesh", ...).
+      const method = resolveMethod(paramQ || country)
+      aladhanUrl = `https://api.aladhan.com/v1/timingsByAddress?address=${encodeURIComponent(
+        paramQ
+      )}&method=${method}`
+    } else if (lat && lng) {
       const timestamp = Math.floor(Date.now() / 1000)
       const method = resolveMethod(country)
       aladhanUrl = `https://api.aladhan.com/v1/timings/${timestamp}?latitude=${lat}&longitude=${lng}&method=${method}`
@@ -113,7 +123,7 @@ export async function GET(request: Request) {
           const geoController = new AbortController()
           const geoTimeout = setTimeout(() => geoController.abort(), 3500)
           const geoRes = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=10`,
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=14`,
             {
               signal: geoController.signal,
               headers: {
@@ -125,9 +135,16 @@ export async function GET(request: Request) {
 
           if (geoRes.ok) {
             const geo = await geoRes.json()
+            // Street-level fields first, then district, then division and
+            // country - zoom 14 gives the town/upazila, which is what a
+            // visitor recognises (e.g. Chuadanga, not just "Khulna").
             const cName =
               geo.address?.city ||
               geo.address?.town ||
+              geo.address?.municipality ||
+              geo.address?.village ||
+              geo.address?.suburb ||
+              geo.address?.county ||
               geo.address?.state_district ||
               geo.address?.state ||
               ''
@@ -190,7 +207,9 @@ export async function GET(request: Request) {
     const isJummah = d.date.gregorian.weekday.en === 'Friday' || isJummahDay(now, timezone)
     const { currentPrayer, nextPrayer } = calculateNextPrayer(cleanTimings, now, timezone)
 
-    const displayCity = lat && lng
+    const displayCity = paramQ
+      ? (locationName || paramQ)
+      : lat && lng
       ? (locationName || `${Number(lat).toFixed(2)}°N, ${Number(lng).toFixed(2)}°E`)
       : city
 
@@ -221,7 +240,7 @@ export async function GET(request: Request) {
     return NextResponse.json(result)
   } catch (error) {
     console.warn('[PRAYER TIME] Using offline fallback due to:', error instanceof Error ? error.message : error)
-    const fallback = getOfflinePrayerFallback(city, country)
+    const fallback = getOfflinePrayerFallback(paramQ || city, country)
     return NextResponse.json(fallback)
   }
 }

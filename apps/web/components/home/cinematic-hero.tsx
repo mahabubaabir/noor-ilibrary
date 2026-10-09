@@ -3,122 +3,75 @@
 import React, { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import {
-  Play,
   Pause,
   Copy,
   Check,
-  Share2,
   BookOpen,
   Volume2,
   ChevronDown,
   Sparkles,
   Search,
-  ArrowRight,
-  RefreshCw,
   Loader2,
+  Bookmark,
+  BookmarkCheck,
 } from "lucide-react"
 import { audioManager } from "@/lib/audio/audio-player-engine"
 import { trackUserInteraction } from "@/lib/recommendation/engine"
 
-interface FeaturedAyah {
+interface DailyAyah {
   surahNumber: number
   surahNameBn: string
-  surahNameAr: string
   surahNameEn: string
   ayahNumber: number
-  arabic: string
-  bangla: string
-  english: string
-  theme: string
+  globalNumber: number
+  textArabic: string
+  translationBn: string
+  translationEn: string
 }
 
-const FEATURED_AYAHS: FeaturedAyah[] = [
-  {
-    surahNumber: 94,
-    surahNameBn: "আল-ইনশিরাহ",
-    surahNameAr: "الشرح",
-    surahNameEn: "Ash-Sharh",
-    ayahNumber: 6,
-    arabic: "إِنَّ مَعَ الْعُسْرِ يُسْرًا",
-    bangla: "নিশ্চয়ই কষ্টের সাথেই রয়েছে স্বস্তি ও পরম প্রশান্তি।",
-    english: "Indeed, with hardship comes ease.",
-    theme: "আশা ও নির্ভরতা • Hope & Solace",
-  },
-  {
-    surahNumber: 24,
-    surahNameBn: "আন-নূর",
-    surahNameAr: "النور",
-    surahNameEn: "An-Nur",
-    ayahNumber: 35,
-    arabic: "اللَّهُ نُورُ السَّمَاوَاتِ وَالْأَرْضِ ۚ مَثَلُ نُورِهِ كَمِشْكَاةٍ فِيهَا مِصْبَاحٌ",
-    bangla: "আল্লাহ নভোমণ্ডল ও ভূমণ্ডলের জ্যোতি; তাঁর জ্যোতির দৃষ্টান্ত যেন একটি কুলঙ্গি, যাতে রয়েছে একটি প্রদীপ।",
-    english: "Allah is the Light of the heavens and the earth. The example of His light is like a niche within which is a lamp.",
-    theme: "আল্লাহর নূর ও হেদায়াত • Light of the Heavens",
-  },
-  {
-    surahNumber: 2,
-    surahNameBn: "আল-বাক্বারাহ (আয়াতুল কুরসী)",
-    surahNameAr: "البقرة",
-    surahNameEn: "Al-Baqarah",
-    ayahNumber: 255,
-    arabic: "اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ ۚ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ",
-    bangla: "আল্লাহ, তিনি ব্যতীত অন্য কোনো উপাস্য নেই; তিনি চিরঞ্জীব, সবকিছুর ধারক। তন্দ্রা বা নিদ্রা তাঁকে স্পর্শ করে না।",
-    english: "Allah! There is no deity except Him, the Ever-Living, the Sustainer of existence. Neither drowsiness overtakes Him nor sleep.",
-    theme: "আল্লাহর মহিমা ও তাওহীদ • Supreme Majesty",
-  },
-  {
-    surahNumber: 18,
-    surahNameBn: "আল-কাহাফ",
-    surahNameAr: "الكهف",
-    surahNameEn: "Al-Kahf",
-    ayahNumber: 64,
-    arabic: "قَالَ ذَٰلِكَ مَا كُنَّا نَبْغِ ۚ فَارْتَدَّا عَلَىٰ آثَارِهِمَا قَصَصًا",
-    bangla: "মূসা বললেন, আমরা তো সে স্থানটিরই অনুসন্ধান করছিলাম। তারপর তারা নিজেদের পদচিহ্ন ধরে ফিরে চলল।",
-    english: "Moses said, 'That is what we were seeking.' So they returned, following their footprints.",
-    theme: "অনুসন্ধান ও হেদায়াত • The Divine Search",
-  },
-  {
-    surahNumber: 55,
-    surahNameBn: "আর-রহমান",
-    surahNameAr: "الرحمن",
-    surahNameEn: "Ar-Rahman",
-    ayahNumber: 13,
-    arabic: "فَبِأَيِّ آلَاءِ رَبِّكُمَا تُكَذِّبَانِ",
-    bangla: "অতএব, তোমরা তোমাদের রবের কোন কোন নিয়ামতকে অস্বীকার করবে?",
-    english: "So which of the favors of your Lord would you deny?",
-    theme: "আল্লাহর অসীম নেয়ামত • Divine Blessings",
-  },
-  {
-    surahNumber: 93,
-    surahNameBn: "আদ-দুহা",
-    surahNameAr: "الضحى",
-    surahNameEn: "Ad-Duha",
-    ayahNumber: 5,
-    arabic: "وَلَسَوْفَ يُعْطِيكَ رَبُّكَ فَتَرْضَىٰ",
-    bangla: "আর অচিরেই আপনার রব আপনাকে এমন দান করবেন যে আপনি সন্তুষ্ট হয়ে যাবেন।",
-    english: "And your Lord is going to give you, and you will be satisfied.",
-    theme: "সুসংবাদ ও পরম করুণা • Glad Tidings",
-  },
-]
+// Graceful first-paint / offline fallback. In normal operation this is replaced
+// by the same deterministic daily ayah every visitor sees today.
+const FALLBACK_AYAH: DailyAyah = {
+  surahNumber: 94,
+  surahNameBn: "আল-ইনশিরাহ",
+  surahNameEn: "Ash-Sharh",
+  ayahNumber: 6,
+  globalNumber: 6094,
+  textArabic: "إِنَّ مَعَ الْعُسْرِ يُسْرًا",
+  translationBn: "নিশ্চয়ই কষ্টের সাথেই রয়েছে স্বস্তি ও পরম প্রশান্তি।",
+  translationEn: "Indeed, with hardship comes ease.",
+}
 
 export function CinematicHero() {
-  const [currentIndex, setCurrentIndex] = useState(0)
+  const [dailyAyah, setDailyAyah] = useState<DailyAyah>(FALLBACK_AYAH)
   const [isPlayingAudio, setIsPlayingAudio] = useState(false)
   const [isLoadingAudio, setIsLoadingAudio] = useState(false)
   const [copied, setCopied] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
+  const [bookmarked, setBookmarked] = useState(false)
+  const [bookmarkBusy, setBookmarkBusy] = useState(false)
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
 
-  const currentAyah = FEATURED_AYAHS[currentIndex]!
-
-  // Reset playback state when the featured ayah changes (render-phase
-  // adjustment, so no cascading setState inside an effect).
-  const [prevIndex, setPrevIndex] = useState(currentIndex)
-  if (prevIndex !== currentIndex) {
-    setPrevIndex(currentIndex)
-    setIsPlayingAudio(false)
-    setIsLoadingAudio(false)
-  }
+  // Load today's ayah from the DB-backed deterministic daily-ayah engine.
+  // Reloads and revisits always return the same ayah for the same day.
+  useEffect(() => {
+    let cancelled = false
+    fetch("/api/quran/daily")
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`status ${r.status}`))))
+      .then((d) => {
+        if (cancelled) return
+        if (d?.ayah?.textArabic) {
+          setDailyAyah(d.ayah as DailyAyah)
+          setBookmarked(Boolean(d.bookmarked))
+        }
+      })
+      .catch(() => {
+        // Keep the fallback ayah - the hero must never look broken
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   // Dynamic Ambient Monochrome Particle Canvas
   useEffect(() => {
@@ -176,11 +129,6 @@ export function CinematicHero() {
     }
   }, [])
 
-  // Stop any audio when the featured ayah changes (side-effect only)
-  useEffect(() => {
-    audioManager.stop()
-  }, [currentIndex])
-
   const handleToggleAudio = () => {
     if (isPlayingAudio) {
       audioManager.pause()
@@ -214,28 +162,67 @@ export function CinematicHero() {
     })
 
     audioManager
-      .playAyah(currentAyah.surahNumber, currentAyah.ayahNumber, "ar.alafasy")
+      .playAyah(dailyAyah.surahNumber, dailyAyah.ayahNumber, "ar.alafasy")
       .catch(() => {
         setIsLoadingAudio(false)
         setIsPlayingAudio(false)
       })
 
-    trackUserInteraction("quran", `hero-audio-${currentAyah.surahNumber}-${currentAyah.ayahNumber}`)
-  }
-
-  const handleNextAyah = () => {
-    const next = (currentIndex + 1) % FEATURED_AYAHS.length
-    setCurrentIndex(next)
-    trackUserInteraction("quran", `hero-ayah-${FEATURED_AYAHS[next]?.surahNumber}`)
+    trackUserInteraction("quran", `hero-audio-${dailyAyah.surahNumber}-${dailyAyah.ayahNumber}`)
   }
 
   const handleCopy = async () => {
-    const text = `${currentAyah.arabic}\n\n"${currentAyah.bangla}"\n— সূরা ${currentAyah.surahNameBn} [${currentAyah.surahNumber}:${currentAyah.ayahNumber}]\nনূর ইসলামিক লাইব্রেরি`
+    const text = `${dailyAyah.textArabic}\n\n"${dailyAyah.translationBn}"\n— সূরা ${dailyAyah.surahNameBn} [${dailyAyah.surahNumber}:${dailyAyah.ayahNumber}]\nনূর ইসলামিক লাইব্রেরি`
     try {
       await navigator.clipboard.writeText(text)
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     } catch {}
+  }
+
+  // Save today's ayah to the account library (Bookmark table). Guests are
+  // redirected to login and come straight back, mirroring the hadith flow.
+  const handleToggleBookmark = async () => {
+    if (bookmarkBusy) return
+    setBookmarkBusy(true)
+    try {
+      if (bookmarked) {
+        const r = await fetch(
+          `/api/library/bookmarks?surah=${dailyAyah.surahNumber}&ayah=${dailyAyah.ayahNumber}`,
+          { method: "DELETE" }
+        )
+        if (r.ok) setBookmarked(false)
+      } else {
+        const r = await fetch("/api/library/bookmarks", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            surahNumber: dailyAyah.surahNumber,
+            ayahNumber: dailyAyah.ayahNumber,
+            surahName: dailyAyah.surahNameEn,
+            textArabic: dailyAyah.textArabic,
+            translationEn: dailyAyah.translationEn,
+            translationBn: dailyAyah.translationBn,
+          }),
+        })
+        if (r.status === 401) {
+          const redirect = encodeURIComponent("/")
+          window.location.href = `/login?redirect=${redirect}&intent=ayah`
+          return
+        }
+        if (r.ok) {
+          setBookmarked(true)
+          trackUserInteraction(
+            "quran",
+            `bookmark-ayah-${dailyAyah.surahNumber}-${dailyAyah.ayahNumber}`
+          )
+        }
+      }
+    } catch {
+      // Ignored - bookmark is a progressive enhancement
+    } finally {
+      setBookmarkBusy(false)
+    }
   }
 
   const scrollToContent = () => {
@@ -261,21 +248,20 @@ export function CinematicHero() {
           <span>নূর ইসলামিক লাইব্রেরি • MINIMALIST EDITION</span>
         </div>
 
-        <button
-          onClick={handleNextAyah}
-          title="পরবর্তী নির্বাচিত আয়াত"
-          className="inline-flex items-center gap-1.5 rounded-full border border-neutral-300 bg-neutral-100/80 px-3 py-1 text-xs font-semibold text-neutral-700 transition-all hover:border-neutral-400 hover:text-neutral-900 active:scale-95 dark:border-neutral-700 dark:bg-neutral-900/80 dark:text-neutral-300 dark:hover:border-neutral-500 dark:hover:text-white"
+        <div
+          title="এই আয়াতটি আজ সারাদিন একই থাকবে — রিলোড বা পুনরায় ভিজিট করলেও পরিবর্তন হবে না"
+          className="inline-flex items-center gap-1.5 rounded-full border border-neutral-300 bg-neutral-100/80 px-3 py-1 text-xs font-semibold text-neutral-700 backdrop-blur-xl dark:border-neutral-700 dark:bg-neutral-900/80 dark:text-neutral-300"
         >
-          <RefreshCw className="h-3 w-3" />
-          <span>পরবর্তী আয়াত ({currentIndex + 1}/{FEATURED_AYAHS.length})</span>
-        </button>
+          <Sparkles className="h-3 w-3" />
+          <span>আজকের আয়াত • স্থির সারাদিন</span>
+        </div>
       </div>
 
-      {/* Center Stage: Hero Featured Ayah (Editorial Swiss Style) */}
+      {/* Center Stage: Hero Daily Ayah (Editorial Swiss Style) */}
       <div className="relative z-10 mx-auto flex w-full max-w-4xl flex-col items-center px-6 py-12 text-center sm:px-8 sm:py-16">
-        {/* Theme Tag */}
+        {/* Daily Tag */}
         <span className="mb-4 inline-block text-[11px] font-bold uppercase tracking-widest text-neutral-500 dark:text-neutral-400">
-          {currentAyah.theme}
+          কুরআনের বাণী • DAILY QURAN AYAH
         </span>
 
         {/* Grand Arabic Calligraphy with High Contrast */}
@@ -283,26 +269,26 @@ export function CinematicHero() {
           dir="rtl"
           className="arabic text-3xl font-medium leading-[2.4] tracking-wide sm:text-5xl lg:text-6xl text-neutral-900 drop-shadow-sm dark:text-white max-w-3xl"
         >
-          {currentAyah.arabic}
+          {dailyAyah.textArabic}
         </h1>
 
         {/* Bengali Translation */}
         <p className="bengali mt-6 max-w-2xl text-base sm:text-xl font-medium leading-relaxed text-neutral-700 dark:text-neutral-200">
-          &ldquo;{currentAyah.bangla}&rdquo;
+          &ldquo;{dailyAyah.translationBn}&rdquo;
         </p>
 
         {/* English Translation */}
         <p className="mt-2 max-w-xl text-xs sm:text-sm italic leading-relaxed text-neutral-500 dark:text-neutral-400">
-          {currentAyah.english}
+          {dailyAyah.translationEn}
         </p>
 
         {/* Surah Citation */}
         <div className="mt-3 flex items-center gap-2 text-xs font-semibold text-neutral-500 dark:text-neutral-400">
           <span className="text-neutral-900 font-bold font-mono dark:text-white">
-            সূরা {currentAyah.surahNameBn} [{currentAyah.surahNumber}:{currentAyah.ayahNumber}]
+            সূরা {dailyAyah.surahNameBn} [{dailyAyah.surahNumber}:{dailyAyah.ayahNumber}]
           </span>
           <span>•</span>
-          <span className="text-neutral-400 dark:text-neutral-500">{currentAyah.surahNameEn}</span>
+          <span className="text-neutral-400 dark:text-neutral-500">{dailyAyah.surahNameEn}</span>
         </div>
 
         {/* Audio Recitation & Action Controls */}
@@ -320,26 +306,45 @@ export function CinematicHero() {
             ) : (
               <Volume2 className="h-4 w-4 text-white dark:text-black" />
             )}
-            <span>{isPlayingAudio ? "তিলাওয়াত থামান" : "তিলাওয়াত শুনুন (Listen)"}</span>
+            <span>{isPlayingAudio ? "তিলাওয়াত থামান" : "তিলাওয়াত শুনুন (Listen)"}</span>
+          </button>
+
+          {/* Bookmark Button */}
+          <button
+            onClick={handleToggleBookmark}
+            disabled={bookmarkBusy}
+            title={bookmarked ? "বুকমার্ক থেকে সরান" : "আজকের আয়াতটি বুকমার্ক করুন"}
+            className={`inline-flex items-center gap-1.5 rounded-xl border px-4 py-2.5 text-xs font-semibold transition-all active:scale-95 disabled:opacity-60 ${
+              bookmarked
+                ? "border-neutral-900 bg-neutral-900 text-white hover:bg-neutral-800 dark:border-white dark:bg-white dark:text-black dark:hover:bg-neutral-200"
+                : "border-neutral-300 bg-neutral-50 text-neutral-700 hover:border-neutral-400 hover:text-neutral-900 dark:border-neutral-700 dark:bg-neutral-900/90 dark:text-neutral-300 dark:hover:border-neutral-500 dark:hover:text-white"
+            }`}
+          >
+            {bookmarked ? (
+              <BookmarkCheck className="h-4 w-4" />
+            ) : (
+              <Bookmark className="h-4 w-4" />
+            )}
+            <span>{bookmarked ? "সংরক্ষিত" : "বুকমার্ক"}</span>
           </button>
 
           {/* Copy Button */}
           <button
             onClick={handleCopy}
-            title="আয়াত কপি করুন"
+            title="আয়াত কপি করুন"
             className="inline-flex items-center gap-1.5 rounded-xl border border-neutral-300 bg-neutral-50 px-4 py-2.5 text-xs font-semibold text-neutral-700 transition-all hover:border-neutral-400 hover:text-neutral-900 dark:border-neutral-700 dark:bg-neutral-900/90 dark:text-neutral-300 dark:hover:border-neutral-500 dark:hover:text-white"
           >
             {copied ? <Check className="h-4 w-4 text-neutral-900 dark:text-white" /> : <Copy className="h-4 w-4" />}
-            <span>{copied ? "কপি হয়েছে" : "কপি"}</span>
+            <span>{copied ? "কপি হয়েছে" : "কপি"}</span>
           </button>
 
           {/* Read Surah Link */}
           <Link
-            href={`/quran/${currentAyah.surahNumber}`}
+            href={`/quran/${dailyAyah.surahNumber}`}
             className="inline-flex items-center gap-1.5 rounded-xl border border-neutral-300 bg-neutral-50 px-4 py-2.5 text-xs font-semibold text-neutral-700 transition-all hover:border-neutral-400 hover:text-neutral-900 dark:border-neutral-700 dark:bg-neutral-900/90 dark:text-neutral-300 dark:hover:border-neutral-500 dark:hover:text-white"
           >
             <BookOpen className="h-4 w-4" />
-            <span>সম্পূর্ণ সূরা পড়ুন</span>
+            <span>সম্পূর্ণ সূরা পড়ুন</span>
           </Link>
         </div>
 
@@ -357,7 +362,7 @@ export function CinematicHero() {
             <Search className="absolute left-4 h-4 w-4 text-neutral-500" />
             <input
               type="text"
-              placeholder="কুরআনের আয়াত, সূরা, হাদিস বা সাহাবীদের জীবনী খুঁজুন..."
+              placeholder="কুরআনের আয়াত, সূরা, হাদিস বা সাহাবীদের জীবনী খুঁজুন..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full rounded-2xl border border-neutral-300 bg-white py-3 pl-11 pr-24 text-xs text-neutral-900 placeholder:text-neutral-400 backdrop-blur-xl focus:border-neutral-500 focus:outline-none dark:border-neutral-800 dark:bg-neutral-900/90 dark:text-white dark:placeholder:text-neutral-500"
@@ -372,13 +377,13 @@ export function CinematicHero() {
 
           {/* Quick Filter Tags */}
           <div className="mt-3 flex flex-wrap items-center justify-center gap-2 text-[11px] text-neutral-500 dark:text-neutral-400">
-            <span className="text-neutral-400 dark:text-neutral-600">জনপ্রিয়:</span>
+            <span className="text-neutral-400 dark:text-neutral-600">জনপ্রিয়:</span>
             <Link href="/quran/67" className="hover:text-neutral-900 underline-offset-2 hover:underline dark:hover:text-white">
               সূরা মুলক
             </Link>
             <span>•</span>
             <Link href="/quran/36" className="hover:text-neutral-900 underline-offset-2 hover:underline dark:hover:text-white">
-              সূরা ইয়াসীন
+              সূরা ইয়াসীন
             </Link>
             <span>•</span>
             <Link href="/quran/18" className="hover:text-neutral-900 underline-offset-2 hover:underline dark:hover:text-white">

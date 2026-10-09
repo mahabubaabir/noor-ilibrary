@@ -83,6 +83,23 @@ model DailyHadith {
   @@index([date])
 }
 
+model DailyAyah {
+  id             String   @id @default(cuid())
+  date           String   @unique
+  globalNumber   Int
+  surahNumber    Int
+  ayahNumber     Int
+  surahNameEn    String
+  surahNameBn    String
+  textArabic     String
+  translationEn  String
+  translationBn  String
+  createdAt      DateTime @default(now())
+
+  @@index([date])
+  @@index([globalNumber])
+}
+
 model Session {
   id        String   @id @default(cuid())
   token     String   @unique

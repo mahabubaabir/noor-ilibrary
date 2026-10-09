@@ -31,23 +31,103 @@ import {
 const SALAH_LOCATION_KEY = "noor_salah_location_v1"
 
 interface SavedLocation {
-  mode: "gps" | "city"
+  mode: "gps" | "city" | "search"
   lat?: number
   lng?: number
   city?: string
   country?: string
+  q?: string
   label?: string
 }
 
-const PRESET_CITIES = [
-  { city: "Dhaka", country: "Bangladesh", labelBn: "ঢাকা (বিভাগীয় সদর)" },
-  { city: "Chittagong", country: "Bangladesh", labelBn: "চট্টগ্রাম" },
-  { city: "Sylhet", country: "Bangladesh", labelBn: "সিলেট" },
-  { city: "Rajshahi", country: "Bangladesh", labelBn: "রাজশাহী" },
-  { city: "Khulna", country: "Bangladesh", labelBn: "খুলনা" },
-  { city: "Barisal", country: "Bangladesh", labelBn: "বরিশাল" },
-  { city: "Rangpur", country: "Bangladesh", labelBn: "রংপুর" },
-  { city: "Mymensingh", country: "Bangladesh", labelBn: "ময়মনসিংহ" },
+interface CityPreset {
+  city: string
+  country?: string
+  labelBn: string
+  /** When set, the server resolves this free-text address (works even when
+   *  the upstream city database lacks the local spelling). */
+  search?: string
+}
+
+// All 64 district headquarters of Bangladesh - resolved through the address
+// lookup so every district works, not just the big division cities.
+const BD_DISTRICTS: CityPreset[] = [
+  // Dhaka Division
+  { city: "Dhaka", labelBn: "ঢাকা", search: "Dhaka, Bangladesh" },
+  { city: "Faridpur", labelBn: "ফরিদপুর", search: "Faridpur, Bangladesh" },
+  { city: "Gazipur", labelBn: "গাজীপুর", search: "Gazipur, Bangladesh" },
+  { city: "Gopalganj", labelBn: "গোপালগঞ্জ", search: "Gopalganj, Bangladesh" },
+  { city: "Kishoreganj", labelBn: "কিশোরগঞ্জ", search: "Kishoreganj, Bangladesh" },
+  { city: "Madaripur", labelBn: "মাদারীপুর", search: "Madaripur, Bangladesh" },
+  { city: "Manikganj", labelBn: "মানিকগঞ্জ", search: "Manikganj, Bangladesh" },
+  { city: "Munshiganj", labelBn: "মুন্সিগঞ্জ", search: "Munshiganj, Bangladesh" },
+  { city: "Narayanganj", labelBn: "নারায়ণগঞ্জ", search: "Narayanganj, Bangladesh" },
+  { city: "Narsingdi", labelBn: "নরসিংদী", search: "Narsingdi, Bangladesh" },
+  { city: "Rajbari", labelBn: "রাজবাড়ী", search: "Rajbari, Bangladesh" },
+  { city: "Shariatpur", labelBn: "শরীয়তপুর", search: "Shariatpur, Bangladesh" },
+  { city: "Tangail", labelBn: "টাঙ্গাইল", search: "Tangail, Bangladesh" },
+  // Chattogram Division
+  { city: "Bandarban", labelBn: "বান্দরবান", search: "Bandarban, Bangladesh" },
+  { city: "Brahmanbaria", labelBn: "ব্রাহ্মণবাড়িয়া", search: "Brahmanbaria, Bangladesh" },
+  { city: "Chandpur", labelBn: "চাঁদপুর", search: "Chandpur, Bangladesh" },
+  { city: "Chittagong", labelBn: "চট্টগ্রাম", search: "Chattogram, Bangladesh" },
+  { city: "Comilla", labelBn: "কুমিল্লা", search: "Comilla, Bangladesh" },
+  { city: "Cox's Bazar", labelBn: "কক্সবাজার", search: "Cox's Bazar, Bangladesh" },
+  { city: "Feni", labelBn: "ফেনী", search: "Feni, Bangladesh" },
+  { city: "Khagrachhari", labelBn: "খাগড়াছড়ি", search: "Khagrachhari, Bangladesh" },
+  { city: "Lakshmipur", labelBn: "লক্ষ্মীপুর", search: "Lakshmipur, Bangladesh" },
+  { city: "Noakhali", labelBn: "নোয়াখালী", search: "Noakhali, Bangladesh" },
+  { city: "Rangamati", labelBn: "রাঙ্গামাটি", search: "Rangamati, Bangladesh" },
+  // Rajshahi Division
+  { city: "Bogra", labelBn: "বগুড়া", search: "Bogura, Bangladesh" },
+  { city: "Chapainawabganj", labelBn: "চাঁপাইনবাবগঞ্জ", search: "Chapainawabganj, Bangladesh" },
+  { city: "Joypurhat", labelBn: "জয়পুরহাট", search: "Joypurhat, Bangladesh" },
+  { city: "Naogaon", labelBn: "নওগাঁ", search: "Naogaon, Bangladesh" },
+  { city: "Natore", labelBn: "নাটোর", search: "Natore, Bangladesh" },
+  { city: "Pabna", labelBn: "পাবনা", search: "Pabna, Bangladesh" },
+  { city: "Rajshahi", labelBn: "রাজশাহী", search: "Rajshahi, Bangladesh" },
+  { city: "Sirajganj", labelBn: "সিরাজগঞ্জ", search: "Sirajganj, Bangladesh" },
+  // Khulna Division
+  { city: "Bagerhat", labelBn: "বাগেরহাট", search: "Bagerhat, Bangladesh" },
+  { city: "Chuadanga", labelBn: "চুয়াডাঙ্গা", search: "Chuadanga, Bangladesh" },
+  { city: "Jessore", labelBn: "যশোর", search: "Jashore, Bangladesh" },
+  { city: "Jhenaidah", labelBn: "ঝিনাইদহ", search: "Jhenaidah, Bangladesh" },
+  { city: "Khulna", labelBn: "খুলনা", search: "Khulna, Bangladesh" },
+  { city: "Kushtia", labelBn: "কুষ্টিয়া", search: "Kushtia, Bangladesh" },
+  { city: "Magura", labelBn: "মাগুরা", search: "Magura, Bangladesh" },
+  { city: "Meherpur", labelBn: "মেহেরপুর", search: "Meherpur, Bangladesh" },
+  { city: "Narail", labelBn: "নড়াইল", search: "Narail, Bangladesh" },
+  { city: "Satkhira", labelBn: "সাতক্ষীরা", search: "Satkhira, Bangladesh" },
+  // Barishal Division
+  { city: "Barguna", labelBn: "বরগুনা", search: "Barguna, Bangladesh" },
+  { city: "Barisal", labelBn: "বরিশাল", search: "Barishal, Bangladesh" },
+  { city: "Bhola", labelBn: "ভোলা", search: "Bhola, Bangladesh" },
+  { city: "Jhalokathi", labelBn: "ঝালকাঠি", search: "Jhalokathi, Bangladesh" },
+  { city: "Patuakhali", labelBn: "পটুয়াখালী", search: "Patuakhali, Bangladesh" },
+  { city: "Pirojpur", labelBn: "পিরোজপুর", search: "Pirojpur, Bangladesh" },
+  // Sylhet Division
+  { city: "Habiganj", labelBn: "হবিগঞ্জ", search: "Habiganj, Bangladesh" },
+  { city: "Moulvibazar", labelBn: "মৌলভীবাজার", search: "Moulvibazar, Bangladesh" },
+  { city: "Sunamganj", labelBn: "সুনামগঞ্জ", search: "Sunamganj, Bangladesh" },
+  { city: "Sylhet", labelBn: "সিলেট", search: "Sylhet, Bangladesh" },
+  // Rangpur Division
+  { city: "Dinajpur", labelBn: "দিনাজপুর", search: "Dinajpur, Bangladesh" },
+  { city: "Gaibandha", labelBn: "গাইবান্ধা", search: "Gaibandha, Bangladesh" },
+  { city: "Kurigram", labelBn: "কুড়িগ্রাম", search: "Kurigram, Bangladesh" },
+  { city: "Lalmonirhat", labelBn: "লালমনিরহাট", search: "Lalmonirhat, Bangladesh" },
+  { city: "Nilphamari", labelBn: "নীলফামারী", search: "Nilphamari, Bangladesh" },
+  { city: "Panchagarh", labelBn: "পঞ্চগড়", search: "Panchagarh, Bangladesh" },
+  { city: "Rangpur", labelBn: "রংপুর", search: "Rangpur, Bangladesh" },
+  { city: "Thakurgaon", labelBn: "ঠাকুরগাঁও", search: "Thakurgaon, Bangladesh" },
+  // Mymensingh Division
+  { city: "Jamalpur", labelBn: "জামালপুর", search: "Jamalpur, Bangladesh" },
+  { city: "Mymensingh", labelBn: "ময়মনসিংহ", search: "Mymensingh, Bangladesh" },
+  { city: "Netrokona", labelBn: "নেত্রকোণা", search: "Netrokona, Bangladesh" },
+  { city: "Sherpur", labelBn: "শেরপুর", search: "Sherpur, Bangladesh" },
+]
+
+// Major cities outside Bangladesh (resolved through the city database path).
+const WORLD_CITIES: CityPreset[] = [
   { city: "Makkah", country: "Saudi Arabia", labelBn: "মক্কা মুকাররমা" },
   { city: "Madinah", country: "Saudi Arabia", labelBn: "মদিনা মুনাওয়ারা" },
   { city: "Jerusalem", country: "Palestine", labelBn: "বায়তুল মুকাদ্দাস" },
@@ -58,6 +138,8 @@ const PRESET_CITIES = [
   { city: "Istanbul", country: "Turkey", labelBn: "ইস্তাম্বুল, তুরস্ক" },
 ]
 
+const PRESET_CITIES: CityPreset[] = [...BD_DISTRICTS, ...WORLD_CITIES]
+
 export function SalahTimeWidget() {
   // Pre-seed with default fallback so it NEVER flashes empty or broken on initial load
   const [data, setData] = useState<PrayerTimesData>(() => getOfflinePrayerFallback("Dhaka", "Bangladesh"))
@@ -67,6 +149,7 @@ export function SalahTimeWidget() {
   const [selectedCity, setSelectedCity] = useState("Dhaka")
   const [selectedCountry, setSelectedCountry] = useState("Bangladesh")
   const [dropdownOpen, setDropdownOpen] = useState(false)
+  const [cityQuery, setCityQuery] = useState("")
   const [countdown, setCountdown] = useState<string>("")
   const [activeProhibitedKey, setActiveProhibitedKey] = useState<string | null>(null)
   const [tracker, setTracker] = useState<Record<string, boolean>>({
@@ -79,6 +162,14 @@ export function SalahTimeWidget() {
 
   const dropdownRef = useRef<HTMLDivElement>(null)
   const initialLoadDoneRef = useRef(false)
+  const lastFetchParamsRef = useRef<{
+    lat?: number
+    lng?: number
+    city?: string
+    country?: string
+    search?: string
+    locName?: string
+  }>({})
 
   // Load tracker state from localStorage for today
   useEffect(() => {
@@ -134,19 +225,29 @@ export function SalahTimeWidget() {
 
   // Robust fetch function
   const fetchPrayerTimes = useCallback(
-    async (params: { lat?: number; lng?: number; city?: string; country?: string; locName?: string }) => {
+    async (params: {
+      lat?: number
+      lng?: number
+      city?: string
+      country?: string
+      search?: string
+      locName?: string
+    }) => {
+      lastFetchParamsRef.current = params
       setLoading(true)
       try {
-        const q = new URLSearchParams()
+        const query = new URLSearchParams()
         if (params.lat && params.lng) {
-          q.set("lat", String(params.lat))
-          q.set("lng", String(params.lng))
+          query.set("lat", String(params.lat))
+          query.set("lng", String(params.lng))
+        } else if (params.search) {
+          query.set("q", params.search)
         } else {
-          q.set("city", params.city || selectedCity)
-          q.set("country", params.country || selectedCountry)
+          query.set("city", params.city || selectedCity)
+          query.set("country", params.country || selectedCountry)
         }
 
-        const res = await fetch(`/api/prayer-times?${q.toString()}`)
+        const res = await fetch(`/api/prayer-times?${query.toString()}`)
         if (!res.ok) throw new Error("Prayer request failed")
         const json = await res.json()
         if (json && json.timings) {
@@ -155,6 +256,8 @@ export function SalahTimeWidget() {
             setLocationName(params.locName)
           } else if (params.lat && params.lng) {
             setLocationName(json.city || `${params.lat.toFixed(2)}°N, ${params.lng.toFixed(2)}°E`)
+          } else if (params.search) {
+            setLocationName(json.city || params.search)
           } else {
             const found = PRESET_CITIES.find(
               (c) => c.city.toLowerCase() === (params.city || selectedCity).toLowerCase()
@@ -179,7 +282,14 @@ export function SalahTimeWidget() {
     if (initialLoadDoneRef.current) return
     initialLoadDoneRef.current = true
     queueMicrotask(() => {
-      let params: { lat?: number; lng?: number; city?: string; country?: string; locName?: string } = {}
+      let params: {
+        lat?: number
+        lng?: number
+        city?: string
+        country?: string
+        search?: string
+        locName?: string
+      } = {}
       try {
         const raw = localStorage.getItem(SALAH_LOCATION_KEY)
         if (raw) {
@@ -190,6 +300,8 @@ export function SalahTimeWidget() {
             setSelectedCity(saved.city)
             setSelectedCountry(saved.country || "Bangladesh")
             params = { city: saved.city, country: saved.country || "Bangladesh", locName: saved.label }
+          } else if (saved.mode === "search" && saved.q) {
+            params = { search: saved.q, locName: saved.label }
           }
         }
       } catch {
@@ -205,6 +317,34 @@ export function SalahTimeWidget() {
     } catch {
       // ignore storage access errors
     }
+  }
+
+  // Select a district / world city from the picker. Bangladesh districts use
+  // the address lookup so every one resolves; world cities use the city DB.
+  const handleSelectPreset = (c: CityPreset) => {
+    setSelectedCity(c.city)
+    setSelectedCountry(c.country || "Bangladesh")
+    setLocationName(c.labelBn)
+    setDropdownOpen(false)
+    setCityQuery("")
+    if (c.search) {
+      persistLocation({ mode: "search", city: c.city, q: c.search, label: c.labelBn })
+      fetchPrayerTimes({ search: c.search, locName: c.labelBn })
+    } else {
+      persistLocation({ mode: "city", city: c.city, country: c.country, label: c.labelBn })
+      fetchPrayerTimes({ city: c.city, country: c.country, locName: c.labelBn })
+    }
+  }
+
+  // Free-typed location ("Chuadanga", "Toronto, Canada", ...).
+  const handleFreeTextSearch = () => {
+    const term = cityQuery.trim()
+    if (!term) return
+    setLocationName(term)
+    setDropdownOpen(false)
+    setCityQuery("")
+    persistLocation({ mode: "search", q: term, label: term })
+    fetchPrayerTimes({ search: term, locName: term })
   }
 
   // Click outside to close dropdown
@@ -297,6 +437,13 @@ export function SalahTimeWidget() {
   const activeProhibited =
     prohibitedWindows.find((w) => w.key === activeProhibitedKey) || null
 
+  // Filter the location picker by Bengali or English name.
+  const filteredCities = PRESET_CITIES.filter((c) => {
+    const q = cityQuery.trim()
+    if (!q) return true
+    return c.labelBn.includes(q) || c.city.toLowerCase().includes(q.toLowerCase())
+  })
+
   const fardKeys = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"]
   const completedCount = fardKeys.filter((k) => !!tracker[k]).length
   const progressPercent = Math.round((completedCount / 5) * 100)
@@ -360,29 +507,29 @@ export function SalahTimeWidget() {
 
               {/* City Selection Dropdown Panel */}
               {dropdownOpen && (
-                <div className="absolute right-0 top-full z-50 mt-2 w-64 rounded-2xl border border-neutral-200 bg-white p-2 shadow-2xl dark:border-neutral-800 dark:bg-neutral-900 animate-in fade-in zoom-in-95 duration-100">
-                  <div className="px-2.5 py-1.5 text-[11px] font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">
-                    শহর নির্বাচন করুন
+                <div className="absolute right-0 top-full z-50 mt-2 w-72 rounded-2xl border border-neutral-200 bg-white p-2 shadow-2xl dark:border-neutral-800 dark:bg-neutral-900 animate-in fade-in zoom-in-95 duration-100">
+                  <div className="p-1">
+                    <input
+                      type="text"
+                      value={cityQuery}
+                      onChange={(e) => setCityQuery(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault()
+                          if (filteredCities.length === 0) handleFreeTextSearch()
+                        }
+                      }}
+                      placeholder="শহর/জেলা খুঁজুন (যেমন: চুয়াডাঙ্গা)"
+                      className="w-full rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2 text-xs font-medium text-neutral-900 placeholder:text-neutral-400 focus:border-neutral-500 focus:outline-none dark:border-neutral-800 dark:bg-neutral-900 dark:text-white dark:placeholder:text-neutral-500"
+                    />
                   </div>
-                  <div className="max-h-60 overflow-y-auto space-y-1">
-                    {PRESET_CITIES.map((c) => {
+                  <div className="max-h-60 overflow-y-auto space-y-1 px-1 pb-1">
+                    {filteredCities.map((c) => {
                       const isSelected = selectedCity.toLowerCase() === c.city.toLowerCase()
                       return (
                         <button
-                          key={c.city}
-                          onClick={() => {
-                            setSelectedCity(c.city)
-                            setSelectedCountry(c.country)
-                            setLocationName(c.labelBn)
-                            setDropdownOpen(false)
-                            persistLocation({
-                              mode: "city",
-                              city: c.city,
-                              country: c.country,
-                              label: c.labelBn,
-                            })
-                            fetchPrayerTimes({ city: c.city, country: c.country, locName: c.labelBn })
-                          }}
+                          key={`${c.city}-${c.labelBn}`}
+                          onClick={() => handleSelectPreset(c)}
                           className={`flex w-full items-center justify-between rounded-xl px-3 py-2 text-xs font-medium transition-colors ${
                             isSelected
                               ? "bg-neutral-900 text-white dark:bg-white dark:text-black"
@@ -390,10 +537,23 @@ export function SalahTimeWidget() {
                           }`}
                         >
                           <span>{c.labelBn}</span>
-                          {isSelected && <Check className="h-3.5 w-3.5" />}
+                          <span className="flex items-center gap-1.5">
+                            <span className="text-[10px] opacity-60">{c.country || "বাংলাদেশ"}</span>
+                            {isSelected && <Check className="h-3.5 w-3.5" />}
+                          </span>
                         </button>
                       )
                     })}
+
+                    {filteredCities.length === 0 && cityQuery.trim() && (
+                      <button
+                        onClick={handleFreeTextSearch}
+                        className="flex w-full items-center justify-between rounded-xl border border-dashed border-neutral-300 px-3 py-2 text-xs font-semibold text-neutral-700 transition-colors hover:bg-neutral-100 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800"
+                      >
+                        <span className="truncate">খুঁজুন: “{cityQuery.trim()}”</span>
+                        <MapPin className="h-3.5 w-3.5 shrink-0" />
+                      </button>
+                    )}
                   </div>
                 </div>
               )}
@@ -401,7 +561,13 @@ export function SalahTimeWidget() {
 
             {/* Manual Sync Button */}
             <button
-              onClick={() => fetchPrayerTimes({ city: selectedCity, country: selectedCountry })}
+              onClick={() =>
+                fetchPrayerTimes(
+                  Object.keys(lastFetchParamsRef.current).length
+                    ? lastFetchParamsRef.current
+                    : { city: selectedCity, country: selectedCountry }
+                )
+              }
               disabled={loading}
               title="রিফ্রেশ করুন"
               className="flex h-9 w-9 items-center justify-center rounded-xl border border-neutral-200 text-neutral-600 transition-all hover:bg-neutral-100 hover:text-black dark:border-neutral-800 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-white"

@@ -54,4 +54,5 @@ export const quranComProvider: ContentProvider = {
   search: async () => null,
   getAudioEditions: async () => null,
   getRandomAyah: async () => null,
+  getAyah: async () => null,
 }

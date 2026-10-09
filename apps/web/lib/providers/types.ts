@@ -24,6 +24,10 @@ export interface ContentProvider {
   search(query: string, language: TranslationLanguage): Promise<SearchMatch[] | null>
   getAudioEditions(): Promise<Reciter[] | null>
   getRandomAyah(): Promise<SurahDetail['ayahs'][number] | null>
+  getAyah(
+    surahNumber: number,
+    ayahNumber: number,
+  ): Promise<SurahDetail['ayahs'][number] | null>
   getTafsirChapter(
     surahNumber: number,
     language: TranslationLanguage,

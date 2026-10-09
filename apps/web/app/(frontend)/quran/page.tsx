@@ -4,123 +4,8 @@ import Link from "next/link"
 import { BookOpen, Search, Sparkles, SlidersHorizontal, ArrowRight, CheckCircle2 } from "lucide-react"
 import { useEffect, useState, useMemo } from "react"
 import type { SurahMeta } from "@noor/types"
+import { SURAH_NAMES_BN } from "@/lib/surah-names-bn"
 
-const BANGLE_SURAH_NAMES: Record<number, { bnName: string; bnMeaning: string }> = {
-  1: { bnName: "আল-ফাতিহা", bnMeaning: "সূচনা" },
-  2: { bnName: "আল-বাক্বারাহ", bnMeaning: "গাভী" },
-  3: { bnName: "আলে-ইমরান", bnMeaning: "ইমরানের পরিবার" },
-  4: { bnName: "আন-নিসা", bnMeaning: "নারী" },
-  5: { bnName: "আল-মায়িদাহ", bnMeaning: "খাদ্য পরিবেশিত পাত্র" },
-  6: { bnName: "আল-আনআম", bnMeaning: "গৃহপালিত পশু" },
-  7: { bnName: "আল-আরাফ", bnMeaning: "উঁচু স্থানসমূহ" },
-  8: { bnName: "আল-আনফাল", bnMeaning: "যুদ্ধলব্ধ ধন-সম্পদ" },
-  9: { bnName: "আত-তাওবাহ", bnMeaning: "অনুশোচনা" },
-  10: { bnName: "ইউনুস", bnMeaning: "নবী ইউনুস" },
-  11: { bnName: "হুদ", bnMeaning: "নবী হুদ" },
-  12: { bnName: "ইউসুফ", bnMeaning: "নবী ইউসুফ" },
-  13: { bnName: "আর-রাদ", bnMeaning: "বজ্রপাত" },
-  14: { bnName: "ইব্রাহীম", bnMeaning: "নবী ইব্রাহীম" },
-  15: { bnName: "আল-হিজর", bnMeaning: "পাথুরে পাহাড়" },
-  16: { bnName: "আন-নাহল", bnMeaning: "মৌমাছি" },
-  17: { bnName: "আল-ইসরা", bnMeaning: "নৈশভ্রমণ" },
-  18: { bnName: "আল-কাহফ", bnMeaning: "গুহা" },
-  19: { bnName: "মারইয়াম", bnMeaning: "মারইয়াম (আ.)" },
-  20: { bnName: "ত্বা-হা", bnMeaning: "ত্বা-হা" },
-  21: { bnName: "আল-আম্বিয়া", bnMeaning: "নবীগণ" },
-  22: { bnName: "আল-হাজ্জ", bnMeaning: "হজ" },
-  23: { bnName: "আল-মুমিনুন", bnMeaning: "মুমিনগণ" },
-  24: { bnName: "আন-নূর", bnMeaning: "জ্যোতি" },
-  25: { bnName: "আল-ফুরকান", bnMeaning: "সত্য-মিথ্যার পার্থক্যকারী" },
-  26: { bnName: "আশ-শুয়ারা", bnMeaning: "কবিগণ" },
-  27: { bnName: "আন-নামল", bnMeaning: "পিপীলিকা" },
-  28: { bnName: "আল-কাসাস", bnMeaning: "কাহিনী" },
-  29: { bnName: "আল-আনকাবুত", bnMeaning: "মাকড়সা" },
-  30: { bnName: "আর-রূম", bnMeaning: "রোমবাসী" },
-  31: { bnName: "লুকমান", bnMeaning: "জ্ঞানী লুকমান" },
-  32: { bnName: "আস-সাজদাহ", bnMeaning: "সিজদা" },
-  33: { bnName: "আল-আহযাব", bnMeaning: "মিত্রবাহিনী" },
-  34: { bnName: "সাবা", bnMeaning: "সাবার অধিবাসী" },
-  35: { bnName: "ফাতির", bnMeaning: "সৃষ্টিকর্তা" },
-  36: { bnName: "ইয়া-সীন", bnMeaning: "ইয়াসীন" },
-  37: { bnName: "আস-সাফফাত", bnMeaning: "সারিবদ্ধভাবে দাঁড়ানো" },
-  38: { bnName: "সোয়াদ", bnMeaning: "সোয়াদ" },
-  39: { bnName: "আজ-জুমার", bnMeaning: "দলবদ্ধ জনতা" },
-  40: { bnName: "গাফির", bnMeaning: "ক্ষমাশীল" },
-  41: { bnName: "ফুসসিলাত", bnMeaning: "সুস্পষ্ট বিবরণ" },
-  42: { bnName: "আশ-শূরা", bnMeaning: "পরামর্শ" },
-  43: { bnName: "আজ-জুখরূফ", bnMeaning: "স্বর্ণালঙ্কার" },
-  44: { bnName: "আদ-দুখান", bnMeaning: "ধোঁয়া" },
-  45: { bnName: "আল-জাসিয়াহ", bnMeaning: "নতজানু" },
-  46: { bnName: "আল-আহকাফ", bnMeaning: "বালির পাহাড়" },
-  47: { bnName: "মুহাম্মদ", bnMeaning: "নবী মুহাম্মদ (ﷺ)" },
-  48: { bnName: "আল-ফাতহ", bnMeaning: "বিজয়" },
-  49: { bnName: "আল-হুজুরাত", bnMeaning: "কক্ষসমূহ" },
-  50: { bnName: "ক্বাফ", bnMeaning: "ক্বাফ" },
-  51: { bnName: "আয-যারিয়াত", bnMeaning: "বিক্ষিপ্তকারী বাতাস" },
-  52: { bnName: "আত-তূর", bnMeaning: "তূর পর্বত" },
-  53: { bnName: "আন-নাজম", bnMeaning: "নক্ষত্র" },
-  54: { bnName: "আল-ক্বামার", bnMeaning: "চন্দ্র" },
-  55: { bnName: "আর-রাহমান", bnMeaning: "পরম দয়াময়" },
-  56: { bnName: "আল-ওয়াকিয়াহ", bnMeaning: "নিশ্চিত ঘটনা" },
-  57: { bnName: "আল-হাদীদ", bnMeaning: "লোহা" },
-  58: { bnName: "আল-মুজাদালাহ", bnMeaning: "বিতর্ককারিণী" },
-  59: { bnName: "আল-হাশর", bnMeaning: "সমাবেশ" },
-  60: { bnName: "আল-মুমতাহানাহ", bnMeaning: "পরীক্ষিত নারী" },
-  61: { bnName: "আস-সাফ", bnMeaning: "সারিবদ্ধ সৈন্যদল" },
-  62: { bnName: "আল-জুমুআহ", bnMeaning: "শুক্রবার" },
-  63: { bnName: "আল-মুনাফিকুন", bnMeaning: "কপটাচারী" },
-  64: { bnName: "আত-তাগাবুন", bnMeaning: "লাভ-ক্ষতি" },
-  65: { bnName: "আত-ত্বালাক্ব", bnMeaning: "তালাক" },
-  66: { bnName: "আত-তাহরীম", bnMeaning: "নিষিদ্ধকরণ" },
-  67: { bnName: "আল-মুলক", bnMeaning: "সার্বভৌম কর্তৃত্ব" },
-  68: { bnName: "আল-ক্বলম", bnMeaning: "কলম" },
-  69: { bnName: "আল-হাক্কাহ", bnMeaning: "অবশ্যম্ভাবী সত্য" },
-  70: { bnName: "আল-মাআরিজ", bnMeaning: "উন্নয়নের সোপান" },
-  71: { bnName: "নূহ", bnMeaning: "নবী নূহ" },
-  72: { bnName: "আল-জ্বিন", bnMeaning: "জ্বিন জাতি" },
-  73: { bnName: "আল-মুযযাম্মিল", bnMeaning: "বস্ত্রাচ্ছাদিত" },
-  74: { bnName: "আল-মুদ্দাসসির", bnMeaning: "চাদরাবৃত" },
-  75: { bnName: "আল-ক্বিয়ামাহ", bnMeaning: "কেয়ামত" },
-  76: { bnName: "আল-ইনসান", bnMeaning: "মানবজাতি" },
-  77: { bnName: "আল-মুরসালাত", bnMeaning: "প্রেরিত বাতাস" },
-  78: { bnName: "আন-নাবা", bnMeaning: "মহা সংবাদ" },
-  79: { bnName: "আন-নাযিআত", bnMeaning: "উৎপাটনকারী" },
-  80: { bnName: "আবাসা", bnMeaning: "ভ্রুকুটি করল" },
-  81: { bnName: "আত-তাকভীর", bnMeaning: "অন্ধকারাচ্ছন্নকরণ" },
-  82: { bnName: "আল-ইনফিতার", bnMeaning: "বিদীর্ণ হওয়া" },
-  83: { bnName: "আল-মুতাফফিফীন", bnMeaning: "পরমাপে কম দানকারী" },
-  84: { bnName: "আল-ইনশিকাক", bnMeaning: "খণ্ড-বিখণ্ড হওয়া" },
-  85: { bnName: "আল-বুরূজ", bnMeaning: "নক্ষত্রপুঞ্জ" },
-  86: { bnName: "আত-তারিক্ব", bnMeaning: "রাতের আগন্তুক" },
-  87: { bnName: "আল-আলা", bnMeaning: "সর্বোচ্চ" },
-  88: { bnName: "আল-গাশিয়াহ", bnMeaning: "আচ্ছন্নকারী বিপর্যয়" },
-  89: { bnName: "আল-ফজর", bnMeaning: "প্রভাতকাল" },
-  90: { bnName: "আল-বালাদ", bnMeaning: "নগরী" },
-  91: { bnName: "আশ-শামস", bnMeaning: "সূর্য" },
-  92: { bnName: "আল-লাইল", bnMeaning: "রাত্রি" },
-  93: { bnName: "আদ-দুহা", bnMeaning: "পূর্বাহ্নের রৌদ্র" },
-  94: { bnName: "আল-ইনশিরাহ", bnMeaning: "বক্ষ প্রশস্তকরণ" },
-  95: { bnName: "আত-তীন", bnMeaning: "ডুমুর" },
-  96: { bnName: "আল-আলাক্ব", bnMeaning: "রক্তপিণ্ড" },
-  97: { bnName: "আল-ক্বদর", bnMeaning: "মহিমান্বিত রজনী" },
-  98: { bnName: "আল-বাইয়্যিনাহ", bnMeaning: "সুস্পষ্ট প্রমাণ" },
-  99: { bnName: "আল-যিলযাল", bnMeaning: "ভূমিকম্প" },
-  100: { bnName: "আল-আদিয়াত", bnMeaning: "অভিযানকারী অশ্ব" },
-  101: { bnName: "আল-ক্বারিয়াহ", bnMeaning: "মহা বিপর্যয়" },
-  102: { bnName: "আত-তাকাসুর", bnMeaning: "প্রাচুর্যের প্রতিযোগিতা" },
-  103: { bnName: "আল-আসর", bnMeaning: "মহাকাল" },
-  104: { bnName: "আল-হুমাযাহ", bnMeaning: "পরনিন্দুক" },
-  105: { bnName: "আল-ফীল", bnMeaning: "হাতি" },
-  106: { bnName: "কুরাইশ", bnMeaning: "কুরাইশ বংশ" },
-  107: { bnName: "আল-মাউন", bnMeaning: "নিত্যপ্রয়োজনীয় সাহায্য" },
-  108: { bnName: "আল-কাউসার", bnMeaning: "প্রচুর কল্যাণ" },
-  109: { bnName: "আল-কাফিরুন", bnMeaning: "অবিশ্বাসীগণ" },
-  110: { bnName: "আন-নাসর", bnMeaning: "সাহায্য ও বিজয়" },
-  111: { bnName: "আল-লাহাব", bnMeaning: "অগ্নিশিখা" },
-  112: { bnName: "আল-ইখলাস", bnMeaning: "একনিষ্ঠতা ও একত্ববাদ" },
-  113: { bnName: "আল-ফালাক্ব", bnMeaning: "উষাকাল" },
-  114: { bnName: "আন-নাস", bnMeaning: "মানবজাতি" },
-}
 
 export default function QuranPage() {
   const [surahs, setSurahs] = useState<SurahMeta[]>([])
@@ -149,7 +34,7 @@ export default function QuranPage() {
       }
       if (!q) return true
 
-      const bn = BANGLE_SURAH_NAMES[s.number]
+      const bn = SURAH_NAMES_BN[s.number]
       const bnMatch = bn?.bnName.toLowerCase().includes(q) || bn?.bnMeaning.toLowerCase().includes(q)
 
       return (
@@ -265,7 +150,7 @@ export default function QuranPage() {
       ) : view === "grid" ? (
         <div className="grid gap-3.5 sm:grid-cols-2 lg:grid-cols-3">
           {filteredSurahs.map((surah) => {
-            const bn = BANGLE_SURAH_NAMES[surah.number]
+            const bn = SURAH_NAMES_BN[surah.number]
             return (
               <Link key={surah.number} href={`/quran/${surah.number}`}>
                 <div className="group relative flex items-center gap-4 rounded-2xl border border-neutral-200 bg-white p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-neutral-900 hover:shadow-lg dark:border-neutral-800 dark:bg-neutral-950 dark:hover:border-white">
@@ -307,7 +192,7 @@ export default function QuranPage() {
       ) : (
         <div className="divide-y divide-neutral-100 rounded-2xl border border-neutral-200 bg-white dark:divide-neutral-900 dark:border-neutral-800 dark:bg-neutral-950">
           {filteredSurahs.map((surah) => {
-            const bn = BANGLE_SURAH_NAMES[surah.number]
+            const bn = SURAH_NAMES_BN[surah.number]
             return (
               <Link key={surah.number} href={`/quran/${surah.number}`}>
                 <div className="flex items-center gap-4 px-4 py-3.5 transition-colors hover:bg-neutral-50 dark:hover:bg-neutral-900/60">

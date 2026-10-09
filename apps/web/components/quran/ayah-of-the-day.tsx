@@ -2,69 +2,109 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import { Loader2, RefreshCw } from "lucide-react"
-import { SURAH_VERSE_COUNTS } from "@/lib/audio/audio-player-engine"
+import { Bookmark, BookmarkCheck, Loader2 } from "lucide-react"
 
-interface RandomAyah {
+interface DailyAyah {
   surahNumber: number
-  numberInSurah: number
+  surahNameBn: string
+  surahNameEn: string
+  ayahNumber: number
   globalNumber: number
   textArabic: string
   translationEn: string
   translationBn: string
 }
 
-function surahFromGlobalNumber(globalNumber: number): number {
-  let remaining = globalNumber
-  for (let i = 0; i < SURAH_VERSE_COUNTS.length; i++) {
-    const count = SURAH_VERSE_COUNTS[i] ?? 0
-    if (remaining <= count) return i + 1
-    remaining -= count
-  }
-  return 114
-}
-
 export function AyahOfTheDay() {
-  const [ayah, setAyah] = useState<RandomAyah | null>(null)
+  const [ayah, setAyah] = useState<DailyAyah | null>(null)
   const [loading, setLoading] = useState(true)
   const [failed, setFailed] = useState(false)
+  const [bookmarked, setBookmarked] = useState(false)
+  const [bookmarkBusy, setBookmarkBusy] = useState(false)
 
-  const load = () => {
-    setLoading(true)
-    setFailed(false)
-    fetch("/api/quran/random")
+  useEffect(() => {
+    let cancelled = false
+    // Same DB-backed daily ayah as the hero: stable for the whole day.
+    fetch("/api/quran/daily")
       .then(async (r) => {
         const d = await r.json()
         if (!r.ok) throw new Error(d.error || "Failed to load ayah")
-        return d.ayah as RandomAyah
+        return d as { ayah: DailyAyah; bookmarked: boolean }
       })
-      .then((a) => setAyah(a))
-      .catch(() => setFailed(true))
-      .finally(() => setLoading(false))
-  }
-
-  useEffect(() => {
-    // Deferred so the initial render is not treated as a cascading update.
-    queueMicrotask(load)
+      .then((d) => {
+        if (cancelled) return
+        setAyah(d.ayah)
+        setBookmarked(Boolean(d.bookmarked))
+      })
+      .catch(() => {
+        if (!cancelled) setFailed(true)
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
   }, [])
 
-  const surahNumber = ayah
-    ? ayah.surahNumber && ayah.surahNumber > 0
-      ? ayah.surahNumber
-      : surahFromGlobalNumber(ayah.globalNumber)
-    : 0
+  const toggleBookmark = async () => {
+    if (!ayah || bookmarkBusy) return
+    setBookmarkBusy(true)
+    try {
+      if (bookmarked) {
+        const r = await fetch(
+          `/api/library/bookmarks?surah=${ayah.surahNumber}&ayah=${ayah.ayahNumber}`,
+          { method: "DELETE" }
+        )
+        if (r.ok) setBookmarked(false)
+      } else {
+        const r = await fetch("/api/library/bookmarks", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            surahNumber: ayah.surahNumber,
+            ayahNumber: ayah.ayahNumber,
+            surahName: ayah.surahNameEn,
+            textArabic: ayah.textArabic,
+            translationEn: ayah.translationEn,
+            translationBn: ayah.translationBn,
+          }),
+        })
+        if (r.status === 401) {
+          const redirect = encodeURIComponent("/")
+          window.location.href = `/login?redirect=${redirect}&intent=ayah`
+          return
+        }
+        if (r.ok) setBookmarked(true)
+      }
+    } catch {
+      // Ignored
+    } finally {
+      setBookmarkBusy(false)
+    }
+  }
 
   return (
     <div className="rounded-2xl border border-neutral-200 bg-white p-5 dark:border-neutral-800 dark:bg-neutral-950">
       <div className="mb-3 flex items-center justify-between">
-        <h3 className="text-sm font-bold text-neutral-900 dark:text-white">Ayah of the Day</h3>
+        <div className="flex items-center gap-2">
+          <h3 className="text-sm font-bold text-neutral-900 dark:text-white">Ayah of the Day</h3>
+          <span className="rounded border border-neutral-300 px-1.5 py-0.5 text-[10px] font-bold text-neutral-600 dark:border-neutral-700 dark:text-neutral-400">
+            আজকের আয়াত
+          </span>
+        </div>
         <button
-          onClick={load}
-          disabled={loading}
-          aria-label="Load another ayah"
-          className="rounded-lg p-1.5 text-neutral-400 transition-colors hover:bg-neutral-100 hover:text-neutral-900 disabled:opacity-40 dark:hover:bg-neutral-900 dark:hover:text-white"
+          onClick={toggleBookmark}
+          disabled={!ayah || bookmarkBusy}
+          aria-label={bookmarked ? "Remove bookmark" : "Bookmark this ayah"}
+          title={bookmarked ? "বুকমার্ক থেকে সরান" : "আজকের আয়াতটি বুকমার্ক করুন"}
+          className={`rounded-lg p-1.5 transition-colors disabled:opacity-40 ${
+            bookmarked
+              ? "text-neutral-900 dark:text-white"
+              : "text-neutral-400 hover:bg-neutral-100 hover:text-neutral-900 dark:hover:bg-neutral-900 dark:hover:text-white"
+          }`}
         >
-          <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
+          {bookmarked ? <BookmarkCheck className="h-3.5 w-3.5" /> : <Bookmark className="h-3.5 w-3.5" />}
         </button>
       </div>
 
@@ -90,10 +130,10 @@ export function AyahOfTheDay() {
             </p>
           )}
           <Link
-            href={`/quran/${surahNumber}#ayah-${ayah.numberInSurah}`}
+            href={`/quran/${ayah.surahNumber}#ayah-${ayah.ayahNumber}`}
             className="text-xs font-semibold text-neutral-900 underline-offset-2 hover:underline dark:text-white"
           >
-            Surah {surahNumber}, Ayah {ayah.numberInSurah} →
+            সূরা {ayah.surahNameBn} ({ayah.surahNameEn}) — {ayah.surahNumber}:{ayah.ayahNumber} →
           </Link>
         </div>
       ) : null}

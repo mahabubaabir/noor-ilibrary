@@ -203,5 +203,19 @@ export const alQuranCloudProvider: ContentProvider = {
     }
   },
 
+  async getAyah(surahNumber: number, ayahNumber: number): Promise<Ayah | null> {
+    // Deterministic single-ayah fetch used by the daily-ayah engine. Ayah text
+    // is immutable, so it is safe to cache per reference for the long TTL.
+    return withCache(`provider:alquran:ayah:${surahNumber}:${ayahNumber}`, TTL_QURAN, async () => {
+      const results = await fetchJson<AlquranEditionResult[]>(
+        `/ayah/${surahNumber}:${ayahNumber}/editions/${EDITION_AR},${EDITION_EN},${EDITION_BN}`,
+      )
+      const ayah = mergeEditions(results)[0]
+      if (!ayah) return null
+      ayah.surahNumber = surahNumber
+      return ayah
+    })
+  },
+
   getTafsirChapter: async () => null,
 }

@@ -1,7 +1,7 @@
 import React from "react"
 import Link from "next/link"
 import { BookOpen, Users } from "lucide-react"
-import { CompanionsGeometricGrid } from "@/components/companions/companions-geometric-grid"
+import { CompanionsNeuralCosmos } from "@/components/companions/companions-neural-cosmos"
 import { client } from "@/sanity/lib/client"
 import { companionsQuery } from "@/sanity/lib/queries"
 
@@ -48,9 +48,9 @@ export default async function CompanionsPage() {
         </div>
       </div>
 
-      {/* Interactive Companions Experience Widget */}
+      {/* Interactive Companions Neural 3D Cosmos (only view option) */}
       <div className="mb-12">
-        <CompanionsGeometricGrid initialCompanions={initialCompanions} />
+        <CompanionsNeuralCosmos initialCompanions={initialCompanions} />
       </div>
     </div>
   )

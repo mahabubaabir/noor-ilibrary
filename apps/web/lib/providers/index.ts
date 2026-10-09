@@ -40,6 +40,8 @@ export const content = {
     withFallback((p) => p.search(query, language)),
   audioEditions: () => withFallback((p) => p.getAudioEditions()),
   randomAyah: () => withFallback((p) => p.getRandomAyah()),
+  ayah: (surahNumber: number, ayahNumber: number) =>
+    withFallback((p) => p.getAyah(surahNumber, ayahNumber)),
   tafsir: (surahNumber: number, language: TranslationLanguage) =>
     withFallback((p) => p.getTafsirChapter(surahNumber, language)),
 }
