@@ -160,7 +160,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="relative min-h-screen bg-white transition-colors dark:bg-black">
+    <div className="relative min-h-screen transition-colors dark:bg-black">
       {/* 1. Full-Screen Cinematic Hero with Calligraphy & Reciter Audio */}
       <CinematicHero />
 

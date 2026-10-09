@@ -33,6 +33,8 @@ export interface PrayerTimesData {
     nameEn: string
     nameBn: string
   }
+  /** True when the current date is Friday (Jummah) at the selected location */
+  isJummah?: boolean
   meta: {
     methodName: string
     source: string
@@ -52,6 +54,32 @@ export const PRAYER_NAMES: Record<string, { bn: string; ar: string }> = {
   Midnight: { bn: "মধ্যরাত", ar: "منتصف الليل" },
   Sunset: { bn: "সূর্যাস্ত", ar: "الغروب" },
   Zawal: { bn: "জাওয়াল", ar: "الاستواء" },
+}
+
+// On Fridays the Dhuhr slot is observed as Jummah (Friday congregational prayer).
+export const JUMMAH_NAMES: { bn: string; ar: string } = { bn: "জুমআ", ar: "الجمعة" }
+
+// True when `now` falls on a Friday in the target location's timezone.
+export function isJummahDay(now: Date = new Date(), targetTimezone?: string): boolean {
+  try {
+    const weekday = new Intl.DateTimeFormat("en-US", {
+      weekday: "short",
+      timeZone: targetTimezone || undefined,
+    }).format(now)
+    return weekday === "Fri"
+  } catch {
+    // Invalid timezone: fall back to the runtime's local weekday
+    return now.getDay() === 5
+  }
+}
+
+// Display names honouring the Jummah substitution for the Dhuhr slot.
+export function getPrayerDisplayName(
+  key: string,
+  isJummah: boolean
+): { bn: string; ar: string } {
+  if (isJummah && key === "Dhuhr") return JUMMAH_NAMES
+  return PRAYER_NAMES[key] ?? { bn: key, ar: "" }
 }
 
 export interface ProhibitedWindow {
@@ -253,14 +281,16 @@ export function calculateNextPrayer(
 
   const remainingFormatted = `${hrs > 0 ? `${hrs}h ` : ""}${mins}m ${secs}s`
 
+  const jummah = isJummahDay(now, targetTimezone)
+
   return {
     currentPrayer: {
       nameEn: currentPrayer,
-      nameBn: currentPrayer ? PRAYER_NAMES[currentPrayer]?.bn || currentPrayer : "ওয়াক্তের বিরতি",
+      nameBn: currentPrayer ? getPrayerDisplayName(currentPrayer, jummah).bn || currentPrayer : "ওয়াক্তের বিরতি",
     },
     nextPrayer: {
       nameEn: nextPrayer.name,
-      nameBn: PRAYER_NAMES[nextPrayer.name]?.bn || nextPrayer.name,
+      nameBn: getPrayerDisplayName(nextPrayer.name, jummah).bn || nextPrayer.name,
       time: nextPrayer.time,
       remainingSeconds,
       remainingFormatted,
@@ -306,6 +336,7 @@ export function getOfflinePrayerFallback(city = "Dhaka", country = "Bangladesh")
     timings,
     currentPrayer,
     nextPrayer,
+    isJummah: isJummahDay(now, "Asia/Dhaka"),
     meta: {
       methodName: "ইসলামিক ফাউন্ডেশন পদ্ধতি",
       source: "স্ট্যান্ডার্ড ওয়াক্ত",

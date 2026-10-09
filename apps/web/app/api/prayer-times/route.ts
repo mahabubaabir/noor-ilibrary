@@ -4,6 +4,7 @@ import {
   calculateNextPrayer,
   cleanTimeStr,
   getOfflinePrayerFallback,
+  isJummahDay,
   type PrayerTimesData,
 } from '@/lib/prayer-times'
 
@@ -50,6 +51,7 @@ interface AladhanResponse {
       readable: string
       gregorian: {
         date: string
+        day: string
         weekday: { en: string }
         month: { en: string }
         year: string
@@ -183,6 +185,9 @@ export async function GET(request: Request) {
 
     const timezone = d.meta.timezone || 'Asia/Dhaka'
     const now = new Date()
+    // Aladhan's weekday is tied to the requested location/date; the timezone
+    // check is a belt-and-braces fallback.
+    const isJummah = d.date.gregorian.weekday.en === 'Friday' || isJummahDay(now, timezone)
     const { currentPrayer, nextPrayer } = calculateNextPrayer(cleanTimings, now, timezone)
 
     const displayCity = lat && lng
@@ -193,7 +198,7 @@ export async function GET(request: Request) {
       city: displayCity,
       country,
       date: {
-        gregorian: `${d.date.gregorian.weekday.en}, ${d.date.gregorian.month.en} ${d.date.gregorian.year}`,
+        gregorian: `${d.date.gregorian.weekday.en}, ${d.date.gregorian.day} ${d.date.gregorian.month.en} ${d.date.gregorian.year}`,
         hijri: {
           day: d.date.hijri.day,
           monthEn: d.date.hijri.month.en,
@@ -204,6 +209,7 @@ export async function GET(request: Request) {
       timings: cleanTimings,
       currentPrayer,
       nextPrayer,
+      isJummah,
       meta: {
         methodName: d.meta.method.name || 'Islamic Foundation',
         source: 'স্ট্যান্ডার্ড ওয়াক্ত',

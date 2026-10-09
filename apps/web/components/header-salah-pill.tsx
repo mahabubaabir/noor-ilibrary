@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react"
 import { Clock } from "lucide-react"
-import { PRAYER_NAMES, formatTo12Hour, type PrayerTimesData } from "@/lib/prayer-times"
+import { formatTo12Hour, getPrayerDisplayName, type PrayerTimesData } from "@/lib/prayer-times"
 
 export function HeaderSalahPill() {
   const [data, setData] = useState<PrayerTimesData | null>(null)
@@ -20,7 +20,9 @@ export function HeaderSalahPill() {
 
   if (!data?.nextPrayer) return null
 
-  const nextName = PRAYER_NAMES[data.nextPrayer.nameEn]?.bn || data.nextPrayer.nameEn
+  const nextName =
+    getPrayerDisplayName(data.nextPrayer.nameEn, data.isJummah ?? false).bn ||
+    data.nextPrayer.nameEn
   const formattedTime = formatTo12Hour(data.nextPrayer.time)
 
   return (

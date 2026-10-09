@@ -18,9 +18,10 @@ import {
 import {
   type PrayerTimesData,
   type ProhibitedWindow,
-  PRAYER_NAMES,
   formatTo12Hour,
   calculateNextPrayer,
+  getPrayerDisplayName,
+  isJummahDay,
   toBengaliNumerals,
   getOfflinePrayerFallback,
   getProhibitedWindows,
@@ -268,10 +269,19 @@ export function SalahTimeWidget() {
     return () => clearInterval(timer)
   }, [data?.timings, data?.meta?.timezone])
 
+  // Jummah: on Fridays the Dhuhr slot is observed as Jummah. The API supplies
+  // isJummah; pre-seeded fallback data re-derives it from the location timezone.
+  const isJummah = data?.isJummah ?? isJummahDay(new Date(), data?.meta?.timezone)
+
   const prayersList = [
     { key: "Fajr", nameBn: "ফজর", nameAr: "الفجر", isFard: true },
     { key: "Sunrise", nameBn: "সূর্যোদয়", nameAr: "الشروق", isSunrise: true, isFard: false },
-    { key: "Dhuhr", nameBn: "যোহর", nameAr: "الظهر", isFard: true },
+    {
+      key: "Dhuhr",
+      nameBn: isJummah ? "জুমআ" : "যোহর",
+      nameAr: isJummah ? "الجمعة" : "الظهر",
+      isFard: true,
+    },
     { key: "Asr", nameBn: "আসর", nameAr: "العصر", isFard: true },
     { key: "Maghrib", nameBn: "মাগরিব", nameAr: "المغرب", isFard: true },
     { key: "Isha", nameBn: "ইশা", nameAr: "العشاء", isFard: true },
@@ -467,7 +477,7 @@ export function SalahTimeWidget() {
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-xs font-bold text-neutral-900 dark:text-white">
-                  পরবর্তী ওয়াক্ত: {PRAYER_NAMES[nextPrayerKey]?.bn || nextPrayerKey}
+                  পরবর্তী ওয়াক্ত: {getPrayerDisplayName(nextPrayerKey, isJummah).bn || nextPrayerKey}
                 </span>
                 <span className="rounded-md border border-neutral-300 px-1.5 py-0.2 text-[10px] font-mono font-semibold text-neutral-700 dark:border-neutral-700 dark:text-neutral-300">
                   {data?.timings ? formatTo12Hour(data.timings[nextPrayerKey as keyof typeof data.timings] || "") : "--:--"}
