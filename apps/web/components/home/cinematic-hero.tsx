@@ -231,7 +231,7 @@ export function CinematicHero() {
   }
 
   return (
-    <div className="relative flex min-h-[92vh] w-full flex-col justify-between overflow-hidden border-b border-neutral-200 text-neutral-900 select-none dark:border-neutral-800 dark:bg-neutral-950 dark:text-white">
+    <div className="relative flex min-h-[92vh] w-full flex-col justify-between overflow-hidden border-b border-neutral-200 text-neutral-900 select-none dark:border-neutral-800 dark:text-white">
       {/* Background Subtle Monochrome Dust Canvas */}
       <canvas
         ref={canvasRef}
